@@ -7,7 +7,7 @@ package com.tongbanjie.tevent.store.config;
  * @author zixiao
  * @date 16/10/10
  */
-public class EventStoreConfig implements Cloneable {
+public class StoreConfig implements Cloneable {
 
     //数据库配置
 

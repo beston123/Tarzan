@@ -10,7 +10,7 @@ import com.tongbanjie.tevent.store.Result;
  * @author zixiao
  * @date 16/10/9
  */
-public interface MQStoreService<T extends MQMessage> {
+public interface StoreService<T extends MQMessage> {
 
     Result put(T mqMessage);
 

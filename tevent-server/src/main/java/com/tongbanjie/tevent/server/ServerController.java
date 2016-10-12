@@ -31,9 +31,9 @@ import com.tongbanjie.tevent.server.client.ClientManager;
 import com.tongbanjie.tevent.server.processer.ClientManageProcessor;
 import com.tongbanjie.tevent.server.processer.SendMessageProcessor;
 import com.tongbanjie.tevent.server.util.ServerUtils;
-import com.tongbanjie.tevent.store.DefaultEventStore;
-import com.tongbanjie.tevent.store.EventStore;
-import com.tongbanjie.tevent.store.config.EventStoreConfig;
+import com.tongbanjie.tevent.store.DefaultStoreManager;
+import com.tongbanjie.tevent.store.StoreManager;
+import com.tongbanjie.tevent.store.config.StoreConfig;
 import com.tongbanjie.tevent.store.util.DistributedIdGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +62,7 @@ public class ServerController {
     private final NettyClientConfig nettyClientConfig;
 
     //数据存储层配置
-    private final EventStoreConfig eventStoreConfig;
+    private final StoreConfig storeConfig;
 
     /********************** client manager ***********************/
     // 客户端连接管理
@@ -76,7 +76,7 @@ public class ServerController {
     private RecoverableRegistry serverRegistry;
 
     //事件存储
-    private EventStore eventStore;
+    private StoreManager storeManager;
 
     //远程通信层对象
     private RpcServer rpcServer;
@@ -97,12 +97,12 @@ public class ServerController {
     public ServerController(final ServerConfig serverConfig, //
                             final NettyServerConfig nettyServerConfig, //
                             final NettyClientConfig nettyClientConfig, //
-                            final EventStoreConfig eventStoreConfig //
+                            final StoreConfig storeConfig //
     ) {
         this.serverConfig = serverConfig;
         this.nettyServerConfig = nettyServerConfig;
         this.nettyClientConfig = nettyClientConfig;
-        this.eventStoreConfig = eventStoreConfig;
+        this.storeConfig = storeConfig;
 
         this.clientManager = new ClientManager();
         this.clientHousekeepingService = new ClientHousekeepingService(this);
@@ -122,8 +122,8 @@ public class ServerController {
 
         if (result) {
             try {
-                this.eventStore =
-                        new DefaultEventStore(this.eventStoreConfig, this.serverConfig);
+                this.storeManager =
+                        new DefaultStoreManager(this.storeConfig);
             }
             catch (IOException e) {
                 result = false;
@@ -131,7 +131,7 @@ public class ServerController {
             }
         }
 
-        result = result && this.eventStore.load();
+        result = result && this.storeManager.load();
 
         if (result) {
             this.rpcServer = new NettyRpcServer(this.nettyServerConfig, this.clientHousekeepingService);
@@ -192,8 +192,8 @@ public class ServerController {
             this.rpcServer.shutdown();
         }
 
-        if (this.eventStore != null) {
-            this.eventStore.shutdown();
+        if (this.storeManager != null) {
+            this.storeManager.shutdown();
         }
 
         if (this.sendMessageExecutor != null) {
@@ -211,8 +211,8 @@ public class ServerController {
     }
 
     public void start() throws Exception {
-        if (this.eventStore != null) {
-            this.eventStore.start();
+        if (this.storeManager != null) {
+            this.storeManager.start();
         }
 
         if (this.rpcServer != null) {
@@ -237,8 +237,8 @@ public class ServerController {
         return nettyClientConfig;
     }
 
-    public EventStoreConfig getEventStoreConfig() {
-        return eventStoreConfig;
+    public StoreConfig getStoreConfig() {
+        return storeConfig;
     }
 
     public ClientManager getClientManager() {
@@ -249,8 +249,8 @@ public class ServerController {
         return serverRegistry;
     }
 
-    public EventStore getEventStore() {
-        return eventStore;
+    public StoreManager getStoreManager() {
+        return storeManager;
     }
 
     public RpcServer getRpcServer() {

@@ -2,9 +2,8 @@ package com.tongbanjie.tevent.store.service;
 
 import com.tongbanjie.tevent.common.message.MQMessage;
 import com.tongbanjie.tevent.common.message.RocketMQMessage;
-import com.tongbanjie.tevent.store.EventStore;
 import com.tongbanjie.tevent.store.Result;
-import com.tongbanjie.tevent.store.config.EventStoreConfig;
+import com.tongbanjie.tevent.store.config.StoreConfig;
 import com.tongbanjie.tevent.store.util.DistributedIdGenerator;
 
 import java.util.Map;
@@ -17,15 +16,15 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author zixiao
  * @date 16/10/9
  */
-public class RocketMQStoreService implements MQStoreService<RocketMQMessage> {
+public class RocketMQStoreService implements StoreService<RocketMQMessage> {
 
     //模拟数据库
     private static Map<Long /*storeId*/, MQMessage> storage = new ConcurrentHashMap<Long, MQMessage>();
 
-    private EventStoreConfig eventStoreConfig;
+    private StoreConfig storeConfig;
 
-    public RocketMQStoreService(EventStoreConfig eventStoreConfig){
-        this.eventStoreConfig = eventStoreConfig;
+    public RocketMQStoreService(StoreConfig storeConfig){
+        this.storeConfig = storeConfig;
     }
 
     @Override

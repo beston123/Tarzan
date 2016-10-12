@@ -1,6 +1,6 @@
 package com.tongbanjie.tevent.store;
 
-import com.tongbanjie.tevent.store.service.MQStoreService;
+import com.tongbanjie.tevent.store.service.StoreService;
 
 /**
  * 〈一句话功能简述〉<p>
@@ -9,7 +9,7 @@ import com.tongbanjie.tevent.store.service.MQStoreService;
  * @author zixiao
  * @date 16/10/10
  */
-public interface EventStore {
+public interface StoreManager {
 
     boolean load();
 
@@ -17,6 +17,6 @@ public interface EventStore {
 
     void shutdown();
 
-    MQStoreService getMQStoreService();
+    StoreService getStoreService();
 
 }

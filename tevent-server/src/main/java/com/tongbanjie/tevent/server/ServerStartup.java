@@ -19,7 +19,7 @@ package com.tongbanjie.tevent.server;
 import com.tongbanjie.tevent.rpc.netty.NettyClientConfig;
 import com.tongbanjie.tevent.rpc.netty.NettyServerConfig;
 import com.tongbanjie.tevent.rpc.netty.NettySystemConfig;
-import com.tongbanjie.tevent.store.config.EventStoreConfig;
+import com.tongbanjie.tevent.store.config.StoreConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +54,7 @@ public class ServerStartup {
             final NettyServerConfig nettyServerConfig = new NettyServerConfig();
             final NettyClientConfig nettyClientConfig = new NettyClientConfig();
 
-            final EventStoreConfig eventStoreConfig = new EventStoreConfig();
+            final StoreConfig storeConfig = new StoreConfig();
 
             if (serverConfig.getServerId() < 0 || serverConfig.getServerId() > 31) {
                 System.out.println("ServerId must between 0 and 31");
@@ -65,7 +65,7 @@ public class ServerStartup {
                 serverConfig, //
                 nettyServerConfig, //
                 nettyClientConfig, //
-                    eventStoreConfig
+                    storeConfig
                 );
             boolean initResult = controller.initialize();
             if (!initResult) {

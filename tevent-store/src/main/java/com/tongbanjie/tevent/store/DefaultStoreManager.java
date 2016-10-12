@@ -1,8 +1,8 @@
 package com.tongbanjie.tevent.store;
 
 import com.tongbanjie.tevent.common.message.MQType;
-import com.tongbanjie.tevent.store.config.EventStoreConfig;
-import com.tongbanjie.tevent.store.service.MQStoreService;
+import com.tongbanjie.tevent.store.config.StoreConfig;
+import com.tongbanjie.tevent.store.service.StoreService;
 import com.tongbanjie.tevent.store.service.RocketMQStoreService;
 
 import java.io.IOException;
@@ -16,19 +16,19 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author zixiao
  * @date 16/10/10
  */
-public class DefaultEventStore implements EventStore {
+public class DefaultStoreManager implements StoreManager {
 
-    private EventStoreConfig eventStoreConfig;
+    private StoreConfig storeConfig;
 
-    private Map<MQType, MQStoreService> mqStoreServiceMap = new ConcurrentHashMap<MQType, MQStoreService>();
+    private Map<MQType, StoreService> mqStoreServiceMap = new ConcurrentHashMap<MQType, StoreService>();
 
-    public DefaultEventStore(EventStoreConfig eventStoreConfig) throws IOException{
-        this.eventStoreConfig = eventStoreConfig;
+    public DefaultStoreManager(StoreConfig storeConfig) throws IOException{
+        this.storeConfig = storeConfig;
     }
 
     @Override
     public boolean load() {
-        mqStoreServiceMap.put(MQType.ROCKET_MQ, new RocketMQStoreService(this.eventStoreConfig));
+        mqStoreServiceMap.put(MQType.ROCKET_MQ, new RocketMQStoreService(this.storeConfig));
         return true;
     }
 
@@ -43,7 +43,7 @@ public class DefaultEventStore implements EventStore {
     }
 
     @Override
-    public MQStoreService getMQStoreService() {
+    public StoreService getStoreService() {
         return mqStoreServiceMap.get(MQType.ROCKET_MQ);
     }
 

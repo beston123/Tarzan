@@ -21,9 +21,15 @@ public class NettySystemConfig {
 
     public static boolean NettyPooledByteBufAllocatorEnable = false;
 
-    public static final int SocketSndbufSize = 65535;
+    public static final String SystemPropertySocketSndbufSize = //
+            "tevent.socket.sndbuf.size";
 
-    public static final int SocketRcvbufSize = 65535;
+    public static final String SystemPropertySocketRcvbufSize = //
+            "tevent.socket.rcvbuf.size";
+
+    public static int SocketSndbufSize = 65535;
+
+    public static int SocketRcvbufSize = 65535;
 
     public static int ClientAsyncSemaphoreValue = 2048;
 
