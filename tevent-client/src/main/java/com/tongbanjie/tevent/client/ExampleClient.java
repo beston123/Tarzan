@@ -10,7 +10,6 @@ import com.tongbanjie.tevent.common.message.MQType;
 import com.tongbanjie.tevent.registry.Address;
 import com.tongbanjie.tevent.registry.RecoverableRegistry;
 import com.tongbanjie.tevent.registry.zookeeper.ClientZooKeeperRegistry;
-import com.tongbanjie.tevent.registry.zookeeper.ZooKeeperServiceRegistry;
 import com.tongbanjie.tevent.rpc.codec.SerializeType;
 import com.tongbanjie.tevent.rpc.exception.*;
 import com.tongbanjie.tevent.rpc.netty.NettyClientConfig;
