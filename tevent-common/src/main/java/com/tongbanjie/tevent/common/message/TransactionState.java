@@ -1,4 +1,4 @@
-package com.tongbanjie.tevent.common;
+package com.tongbanjie.tevent.common.message;
 
 /**
  * 事务状态 <p>

@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 〈一句话功能简述〉<p>
@@ -21,7 +20,7 @@ public class ServerZooKeeperRegistry extends AbstractZooKeeperRegistry{
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerZooKeeperRegistry.class);
 
     //已发现的地址
-    protected final List<Address> discovered = new CopyOnWriteArrayList<Address>();
+    protected List<Address> discovered = new ArrayList<Address>();
 
     private Random random = new Random();
 
@@ -69,21 +68,24 @@ public class ServerZooKeeperRegistry extends AbstractZooKeeperRegistry{
                 addressOnZk.add(address);
             }
         }
+        // 2 更新本地列表
+        discovered = addressOnZk;
 
-        Iterator<Address> iterator = discovered.iterator();
-        //2 剔除已经失效的节点
-        while(iterator.hasNext()){
-            Address address = iterator.next();
-            if(!addressOnZk.contains(address)){
-                iterator.remove();
-            }
-        }
-        //3 添加 新增的节点
-        for(Address address : addressOnZk){
-            if(!discovered.contains(address)){
-                discovered.add(address);
-            }
-        }
+//        Iterator<Address> iterator = discovered.iterator();
+//        //2 剔除已经失效的节点
+//        while(iterator.hasNext()){
+//            Address address = iterator.next();
+//            if(!addressOnZk.contains(address)){
+//                iterator.remove();
+//            }
+//        }
+//        //3 添加 新增的节点
+//        for(Address address : addressOnZk){
+//            if(!discovered.contains(address)){
+//                discovered.add(address);
+//            }
+//        }
+
     }
 
 }

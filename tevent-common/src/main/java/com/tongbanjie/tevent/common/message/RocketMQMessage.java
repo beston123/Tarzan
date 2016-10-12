@@ -1,6 +1,5 @@
 package com.tongbanjie.tevent.common.message;
 
-import com.tongbanjie.tevent.common.TransactionState;
 import com.tongbanjie.tevent.common.body.RocketMQBody;
 
 import java.util.Date;

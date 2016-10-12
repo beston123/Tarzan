@@ -7,7 +7,7 @@ import com.alibaba.rocketmq.client.producer.MQProducer;
 import com.alibaba.rocketmq.client.producer.SendResult;
 import com.alibaba.rocketmq.common.message.Message;
 import com.alibaba.rocketmq.remoting.exception.RemotingException;
-import com.tongbanjie.tevent.common.TransactionState;
+import com.tongbanjie.tevent.common.message.TransactionState;
 import com.tongbanjie.tevent.common.message.RocketMQMessage;
 import com.tongbanjie.tevent.rpc.exception.RpcCommandException;
 import com.tongbanjie.tevent.rpc.protocol.ResponseCode;
@@ -17,14 +17,13 @@ import com.tongbanjie.tevent.common.body.RocketMQBody;
 import com.tongbanjie.tevent.rpc.protocol.header.TransactionMessageHeader;
 import com.tongbanjie.tevent.server.ServerController;
 import com.tongbanjie.tevent.store.Result;
-import com.tongbanjie.tevent.store.service.RocketMQStoreService;
+import com.tongbanjie.tevent.store.service.MQStoreService;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -39,21 +38,20 @@ public class RocketMQProducer implements EventProducer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RocketMQProducer.class);
 
-    private Map<String/* Group */, MQProducer> producerTable = new ConcurrentHashMap<String, MQProducer>();
+    private final Map<String/* Group */, MQProducer> producerTable = new ConcurrentHashMap<String, MQProducer>();
 
-    private AtomicLong atomicLong = new AtomicLong(0);
+    private final Lock lock = new ReentrantLock();
 
-    private Lock lock = new ReentrantLock();
-
-    private String ROCKET_MQ_ADDRESS = "192.168.1.42:9876";
-
-    private RocketMQStoreService rocketMQStoreService = new RocketMQStoreService();
+    private MQStoreService mQStoreService;
 
     private ServerController serverController;
 
+    private String namesrvAddr;
+
     public RocketMQProducer(ServerController serverController) {
         this.serverController = serverController;
-        rocketMQStoreService = new RocketMQStoreService();
+        this.mQStoreService = this.serverController.getEventStore().getMQStoreService();
+        this.namesrvAddr = this.serverController.getServerConfig().getRocketMQNamesrv();
     }
 
     @Override
@@ -103,11 +101,7 @@ public class RocketMQProducer implements EventProducer {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-//        for(MQProducer mqProducer : producerTable.values()){
-//            DefaultMQProducer mqProducer1 = (DefaultMQProducer) mqProducer;
-//            LOGGER.debug("Group {} client {}", mqProducer1.getProducerGroup(),
-//                    mqProducer1.getDefaultMQProducerImpl().getmQClientFactory().getMQClientAPIImpl().getRemotingClient());
-//        }
+
         return null;
     }
 
@@ -120,7 +114,7 @@ public class RocketMQProducer implements EventProducer {
         RocketMQMessage mqMessage = RocketMQMessage.build(mqBody, TransactionState.PREPARE);
 
         //持久化 消息
-        Result<Long> putResult = rocketMQStoreService.put(mqMessage);
+        Result<Long> putResult = mQStoreService.put(mqMessage);
         if(putResult.isSuccess()){
             Long tid = putResult.getData();
 
@@ -145,7 +139,7 @@ public class RocketMQProducer implements EventProducer {
         final RpcCommand response;
         final RocketMQBody newMqBody = request.getBody(RocketMQBody.class);
 
-        Result<RocketMQMessage> getResult = rocketMQStoreService.get(transactionId);
+        Result<RocketMQMessage> getResult = mQStoreService.get(transactionId);
         if(getResult.isSuccess()){
             if(getResult.getData() == null){
                 response = RpcCommandBuilder.buildResponse(ResponseCode.NOT_EXIST, "该事务消息不存在");
@@ -153,8 +147,9 @@ public class RocketMQProducer implements EventProducer {
             }else{
                 RocketMQMessage mqMessage = getResult.getData();
                 if(newMqBody.getMessageBody() != null){
-                    //TODO 更新消息体
                     mqMessage.setMessageBody(newMqBody.getMessageBody());
+                    //更新消息体
+                    mQStoreService.update(transactionId, mqMessage);
                 }
                 //发送消息
                 sendMessage(newMqBody);
@@ -173,7 +168,7 @@ public class RocketMQProducer implements EventProducer {
     @Override
     public RpcCommand rollbackMessage(ChannelHandlerContext ctx, RpcCommand request, Long transactionId) {
         final RpcCommand response;
-        Result<RocketMQMessage> getResult = rocketMQStoreService.get(transactionId);
+        Result<RocketMQMessage> getResult = mQStoreService.get(transactionId);
         if(getResult.isSuccess()){
             if(getResult.getData() == null){
                 response = RpcCommandBuilder.buildResponse(ResponseCode.NOT_EXIST, "该事务消息不存在");
@@ -206,7 +201,7 @@ public class RocketMQProducer implements EventProducer {
             }
 
             DefaultMQProducer producer = new DefaultMQProducer(group);
-            producer.setNamesrvAddr(ROCKET_MQ_ADDRESS);
+            producer.setNamesrvAddr(namesrvAddr);
             producer.start();
 
             producerTable.put(group, producer);

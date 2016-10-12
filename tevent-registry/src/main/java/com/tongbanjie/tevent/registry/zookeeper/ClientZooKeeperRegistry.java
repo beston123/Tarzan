@@ -7,10 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 〈一句话功能简述〉<p>
@@ -24,7 +22,7 @@ public class ClientZooKeeperRegistry extends AbstractZooKeeperRegistry {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientZooKeeperRegistry.class);
 
     //已发现的地址
-    protected final List<Address> discoveredServers = new CopyOnWriteArrayList<Address>();
+    protected List<Address> discovered = new ArrayList<Address>();
 
     private Random random = new Random();
 
@@ -41,18 +39,23 @@ public class ClientZooKeeperRegistry extends AbstractZooKeeperRegistry {
 
     @Override
     public Address discover() {
-        int size = discoveredServers.size();
+        return doDiscover();
+    }
+
+    private Address doDiscover(){
+        int size = discovered.size();
         Address address = null;
         if(size == 0){
             LOGGER.warn("Can not find a server.");
-            return null;
+            //return null;
+            throw new RuntimeException(">>>>>>>>Can not find a server.");
         }else if(size == 1) {
             // 若只有一个地址，则获取该地址
-            address = discoveredServers.get(0);
+            address = discovered.get(0);
         } else {
             // 若存在多个地址，则随机获取一个地址
             // TODO 此处要做负载均衡
-            address = discoveredServers.get(random.nextInt(size));
+            address = discovered.get(random.nextInt(size));
         }
         LOGGER.debug("Find a server {}", address);
         return address;
@@ -61,31 +64,19 @@ public class ClientZooKeeperRegistry extends AbstractZooKeeperRegistry {
     @Override
     protected void updateDiscovered(List<String> childrenPathList){
         if (CollectionUtils.isEmpty(childrenPathList)) {
-            discoveredServers.clear();
+            discovered.clear();
             return;
         }
         // 1 获取所用子节点的数据
-        List<Address> addressOnZk = new ArrayList<Address>(childrenPathList.size());
+        List<Address> addressOnZk = new ArrayList<Address>();
         for(String childPath : childrenPathList){
             Address address = zkClient.readData(this.getDiscoverPath() + "/" + childPath, true);
             if(address != null){
                 addressOnZk.add(address);
             }
         }
-
-        Iterator<Address> iterator = discoveredServers.iterator();
-        //2 剔除已经失效的节点
-        while(iterator.hasNext()){
-            Address address = iterator.next();
-            if(!addressOnZk.contains(address)){
-                iterator.remove();
-            }
-        }
-        //3 添加 新增的节点
-        for(Address address : addressOnZk){
-            if(!discoveredServers.contains(address)){
-                discoveredServers.add(address);
-            }
-        }
+        // 2 更新本地列表
+        discovered = addressOnZk;
     }
+
 }

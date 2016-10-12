@@ -3,10 +3,9 @@ package com.tongbanjie.tevent.client;
 import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.common.message.Message;
 import com.tongbanjie.tevent.client.validator.RocketMQValidators;
-import com.tongbanjie.tevent.common.TransactionState;
 import com.tongbanjie.tevent.common.body.RocketMQBody;
-import com.tongbanjie.tevent.common.config.ServerConfig;
 import com.tongbanjie.tevent.common.message.MQType;
+import com.tongbanjie.tevent.common.message.TransactionState;
 import com.tongbanjie.tevent.registry.Address;
 import com.tongbanjie.tevent.registry.RecoverableRegistry;
 import com.tongbanjie.tevent.registry.zookeeper.ClientZooKeeperRegistry;
@@ -36,8 +35,6 @@ import java.util.concurrent.*;
  *
  * @author zixiao
  * @date 16/9/29
- * @see [相关类/方法]（可选）
- * @since [产品/模块版本] （可选）
  */
 public class ExampleClient {
 
@@ -47,7 +44,7 @@ public class ExampleClient {
 
     private RecoverableRegistry clientRegistry;
 
-    private ServerConfig serverConfig = new ServerConfig();
+    private ClientConfig clientConfig = new ClientConfig();
 
     private String producerGroup = "ExampleClientGroup";
 
@@ -66,7 +63,7 @@ public class ExampleClient {
     });
 
     public void init(){
-        clientRegistry = new ClientZooKeeperRegistry(serverConfig.getRegistryAddress());
+        clientRegistry = new ClientZooKeeperRegistry(clientConfig.getRegistryAddress());
         try {
             clientRegistry.start();
         } catch (Exception e) {

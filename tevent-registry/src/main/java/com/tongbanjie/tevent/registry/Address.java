@@ -17,6 +17,9 @@ public class Address implements Serializable{
      */
     private String address;
 
+    /**
+     * 权重
+     */
     private int weight;
 
     public Address(String ip, int port){

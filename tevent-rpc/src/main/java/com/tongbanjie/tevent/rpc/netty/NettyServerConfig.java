@@ -16,20 +16,22 @@
  */
 package com.tongbanjie.tevent.rpc.netty;
 
-/**
- * @author shijia.wxr
- */
+
 public class NettyServerConfig implements Cloneable{
-    private int listenPort = 9301;
+
+    private int listenPort = 7777;
+
     private int serverWorkerThreads = 8;
     private int serverCallbackExecutorThreads = 0;
     private int serverSelectorThreads = 3;
+
     private int serverOnewaySemaphoreValue = 256;
     private int serverAsyncSemaphoreValue = 64;
     private int serverChannelMaxIdleTimeSeconds = 120;
 
     private int serverSocketSndBufSize = NettySystemConfig.SocketSndbufSize;
     private int serverSocketRcvBufSize = NettySystemConfig.SocketRcvbufSize;
+
     private boolean serverPooledByteBufAllocatorEnable = true;
 
     /**

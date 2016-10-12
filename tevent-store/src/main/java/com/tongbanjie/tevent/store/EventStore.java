@@ -1,5 +1,7 @@
 package com.tongbanjie.tevent.store;
 
+import com.tongbanjie.tevent.store.service.MQStoreService;
+
 /**
  * 〈一句话功能简述〉<p>
  * 〈功能详细描述〉
@@ -14,4 +16,7 @@ public interface EventStore {
     void start() throws Exception;
 
     void shutdown();
+
+    MQStoreService getMQStoreService();
+
 }

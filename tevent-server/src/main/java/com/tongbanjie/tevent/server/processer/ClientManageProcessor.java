@@ -55,31 +55,6 @@ public class ClientManageProcessor implements NettyRequestProcessor {
         return null;
     }
 
-//    private List<ConsumeMessageHook> consumeMessageHookList;
-//
-//    public boolean hasConsumeMessageHook() {
-//        return consumeMessageHookList != null && !this.consumeMessageHookList.isEmpty();
-//    }
-//
-//
-//    public void registerConsumeMessageHook(List<ConsumeMessageHook> consumeMessageHookList) {
-//        this.consumeMessageHookList = consumeMessageHookList;
-//    }
-
-
-//    public void executeConsumeMessageHookAfter(final ConsumeMessageContext context) {
-//        if (hasConsumeMessageHook()) {
-//            for (ConsumeMessageHook hook : this.consumeMessageHookList) {
-//                try {
-//                    hook.consumeMessageAfter(context);
-//                }
-//                catch (Throwable e) {
-//                }
-//            }
-//        }
-//    }
-
-
     public RpcCommand unregisterClient(ChannelHandlerContext ctx, RpcCommand request)
             throws RpcCommandException {
         final RpcCommand response = RpcCommandBuilder.buildResponse();

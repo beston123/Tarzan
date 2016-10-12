@@ -16,7 +16,6 @@
  */
 package com.tongbanjie.tevent.server;
 
-import com.tongbanjie.tevent.common.config.ServerConfig;
 import com.tongbanjie.tevent.rpc.netty.NettyClientConfig;
 import com.tongbanjie.tevent.rpc.netty.NettyServerConfig;
 import com.tongbanjie.tevent.rpc.netty.NettySystemConfig;

@@ -17,8 +17,7 @@
 package com.tongbanjie.tevent.server;
 
 
-import com.tongbanjie.tevent.common.NamedThreadFactory;
-import com.tongbanjie.tevent.common.config.ServerConfig;
+import com.tongbanjie.tevent.common.ext.NamedThreadFactory;
 import com.tongbanjie.tevent.registry.Address;
 import com.tongbanjie.tevent.registry.RecoverableRegistry;
 import com.tongbanjie.tevent.registry.zookeeper.ServerZooKeeperRegistry;
@@ -145,9 +144,9 @@ public class ServerController {
                 this.sendThreadPoolQueue,//
                 new NamedThreadFactory("SendMessageThread_"));
 
-            this.clientManageExecutor =
-                    Executors.newFixedThreadPool(this.serverConfig.getClientManageThreadPoolNums(), new NamedThreadFactory(
-                            "ClientManageThread_"));
+            this.clientManageExecutor = Executors.newFixedThreadPool(
+                            this.serverConfig.getClientManageThreadPoolNums(),
+                            new NamedThreadFactory("ClientManageThread_"));
 
             this.registerProcessor();
 
@@ -166,8 +165,7 @@ public class ServerController {
                 serverRegistry.register(serverAddress);
             } catch (Exception e) {
                 result = false;
-                LOGGER.error("The registry connect failed, address: "+serverConfig.getRegistryAddress(), e);
-                e.printStackTrace();
+                LOGGER.error("The registry connect failed, address: " + serverConfig.getRegistryAddress(), e);
             }
         }
 
@@ -177,14 +175,12 @@ public class ServerController {
 
     public void registerProcessor() {
         SendMessageProcessor sendProcessor = new SendMessageProcessor(this);
-        //sendProcessor.registerSendMessageHook(sendMessageHookList);
 
         this.rpcServer.registerProcessor(RequestCode.SEND_MSG, sendProcessor, this.sendMessageExecutor);
         this.rpcServer.registerProcessor(RequestCode.TRANSACTION_MSG, sendProcessor, this.sendMessageExecutor);
 
-
         ClientManageProcessor clientProcessor = new ClientManageProcessor(this);
-//        clientProcessor.registerConsumeMessageHook(this.consumeMessageHookList);
+
         this.rpcServer.registerProcessor(RequestCode.HEART_BEAT, clientProcessor, this.clientManageExecutor);
         this.rpcServer.registerProcessor(RequestCode.UNREGISTER_CLIENT, clientProcessor, this.clientManageExecutor);
 

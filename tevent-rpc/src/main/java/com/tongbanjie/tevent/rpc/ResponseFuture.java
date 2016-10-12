@@ -17,7 +17,7 @@
 package com.tongbanjie.tevent.rpc;
 
 import com.tongbanjie.tevent.rpc.protocol.RpcCommand;
-import com.tongbanjie.tevent.common.OnceSemaphore;
+import com.tongbanjie.tevent.common.ext.OnceSemaphore;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;

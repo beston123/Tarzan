@@ -9,5 +9,6 @@ package com.tongbanjie.tevent.store.config;
  */
 public class EventStoreConfig implements Cloneable {
 
+    //数据库配置
 
 }

@@ -52,7 +52,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class NettyRpcServer extends NettyRpcAbstract implements RpcServer {
 
-    private static final Logger log = LoggerFactory.getLogger(NettyRpcServer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NettyRpcServer.class);
 
     /******************************** Netty *******************************/
     private final NettyServerConfig nettyServerConfig;
@@ -71,7 +71,7 @@ public class NettyRpcServer extends NettyRpcAbstract implements RpcServer {
     /******************************** 其他 *******************************/
     private RpcHook rpcHook;
 
-    private int port = 0;
+    private int port = 7777;
 
     public NettyRpcServer(final NettyServerConfig nettyServerConfig) {
         this(nettyServerConfig, null);
@@ -206,7 +206,7 @@ public class NettyRpcServer extends NettyRpcAbstract implements RpcServer {
                     NettyRpcServer.this.scanResponseTable();
                 }
                 catch (Exception e) {
-                    log.error("scanResponseTable exception", e);
+                    LOGGER.error("scanResponseTable exception", e);
                 }
             }
         }, 1000 * 3, 1000);
@@ -272,7 +272,7 @@ public class NettyRpcServer extends NettyRpcAbstract implements RpcServer {
             }
         }
         catch (Exception e) {
-            log.error("NettyRpcClientServer shutdown exception, ", e);
+            LOGGER.error("NettyRpcClientServer shutdown exception, ", e);
         }
 
         if (this.publicExecutor != null) {
@@ -280,7 +280,7 @@ public class NettyRpcServer extends NettyRpcAbstract implements RpcServer {
                 this.publicExecutor.shutdown();
             }
             catch (Exception e) {
-                log.error("NettyRpcClientServer shutdown exception, ", e);
+                LOGGER.error("NettyRpcClientServer shutdown exception, ", e);
             }
         }
     }
@@ -309,7 +309,7 @@ public class NettyRpcServer extends NettyRpcAbstract implements RpcServer {
         @Override
         public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
             final String remoteAddress = RpcHelper.parseChannelRemoteAddr(ctx.channel());
-            log.info("NETTY SERVER PIPELINE: channelRegistered {}", remoteAddress);
+            LOGGER.info("NETTY SERVER PIPELINE: channelRegistered {}", remoteAddress);
             super.channelRegistered(ctx);
         }
 
@@ -317,7 +317,7 @@ public class NettyRpcServer extends NettyRpcAbstract implements RpcServer {
         @Override
         public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
             final String remoteAddress = RpcHelper.parseChannelRemoteAddr(ctx.channel());
-            log.info("NETTY SERVER PIPELINE: channelUnregistered, the channel[{}]", remoteAddress);
+            LOGGER.info("NETTY SERVER PIPELINE: channelUnregistered, the channel[{}]", remoteAddress);
             super.channelUnregistered(ctx);
         }
 
@@ -325,7 +325,7 @@ public class NettyRpcServer extends NettyRpcAbstract implements RpcServer {
         @Override
         public void channelActive(ChannelHandlerContext ctx) throws Exception {
             final String remoteAddress = RpcHelper.parseChannelRemoteAddr(ctx.channel());
-            log.info("NETTY SERVER PIPELINE: channelActive, the channel[{}]", remoteAddress);
+            LOGGER.info("NETTY SERVER PIPELINE: channelActive, the channel[{}]", remoteAddress);
             super.channelActive(ctx);
 
             if (NettyRpcServer.this.channelEventListener != null) {
@@ -337,7 +337,7 @@ public class NettyRpcServer extends NettyRpcAbstract implements RpcServer {
         @Override
         public void channelInactive(ChannelHandlerContext ctx) throws Exception {
             final String remoteAddress = RpcHelper.parseChannelRemoteAddr(ctx.channel());
-            log.info("NETTY SERVER PIPELINE: channelInactive, the channel[{}]", remoteAddress);
+            LOGGER.info("NETTY SERVER PIPELINE: channelInactive, the channel[{}]", remoteAddress);
             super.channelInactive(ctx);
 
             if (NettyRpcServer.this.channelEventListener != null) {
@@ -352,7 +352,7 @@ public class NettyRpcServer extends NettyRpcAbstract implements RpcServer {
                 IdleStateEvent evnet = (IdleStateEvent) evt;
                 if (evnet.state().equals(IdleState.ALL_IDLE)) {
                     final String remoteAddress = RpcHelper.parseChannelRemoteAddr(ctx.channel());
-                    log.warn("NETTY SERVER PIPELINE: IDLE exception [{}]", remoteAddress);
+                    LOGGER.warn("NETTY SERVER PIPELINE: IDLE exception [{}]", remoteAddress);
                     RpcHelper.closeChannel(ctx.channel());
                     if (NettyRpcServer.this.channelEventListener != null) {
                         NettyRpcServer.this
@@ -368,8 +368,8 @@ public class NettyRpcServer extends NettyRpcAbstract implements RpcServer {
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
             final String remoteAddress = RpcHelper.parseChannelRemoteAddr(ctx.channel());
-            log.warn("NETTY SERVER PIPELINE: exceptionCaught {}", remoteAddress);
-            log.warn("NETTY SERVER PIPELINE: exceptionCaught exception.", cause);
+            LOGGER.warn("NETTY SERVER PIPELINE: exceptionCaught {}", remoteAddress);
+            LOGGER.warn("NETTY SERVER PIPELINE: exceptionCaught exception.", cause);
 
             if (NettyRpcServer.this.channelEventListener != null) {
                 NettyRpcServer.this.putNettyEvent(new NettyEvent(NettyEventType.EXCEPTION, remoteAddress.toString(), ctx.channel()));

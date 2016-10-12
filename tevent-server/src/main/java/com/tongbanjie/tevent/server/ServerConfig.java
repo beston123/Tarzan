@@ -14,14 +14,25 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.tongbanjie.tevent.common.config;
+package com.tongbanjie.tevent.server;
 
-public class ServerConfig {
+import com.tongbanjie.tevent.common.Constants;
 
+public class ServerConfig implements Cloneable{
+
+    /**
+     * 消息发送线程池大小
+     */
     private int sendMessageThreadPoolNums = 16 + Runtime.getRuntime().availableProcessors() * 4;
 
+    /**
+     * 客户端管理线程池大小
+     */
     private int clientManageThreadPoolNums = 16;
 
+    /**
+     * 消息发送线程池队列容量
+     */
     private int sendThreadPoolQueueCapacity = 100000;
 
     /**
@@ -32,33 +43,36 @@ public class ServerConfig {
     /**
      * 注册中心地址
      */
-    private String registryAddress =  System.getProperty("tevent.registry.address", "192.168.1.120:2181");
+    private String registryAddress = System.getProperty(Constants.TEVENT_REGISTRY_ADDRESS, "192.168.1.120:2181");
+
+    /**
+     * RocketMQ nameserv 地址
+     */
+    private String rocketMQNamesrv =  System.getProperty(Constants.TEVENT_ROCKETMQ_NAMESRV, "192.168.1.42:9876");
+
 
     public int getSendMessageThreadPoolNums() {
         return sendMessageThreadPoolNums;
     }
 
-
     public void setSendMessageThreadPoolNums(int sendMessageThreadPoolNums) {
         this.sendMessageThreadPoolNums = sendMessageThreadPoolNums;
-    }
-
-    public int getSendThreadPoolQueueCapacity() {
-        return sendThreadPoolQueueCapacity;
-    }
-
-
-    public void setSendThreadPoolQueueCapacity(int sendThreadPoolQueueCapacity) {
-        this.sendThreadPoolQueueCapacity = sendThreadPoolQueueCapacity;
     }
 
     public int getClientManageThreadPoolNums() {
         return clientManageThreadPoolNums;
     }
 
-
     public void setClientManageThreadPoolNums(int clientManageThreadPoolNums) {
         this.clientManageThreadPoolNums = clientManageThreadPoolNums;
+    }
+
+    public int getSendThreadPoolQueueCapacity() {
+        return sendThreadPoolQueueCapacity;
+    }
+
+    public void setSendThreadPoolQueueCapacity(int sendThreadPoolQueueCapacity) {
+        this.sendThreadPoolQueueCapacity = sendThreadPoolQueueCapacity;
     }
 
     public int getServerId() {
@@ -75,5 +89,13 @@ public class ServerConfig {
 
     public void setRegistryAddress(String registryAddress) {
         this.registryAddress = registryAddress;
+    }
+
+    public String getRocketMQNamesrv() {
+        return rocketMQNamesrv;
+    }
+
+    public void setRocketMQNamesrv(String rocketMQNamesrv) {
+        this.rocketMQNamesrv = rocketMQNamesrv;
     }
 }

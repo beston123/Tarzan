@@ -7,20 +7,20 @@ package com.tongbanjie.tevent.registry.zookeeper;
  * @author zixiao
  * @date 16/10/10
  */
-public interface ZkConstants {
+public abstract class ZkConstants {
 
-    int SESSION_TIMEOUT = 5000;
+    public static final int SESSION_TIMEOUT = 5000;
 
-    int CONNECTION_TIMEOUT = 3000;
+    public static final int CONNECTION_TIMEOUT = 3000;
 
-    String REGISTRY_ROOT = "/tevent";
+    public static final String REGISTRY_ROOT = "/tevent";
 
-    String SERVERS_ROOT = REGISTRY_ROOT + "/servers";
+    public static final String SERVERS_ROOT = REGISTRY_ROOT + "/servers";
 
-    String CLIENTS_ROOT = REGISTRY_ROOT + "/clients";
+    public static final String CLIENTS_ROOT = REGISTRY_ROOT + "/clients";
 
-    String SERVER_CHILD_PATH = SERVERS_ROOT + "/server-";
+    public static final String SERVER_CHILD_PATH = SERVERS_ROOT + "/server-";
 
-    String CLIENT_CHILD_PATH = CLIENTS_ROOT + "/client-";
+    public static final String CLIENT_CHILD_PATH = CLIENTS_ROOT + "/client-";
 
 }

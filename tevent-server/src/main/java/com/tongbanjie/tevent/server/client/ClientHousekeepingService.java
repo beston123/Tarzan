@@ -17,7 +17,7 @@
 package com.tongbanjie.tevent.server.client;
 
 
-import com.tongbanjie.tevent.common.NamedThreadFactory;
+import com.tongbanjie.tevent.common.ext.NamedThreadFactory;
 import com.tongbanjie.tevent.rpc.netty.ChannelEventListener;
 import com.tongbanjie.tevent.server.ServerController;
 import io.netty.channel.Channel;

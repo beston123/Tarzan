@@ -2,7 +2,9 @@ package com.tongbanjie.tevent.store.service;
 
 import com.tongbanjie.tevent.common.message.MQMessage;
 import com.tongbanjie.tevent.common.message.RocketMQMessage;
+import com.tongbanjie.tevent.store.EventStore;
 import com.tongbanjie.tevent.store.Result;
+import com.tongbanjie.tevent.store.config.EventStoreConfig;
 import com.tongbanjie.tevent.store.util.DistributedIdGenerator;
 
 import java.util.Map;
@@ -19,6 +21,12 @@ public class RocketMQStoreService implements MQStoreService<RocketMQMessage> {
 
     //模拟数据库
     private static Map<Long /*storeId*/, MQMessage> storage = new ConcurrentHashMap<Long, MQMessage>();
+
+    private EventStoreConfig eventStoreConfig;
+
+    public RocketMQStoreService(EventStoreConfig eventStoreConfig){
+        this.eventStoreConfig = eventStoreConfig;
+    }
 
     @Override
     public Result<Long> put(RocketMQMessage mqMessage) {
@@ -42,6 +50,19 @@ public class RocketMQStoreService implements MQStoreService<RocketMQMessage> {
         try {
             RocketMQMessage mqMessage = (RocketMQMessage)storage.get(storeId);
             result = Result.buildSucc(mqMessage);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result = Result.buildFail("", "", e.getMessage());
+        }
+        return result;
+    }
+
+    @Override
+    public Result update(Long storeId, RocketMQMessage mqMessage) {
+        Result<RocketMQMessage> result;
+        try {
+            RocketMQMessage newMqMessage = (RocketMQMessage)storage.put(storeId, mqMessage);
+            result = Result.buildSucc(newMqMessage);
         } catch (Exception e) {
             e.printStackTrace();
             result = Result.buildFail("", "", e.getMessage());

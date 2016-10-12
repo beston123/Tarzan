@@ -16,4 +16,6 @@ public interface MQStoreService<T extends MQMessage> {
 
     Result get(Long id);
 
+    Result update(Long id, T mqMessage);
+
 }

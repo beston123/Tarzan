@@ -1,7 +1,7 @@
 package com.tongbanjie.tevent.rpc.protocol.header;
 
 import com.tongbanjie.tevent.common.message.MQType;
-import com.tongbanjie.tevent.common.TransactionState;
+import com.tongbanjie.tevent.common.message.TransactionState;
 import com.tongbanjie.tevent.rpc.exception.RpcCommandException;
 
 

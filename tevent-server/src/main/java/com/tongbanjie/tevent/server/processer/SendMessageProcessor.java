@@ -73,6 +73,9 @@ public class SendMessageProcessor implements NettyRequestProcessor {
         MQMessageHeader header = (MQMessageHeader)request.decodeCustomHeader(MQMessageHeader.class);
         EventProducer producer = getProducer(header.getMqType());
         //TODO 检查producer是否存在
+        if(producer == null){
+
+        }
         return producer.sendMessage(ctx, request);
     }
 
