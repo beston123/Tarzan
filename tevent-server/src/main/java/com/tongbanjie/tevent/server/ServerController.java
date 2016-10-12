@@ -19,7 +19,12 @@ package com.tongbanjie.tevent.server;
 
 import com.tongbanjie.tevent.common.NamedThreadFactory;
 import com.tongbanjie.tevent.common.config.ServerConfig;
+import com.tongbanjie.tevent.registry.Address;
+import com.tongbanjie.tevent.registry.RecoverableRegistry;
+import com.tongbanjie.tevent.registry.RegistryType;
 import com.tongbanjie.tevent.registry.ServiceRegistry;
+import com.tongbanjie.tevent.registry.zookeeper.ServerZooKeeperRegistry;
+import com.tongbanjie.tevent.registry.zookeeper.ZkConstants;
 import com.tongbanjie.tevent.registry.zookeeper.ZooKeeperServiceRegistry;
 import com.tongbanjie.tevent.rpc.RpcServer;
 import com.tongbanjie.tevent.rpc.protocol.RequestCode;
@@ -73,7 +78,7 @@ public class ServerController {
 
     /********************** 服务 ***********************/
     //服务注册
-    private ServiceRegistry serverRegistry;
+    private RecoverableRegistry serverRegistry;
 
     //事件存储
     private EventStore eventStore;
@@ -92,7 +97,7 @@ public class ServerController {
     private final BlockingQueue<Runnable> sendThreadPoolQueue;
 
     //服务器地址
-    private String serverAddress;
+    private Address serverAddress;
 
     public ServerController(final ServerConfig serverConfig, //
                             final NettyServerConfig nettyServerConfig, //
@@ -109,7 +114,7 @@ public class ServerController {
 
         this.sendThreadPoolQueue = new LinkedBlockingQueue<Runnable>(this.serverConfig.getSendThreadPoolQueueCapacity());
 
-        this.serverRegistry = new ZooKeeperServiceRegistry(serverConfig.getRegistryAddress());
+        this.serverRegistry = new ServerZooKeeperRegistry(serverConfig.getRegistryAddress());
 
     }
 
@@ -154,10 +159,11 @@ public class ServerController {
             DistributedIdGenerator.setUniqueWorkId(serverConfig.getServerId());
 
             //服务器地址 [ip]:[port]
-            serverAddress = ServerUtils.getLocalHostIp() + ":" + nettyServerConfig.getListenPort();
-            if(serverAddress == null){
+            String ip = ServerUtils.getLocalHostIp();
+            if(ip == null){
                 throw new RuntimeException("Get localHost ip failed.");
             }
+            serverAddress = new Address(ServerUtils.getLocalHostIp(), nettyServerConfig.getListenPort());
             //注册地址
             try {
                 serverRegistry.start();
@@ -247,7 +253,7 @@ public class ServerController {
         return clientManager;
     }
 
-    public ServiceRegistry getServerRegistry() {
+    public RecoverableRegistry getServerRegistry() {
         return serverRegistry;
     }
 
@@ -259,7 +265,7 @@ public class ServerController {
         return rpcServer;
     }
 
-    public String getServerAddress() {
+    public Address getServerAddress() {
         return serverAddress;
     }
 }

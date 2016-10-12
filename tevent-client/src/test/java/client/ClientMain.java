@@ -17,7 +17,7 @@ import java.util.Random;
  */
 public class ClientMain {
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args)  {
         ExampleClient client = new ExampleClient();
 
         client.init();
@@ -39,12 +39,16 @@ public class ClientMain {
                 } catch (InterruptedException e1) {
                     //
                 }
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        Thread.sleep(5000<<10);
+        try {
+            Thread.sleep(5000<<10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         try {
             client.unregister();

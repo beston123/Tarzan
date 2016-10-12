@@ -1,7 +1,7 @@
 package com.tongbanjie.tevent.server.processer;
 
 import com.alibaba.rocketmq.client.exception.MQClientException;
-import com.tongbanjie.tevent.common.MQType;
+import com.tongbanjie.tevent.common.message.MQType;
 import com.tongbanjie.tevent.rpc.exception.RpcCommandException;
 import com.tongbanjie.tevent.rpc.netty.NettyRequestProcessor;
 import com.tongbanjie.tevent.rpc.protocol.RequestCode;

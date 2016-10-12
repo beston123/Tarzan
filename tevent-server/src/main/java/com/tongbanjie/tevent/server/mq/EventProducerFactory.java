@@ -1,6 +1,6 @@
 package com.tongbanjie.tevent.server.mq;
 
-import com.tongbanjie.tevent.common.MQType;
+import com.tongbanjie.tevent.common.message.MQType;
 import com.tongbanjie.tevent.server.ServerController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

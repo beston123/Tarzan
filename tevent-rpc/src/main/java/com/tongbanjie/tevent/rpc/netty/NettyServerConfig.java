@@ -20,7 +20,7 @@ package com.tongbanjie.tevent.rpc.netty;
  * @author shijia.wxr
  */
 public class NettyServerConfig implements Cloneable{
-    private int listenPort = 9300;
+    private int listenPort = 9301;
     private int serverWorkerThreads = 8;
     private int serverCallbackExecutorThreads = 0;
     private int serverSelectorThreads = 3;

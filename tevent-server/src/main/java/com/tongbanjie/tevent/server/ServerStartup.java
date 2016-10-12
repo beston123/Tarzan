@@ -108,13 +108,13 @@ public class ServerStartup {
             controller.start();
 
             String tip = "The tevent server[" + controller.getServerAddress() + "] boot success.";
-            System.out.println(tip);
+
             LOGGER.info(tip);
 
             return controller;
         }
         catch (Throwable e) {
-            e.printStackTrace();
+            LOGGER.error("The tevent server[" + controller.getServerAddress() + "] boot failed.", e);
             System.exit(-1);
         }
 

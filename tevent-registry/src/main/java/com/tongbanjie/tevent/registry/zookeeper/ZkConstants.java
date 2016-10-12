@@ -9,19 +9,18 @@ package com.tongbanjie.tevent.registry.zookeeper;
  */
 public interface ZkConstants {
 
-    int ZK_SESSION_TIMEOUT = 5000;
-    int ZK_CONNECTION_TIMEOUT = 2000;
+    int SESSION_TIMEOUT = 5000;
 
-    String ZK_REGISTRY_PATH = "/tevent";
+    int CONNECTION_TIMEOUT = 3000;
 
-    String ZK_SERVERS_PATH = ZK_REGISTRY_PATH + "/servers";
+    String REGISTRY_ROOT = "/tevent";
 
-    String ZK_CLIENTS_PATH = ZK_REGISTRY_PATH + "/clients";
+    String SERVERS_ROOT = REGISTRY_ROOT + "/servers";
 
-    String ZK_CHILD_SERVER_PATH = ZK_SERVERS_PATH + "/server-";
+    String CLIENTS_ROOT = REGISTRY_ROOT + "/clients";
 
-    String ZK_CHILD_CLIENT_PATH = ZK_CLIENTS_PATH + "/client-";
+    String SERVER_CHILD_PATH = SERVERS_ROOT + "/server-";
 
-
+    String CLIENT_CHILD_PATH = CLIENTS_ROOT + "/client-";
 
 }

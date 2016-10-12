@@ -5,12 +5,11 @@ package com.tongbanjie.tevent.registry;
  * 〈功能详细描述〉
  *
  * @author zixiao
- * @date 16/10/10
+ * @date 16/10/12
  */
-public interface ServiceDiscovery {
+public enum RegistryType {
 
-    void start();
-
-    String discover(String name);
+    SERVER,
+    CLIENT;
 
 }

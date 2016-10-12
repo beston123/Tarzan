@@ -1,4 +1,5 @@
 import com.tongbanjie.tevent.common.config.ServerConfig;
+import com.tongbanjie.tevent.registry.RegistryType;
 import com.tongbanjie.tevent.registry.ServiceDiscovery;
 import com.tongbanjie.tevent.registry.ServiceRegistry;
 import com.tongbanjie.tevent.registry.zookeeper.ZkConstants;
@@ -20,15 +21,15 @@ public class ZkTest {
         BasicConfigurator.configure();
 
         String zkAddress = new ServerConfig().getRegistryAddress();
-        ServiceRegistry registry = new ZooKeeperServiceRegistry("192.168.1.120:2181");
+        ServiceRegistry registry = new ZooKeeperServiceRegistry(RegistryType.SERVER, "192.168.1.120:2181");
         registry.start();
 
         ServiceDiscovery discovery = new ZooKeeperServiceDiscovery(zkAddress);
 
-        registry.register("127.0.0.1:1100");
-        registry.register("127.0.0.1:1101");
+        registry.register(ZkConstants.SERVERS_ROOT, "127.0.0.1:1100");
+        registry.register(ZkConstants.SERVERS_ROOT, "127.0.0.1:1101");
 
-//        String addr = discovery.discover(ZkConstants.ZK_SERVERS_PATH);
+//        String addr = discovery.discover(ZkConstants.SERVERS_ROOT);
 //        System.out.println(">>> "+addr);
     }
 }

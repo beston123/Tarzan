@@ -3,24 +3,24 @@ package com.tongbanjie.tevent.client;
 import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.common.message.Message;
 import com.tongbanjie.tevent.client.validator.RocketMQValidators;
-import com.tongbanjie.tevent.common.MQType;
 import com.tongbanjie.tevent.common.TransactionState;
+import com.tongbanjie.tevent.common.body.RocketMQBody;
 import com.tongbanjie.tevent.common.config.ServerConfig;
-import com.tongbanjie.tevent.registry.ServiceDiscovery;
-import com.tongbanjie.tevent.registry.zookeeper.ZkConstants;
-import com.tongbanjie.tevent.registry.zookeeper.ZooKeeperServiceDiscovery;
+import com.tongbanjie.tevent.common.message.MQType;
+import com.tongbanjie.tevent.registry.Address;
+import com.tongbanjie.tevent.registry.RecoverableRegistry;
+import com.tongbanjie.tevent.registry.zookeeper.ClientZooKeeperRegistry;
 import com.tongbanjie.tevent.registry.zookeeper.ZooKeeperServiceRegistry;
 import com.tongbanjie.tevent.rpc.codec.SerializeType;
 import com.tongbanjie.tevent.rpc.exception.*;
-import com.tongbanjie.tevent.common.body.RocketMQBody;
-import com.tongbanjie.tevent.rpc.protocol.header.MQMessageHeader;
-import com.tongbanjie.tevent.rpc.protocol.header.RegisterRequestHeader;
-import com.tongbanjie.tevent.rpc.protocol.RequestCode;
-import com.tongbanjie.tevent.rpc.protocol.ResponseCode;
 import com.tongbanjie.tevent.rpc.netty.NettyClientConfig;
 import com.tongbanjie.tevent.rpc.netty.NettyRpcClient;
+import com.tongbanjie.tevent.rpc.protocol.RequestCode;
+import com.tongbanjie.tevent.rpc.protocol.ResponseCode;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommand;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommandBuilder;
+import com.tongbanjie.tevent.rpc.protocol.header.MQMessageHeader;
+import com.tongbanjie.tevent.rpc.protocol.header.RegisterRequestHeader;
 import com.tongbanjie.tevent.rpc.protocol.header.TransactionMessageHeader;
 import com.tongbanjie.tevent.rpc.protocol.heartbeat.HeartbeatData;
 import org.slf4j.Logger;
@@ -46,7 +46,7 @@ public class ExampleClient {
 
     private NettyRpcClient remotingClient;
 
-    private ServiceDiscovery serviceDiscovery;
+    private RecoverableRegistry clientRegistry;
 
     private ServerConfig serverConfig = new ServerConfig();
 
@@ -67,8 +67,12 @@ public class ExampleClient {
     });
 
     public void init(){
-        serviceDiscovery = new ZooKeeperServiceDiscovery(serverConfig.getRegistryAddress());
-        serviceDiscovery.start();
+        clientRegistry = new ClientZooKeeperRegistry(serverConfig.getRegistryAddress());
+        try {
+            clientRegistry.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         remotingClient = new NettyRpcClient(nettyClientConfig, null);
         remotingClient.start();
@@ -76,7 +80,7 @@ public class ExampleClient {
             sendHeartbeat();
         } catch (RpcException e) {
             e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         this.startScheduledTask();
@@ -88,7 +92,7 @@ public class ExampleClient {
             @Override
             public void run() {
                 try {
-                    ExampleClient.this.cleanOfflineBroker();
+                    ExampleClient.this.cleanOfflineServer();
                     ExampleClient.this.sendHeartbeatToAllServerWithLock();
                 } catch (Exception e) {
                     LOGGER.error("ScheduledTask sendHeartbeatToAllServer exception", e);
@@ -97,8 +101,8 @@ public class ExampleClient {
         }, 30, 30, TimeUnit.SECONDS);
     }
 
-    private void cleanOfflineBroker() {
-
+    private void cleanOfflineServer() {
+        //
     }
 
     private void sendHeartbeatToAllServerWithLock() throws RpcException, InterruptedException {
@@ -120,9 +124,8 @@ public class ExampleClient {
         RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.HEART_BEAT, null);
         request.setBody(heartbeatData);
 
-        String serverAddr = serviceDiscovery.discover(ZkConstants.ZK_SERVERS_PATH);
-
-        RpcCommand response = this.remotingClient.invokeSync(serverAddr, request, timeoutMillis);
+        Address serverAddr = clientRegistry.discover();
+        RpcCommand response = this.remotingClient.invokeSync(serverAddr.getAddress(), request, timeoutMillis);
         assert response != null;
         switch (response.getCmdCode()) {
             case ResponseCode.SUCCESS: {
@@ -138,8 +141,8 @@ public class ExampleClient {
     }
 
     public void unregister() throws RpcException, InterruptedException {
-        String serverAddr = serviceDiscovery.discover(ZkConstants.ZK_SERVERS_PATH);
-        unregister(serverAddr, clientId, producerGroup, 6 << 10);
+        Address serverAddr = clientRegistry.discover();
+        unregister(serverAddr.getAddress(), clientId, producerGroup, 6 << 10);
     }
 
     public void unregister(//
@@ -170,11 +173,11 @@ public class ExampleClient {
     }
 
     public void sendMessage(Message message, String group, boolean trans) throws RpcException, InterruptedException {
-        String serverAddr = serviceDiscovery.discover(ZkConstants.ZK_SERVERS_PATH);
+        Address serverAddr = clientRegistry.discover();
         if(trans){
-            transMessage(message, serverAddr, group, 6 << 10);
+            transMessage(message, serverAddr.getAddress(), group, 6 << 10);
         }else{
-            sendMessage(message, serverAddr, group, 6 << 10);
+            sendMessage(message, serverAddr.getAddress(), group, 6 << 10);
         }
     }
 
