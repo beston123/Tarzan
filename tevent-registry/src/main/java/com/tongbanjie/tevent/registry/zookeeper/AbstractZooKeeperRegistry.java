@@ -34,7 +34,7 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry {
     protected final ZkClient zkClient;
 
     //已注册的地址
-    protected final Map<Address /* address */, String/* relativePath */> registered = new ConcurrentHashMap<Address, String>();
+    protected final Map<Address /* address */, String/* absolutePath */> registered = new ConcurrentHashMap<Address, String>();
 
     private String registerRootPath;
 
@@ -134,14 +134,12 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry {
 
     @Override
     public String register(String path, Address address) {
-        String relativePath = zkClient.createEphemeralSequential(path, address);
-        LOGGER.info("create address node: {}", relativePath);
+        String absolutePath = zkClient.createEphemeralSequential(path, address);
+        LOGGER.info("create address node: {}", absolutePath);
 
         //更新已注册地址
-        if(!registered.containsKey(address)){
-            registered.put(address, relativePath);
-        }
-        return relativePath;
+        registered.put(address, absolutePath);
+        return absolutePath;
     }
 
     @Override
@@ -193,7 +191,7 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry {
         Iterator<Map.Entry<Address, String>> ite = entrySet.iterator();
         while (ite.hasNext()){
             Map.Entry<Address, String> entry = ite.next();
-            unregister(this.registerRootPath + "/" + entry.getValue());
+            unregister(entry.getValue());
         }
     }
 

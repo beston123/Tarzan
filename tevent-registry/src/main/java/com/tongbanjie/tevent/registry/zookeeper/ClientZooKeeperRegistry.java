@@ -43,7 +43,8 @@ public class ClientZooKeeperRegistry extends AbstractZooKeeperRegistry {
     }
 
     private Address doDiscover(){
-        int size = discovered.size();
+        List<Address> copy = discovered;
+        int size = copy.size();
         Address address = null;
         if(size == 0){
             LOGGER.warn("Can not find a server.");
@@ -51,11 +52,11 @@ public class ClientZooKeeperRegistry extends AbstractZooKeeperRegistry {
             throw new RuntimeException(">>>>>>>>Can not find a server.");
         }else if(size == 1) {
             // 若只有一个地址，则获取该地址
-            address = discovered.get(0);
+            address = copy.get(0);
         } else {
             // 若存在多个地址，则随机获取一个地址
             // TODO 此处要做负载均衡
-            address = discovered.get(random.nextInt(size));
+            address = copy.get(random.nextInt(size));
         }
         LOGGER.debug("Find a server {}", address);
         return address;
