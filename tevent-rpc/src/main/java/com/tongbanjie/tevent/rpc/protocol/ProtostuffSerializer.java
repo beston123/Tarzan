@@ -1,4 +1,4 @@
-package com.tongbanjie.tevent.rpc.codec;
+package com.tongbanjie.tevent.rpc.protocol;
 
 import com.dyuproject.protostuff.LinkedBuffer;
 import com.dyuproject.protostuff.ProtostuffIOUtil;

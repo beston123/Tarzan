@@ -101,6 +101,8 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry {
             public void handleStateChanged(Watcher.Event.KeeperState keeperState) throws Exception {
                 if (keeperState == Watcher.Event.KeeperState.Disconnected) {
                     LOGGER.warn(">>>Zookeeper session disconnected.");
+                    //与zk断开后，可能未删除
+
                 } else if (keeperState == Watcher.Event.KeeperState.SyncConnected) {
                     LOGGER.info(">>>Zookeeper session connected.");
                     //与zk重新链接后，马上恢复
@@ -162,7 +164,7 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry {
         registerAll();
     }
 
-    public void discoverAll() {
+    protected void discoverAll() {
         String discoverPath = getDiscoverPath();
         if (!zkClient.exists(discoverPath)) {
             throw new RuntimeException(String.format("can not find node on path: %s", discoverPath));
@@ -170,13 +172,15 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry {
         List<String> childrenPathList = zkClient.getChildren(discoverPath);
 
         updateDiscovered(childrenPathList);
-
     }
 
     abstract void updateDiscovered(List<String> childrenPathList);
 
 
     protected void registerAll(){
+        //反注册，在闪断的情况下，zk上的临时节点未及时删除
+        unregisterAll();
+        //重新注册
         Set<Address> addressSet = registered.keySet();
         Iterator<Address> ite = addressSet.iterator();
         while (ite.hasNext()){
@@ -184,7 +188,6 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry {
             register(this.registerChildPath, address);
         }
     }
-
 
     protected void unregisterAll(){
         Set<Map.Entry<Address, String>> entrySet = registered.entrySet();

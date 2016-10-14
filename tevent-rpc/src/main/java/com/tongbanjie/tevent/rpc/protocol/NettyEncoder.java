@@ -1,7 +1,6 @@
-package com.tongbanjie.tevent.rpc.codec;
+package com.tongbanjie.tevent.rpc.protocol;
 
 import com.tongbanjie.tevent.rpc.util.RpcHelper;
-import com.tongbanjie.tevent.rpc.protocol.RpcCommand;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;

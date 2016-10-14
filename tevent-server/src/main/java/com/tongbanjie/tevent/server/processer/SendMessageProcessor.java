@@ -8,7 +8,7 @@ import com.tongbanjie.tevent.rpc.protocol.RequestCode;
 import com.tongbanjie.tevent.rpc.protocol.ResponseCode;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommand;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommandBuilder;
-import com.tongbanjie.tevent.rpc.protocol.header.MQMessageHeader;
+import com.tongbanjie.tevent.rpc.protocol.header.SendMessageHeader;
 import com.tongbanjie.tevent.rpc.protocol.header.TransactionMessageHeader;
 import com.tongbanjie.tevent.server.ServerController;
 import com.tongbanjie.tevent.server.mq.EventProducer;
@@ -37,9 +37,9 @@ public class SendMessageProcessor implements NettyRequestProcessor {
     @Override
     public RpcCommand processRequest(ChannelHandlerContext ctx, RpcCommand request) throws Exception {
         switch (request.getCmdCode()) {
-            case RequestCode.SEND_MSG:
+            case RequestCode.SEND_MESSAGE:
                 return this.sendMessage(ctx, request);
-            case RequestCode.TRANSACTION_MSG:
+            case RequestCode.TRANSACTION_MESSAGE:
                 return this.transactionMessage(ctx, request);
             default:
                 LOGGER.warn("Unknown request code "+request.getCmdCode());
@@ -70,7 +70,7 @@ public class SendMessageProcessor implements NettyRequestProcessor {
     }
 
     private RpcCommand sendMessage(ChannelHandlerContext ctx, RpcCommand request) throws MQClientException, RpcCommandException {
-        MQMessageHeader header = (MQMessageHeader)request.decodeCustomHeader(MQMessageHeader.class);
+        SendMessageHeader header = (SendMessageHeader)request.decodeCustomHeader(SendMessageHeader.class);
         EventProducer producer = getProducer(header.getMqType());
         //TODO 检查producer是否存在
         if(producer == null){

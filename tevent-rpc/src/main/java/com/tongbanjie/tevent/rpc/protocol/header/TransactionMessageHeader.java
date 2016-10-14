@@ -6,7 +6,7 @@ import com.tongbanjie.tevent.rpc.exception.RpcCommandException;
 
 
 /**
- * 〈一句话功能简述〉<p>
+ * 事务消息请求 协议头 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao
@@ -14,7 +14,7 @@ import com.tongbanjie.tevent.rpc.exception.RpcCommandException;
  * @see [相关类/方法]（可选）
  * @since [产品/模块版本] （可选）
  */
-public class TransactionMessageHeader extends MQMessageHeader implements CustomHeader {
+public class TransactionMessageHeader extends SendMessageHeader implements CustomHeader {
 
     private Long transactionId;
 

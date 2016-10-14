@@ -1,4 +1,4 @@
-package com.tongbanjie.tevent.rpc.codec;
+package com.tongbanjie.tevent.rpc.protocol;
 
 /**
  * 序列化方式枚举 <p>

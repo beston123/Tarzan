@@ -6,10 +6,11 @@ import com.tongbanjie.tevent.client.validator.RocketMQValidators;
 import com.tongbanjie.tevent.common.body.RocketMQBody;
 import com.tongbanjie.tevent.common.message.MQType;
 import com.tongbanjie.tevent.common.message.TransactionState;
+import com.tongbanjie.tevent.common.util.RemotingUtils;
 import com.tongbanjie.tevent.registry.Address;
 import com.tongbanjie.tevent.registry.RecoverableRegistry;
 import com.tongbanjie.tevent.registry.zookeeper.ClientZooKeeperRegistry;
-import com.tongbanjie.tevent.rpc.codec.SerializeType;
+import com.tongbanjie.tevent.rpc.protocol.SerializeType;
 import com.tongbanjie.tevent.rpc.exception.*;
 import com.tongbanjie.tevent.rpc.netty.NettyClientConfig;
 import com.tongbanjie.tevent.rpc.netty.NettyRpcClient;
@@ -17,7 +18,7 @@ import com.tongbanjie.tevent.rpc.protocol.RequestCode;
 import com.tongbanjie.tevent.rpc.protocol.ResponseCode;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommand;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommandBuilder;
-import com.tongbanjie.tevent.rpc.protocol.header.MQMessageHeader;
+import com.tongbanjie.tevent.rpc.protocol.header.SendMessageHeader;
 import com.tongbanjie.tevent.rpc.protocol.header.RegisterRequestHeader;
 import com.tongbanjie.tevent.rpc.protocol.header.TransactionMessageHeader;
 import com.tongbanjie.tevent.rpc.protocol.heartbeat.HeartbeatData;
@@ -51,6 +52,8 @@ public class ExampleClient {
     private String clientId = "123444";
 
     private NettyClientConfig nettyClientConfig = new NettyClientConfig();
+
+    private Address serverAddr = new Address(RemotingUtils.getLocalHostIp(), 7777);
 
     private final ConcurrentHashMap<String/* Server Name */, HashMap<Long/* brokerId */, String/* address */>> serverAddrTable =
             new ConcurrentHashMap<String, HashMap<Long, String>>();
@@ -120,7 +123,6 @@ public class ExampleClient {
         RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.HEART_BEAT, null);
         request.setBody(heartbeatData);
 
-        Address serverAddr = clientRegistry.discover();
         RpcCommand response = this.remotingClient.invokeSync(serverAddr.getAddress(), request, timeoutMillis);
         assert response != null;
         switch (response.getCmdCode()) {
@@ -137,7 +139,6 @@ public class ExampleClient {
     }
 
     public void unregister() throws RpcException, InterruptedException {
-        Address serverAddr = clientRegistry.discover();
         unregister(serverAddr.getAddress(), clientId, producerGroup, 6 << 10);
     }
 
@@ -169,7 +170,6 @@ public class ExampleClient {
     }
 
     public void sendMessage(Message message, String group, boolean trans) throws RpcException, InterruptedException {
-        Address serverAddr = clientRegistry.discover();
         if(trans){
             transMessage(message, serverAddr.getAddress(), group, 6 << 10);
         }else{
@@ -189,10 +189,10 @@ public class ExampleClient {
             return;
         }
 
-        final MQMessageHeader requestHeader = new MQMessageHeader();
+        final SendMessageHeader requestHeader = new SendMessageHeader();
         requestHeader.setMqType(MQType.ROCKET_MQ);
 
-        RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.SEND_MSG, requestHeader);
+        RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.SEND_MESSAGE, requestHeader);
         request.setSerializeType(SerializeType.PROTOSTUFF);
 
         RocketMQBody mqBody = new RocketMQBody();
@@ -233,7 +233,7 @@ public class ExampleClient {
         requestHeader.setMqType(MQType.ROCKET_MQ);
         requestHeader.setTransactionState(TransactionState.PREPARE);
 
-        RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.TRANSACTION_MSG, requestHeader);
+        RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.TRANSACTION_MESSAGE, requestHeader);
         request.setSerializeType(SerializeType.PROTOSTUFF);
 
         RocketMQBody mqBody = new RocketMQBody();
@@ -288,7 +288,7 @@ public class ExampleClient {
         requestHeader.setTransactionState(TransactionState.COMMIT);
         requestHeader.setTransactionId(transactionId);
 
-        RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.TRANSACTION_MSG, requestHeader);
+        RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.TRANSACTION_MESSAGE, requestHeader);
         request.setSerializeType(SerializeType.PROTOSTUFF);
 
         RocketMQBody mqBody = new RocketMQBody();
@@ -337,7 +337,7 @@ public class ExampleClient {
         requestHeader.setTransactionState(TransactionState.ROLLBACK);
         requestHeader.setTransactionId(transactionId);
 
-        RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.TRANSACTION_MSG, requestHeader);
+        RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.TRANSACTION_MESSAGE, requestHeader);
         request.setSerializeType(SerializeType.PROTOSTUFF);
 
         RpcCommand response = this.remotingClient.invokeSync(addr, request, timeoutMillis);

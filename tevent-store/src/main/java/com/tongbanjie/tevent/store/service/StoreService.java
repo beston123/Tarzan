@@ -18,4 +18,6 @@ public interface StoreService<T extends MQMessage> {
 
     Result update(Long id, T mqMessage);
 
+    Result selectTrans();
+
 }

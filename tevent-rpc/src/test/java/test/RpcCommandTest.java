@@ -1,7 +1,7 @@
 package test;
 
 import com.tongbanjie.tevent.common.message.MQType;
-import com.tongbanjie.tevent.rpc.codec.SerializeType;
+import com.tongbanjie.tevent.rpc.protocol.SerializeType;
 import com.tongbanjie.tevent.rpc.exception.RpcCommandException;
 import com.tongbanjie.tevent.rpc.protocol.RequestCode;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommand;

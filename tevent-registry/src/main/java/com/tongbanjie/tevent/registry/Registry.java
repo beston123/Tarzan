@@ -1,5 +1,7 @@
 package com.tongbanjie.tevent.registry;
 
+import java.util.List;
+
 /**
  * 〈一句话功能简述〉<p>
  * 〈功能详细描述〉
@@ -41,6 +43,6 @@ public interface Registry {
      * 发现
      * @return
      */
-    Address discover();
+    List<Address> getDiscovered();
 
 }

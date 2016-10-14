@@ -17,9 +17,11 @@
 package com.tongbanjie.tevent.rpc.netty;
 
 
+import java.util.Random;
+
 public class NettyServerConfig implements Cloneable{
 
-    private int listenPort = 7777;
+    private int listenPort = 7770 + new Random().nextInt(10);
 
     private int serverWorkerThreads = 8;
     private int serverCallbackExecutorThreads = 0;

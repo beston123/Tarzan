@@ -17,7 +17,7 @@
 package com.tongbanjie.tevent.server;
 
 
-import com.tongbanjie.tevent.common.ext.NamedThreadFactory;
+import com.tongbanjie.tevent.common.util.NamedThreadFactory;
 import com.tongbanjie.tevent.registry.Address;
 import com.tongbanjie.tevent.registry.RecoverableRegistry;
 import com.tongbanjie.tevent.registry.zookeeper.ServerZooKeeperRegistry;
@@ -30,7 +30,8 @@ import com.tongbanjie.tevent.server.client.ClientHousekeepingService;
 import com.tongbanjie.tevent.server.client.ClientManager;
 import com.tongbanjie.tevent.server.processer.ClientManageProcessor;
 import com.tongbanjie.tevent.server.processer.SendMessageProcessor;
-import com.tongbanjie.tevent.server.util.ServerUtils;
+import com.tongbanjie.tevent.common.util.RemotingUtils;
+import com.tongbanjie.tevent.server.transaction.TransactionCheckService;
 import com.tongbanjie.tevent.store.DefaultStoreManager;
 import com.tongbanjie.tevent.store.StoreManager;
 import com.tongbanjie.tevent.store.config.StoreConfig;
@@ -73,7 +74,7 @@ public class ServerController {
 
     /********************** 服务 ***********************/
     //服务注册
-    private RecoverableRegistry serverRegistry;
+    private final RecoverableRegistry serverRegistry;
 
     //事件存储
     private StoreManager storeManager;
@@ -87,6 +88,9 @@ public class ServerController {
 
     // 处理管理Client线程池
     private ExecutorService clientManageExecutor;
+
+    //事务状态检查
+    private TransactionCheckService transactionCheckService;
 
     // 对消息写入进行流控
     private final BlockingQueue<Runnable> sendThreadPoolQueue;
@@ -154,11 +158,11 @@ public class ServerController {
             DistributedIdGenerator.setUniqueWorkId(serverConfig.getServerId());
 
             //服务器地址 [ip]:[port]
-            String ip = ServerUtils.getLocalHostIp();
-            if(ip == null){
+            String localIp = RemotingUtils.getLocalHostIp();
+            if(localIp == null){
                 throw new RuntimeException("Get localHost ip failed.");
             }
-            serverAddress = new Address(ServerUtils.getLocalHostIp(), nettyServerConfig.getListenPort());
+            serverAddress = new Address(localIp, nettyServerConfig.getListenPort());
             //注册地址
             try {
                 serverRegistry.start();
@@ -167,6 +171,8 @@ public class ServerController {
                 result = false;
                 LOGGER.error("The registry connect failed, address: " + serverConfig.getRegistryAddress(), e);
             }
+
+            transactionCheckService = new TransactionCheckService(this);
         }
 
         return result;
@@ -176,8 +182,8 @@ public class ServerController {
     public void registerProcessor() {
         SendMessageProcessor sendProcessor = new SendMessageProcessor(this);
 
-        this.rpcServer.registerProcessor(RequestCode.SEND_MSG, sendProcessor, this.sendMessageExecutor);
-        this.rpcServer.registerProcessor(RequestCode.TRANSACTION_MSG, sendProcessor, this.sendMessageExecutor);
+        this.rpcServer.registerProcessor(RequestCode.SEND_MESSAGE, sendProcessor, this.sendMessageExecutor);
+        this.rpcServer.registerProcessor(RequestCode.TRANSACTION_MESSAGE, sendProcessor, this.sendMessageExecutor);
 
         ClientManageProcessor clientProcessor = new ClientManageProcessor(this);
 
@@ -208,6 +214,10 @@ public class ServerController {
             this.clientHousekeepingService.shutdown();
         }
 
+        if(this.transactionCheckService != null){
+            this.transactionCheckService.shutdown();
+        }
+
     }
 
     public void start() throws Exception {
@@ -221,6 +231,10 @@ public class ServerController {
 
         if (this.clientHousekeepingService != null) {
             this.clientHousekeepingService.start();
+        }
+
+        if(this.transactionCheckService != null){
+            this.transactionCheckService.start();
         }
 
     }

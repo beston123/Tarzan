@@ -1,9 +1,9 @@
 package com.tongbanjie.tevent.rpc.util;
 
 import com.tongbanjie.tevent.rpc.protocol.RpcCommand;
-import com.tongbanjie.tevent.rpc.codec.JsonSerializer;
-import com.tongbanjie.tevent.rpc.codec.ProtostuffSerializer;
-import com.tongbanjie.tevent.rpc.codec.SerializeType;
+import com.tongbanjie.tevent.rpc.protocol.JsonSerializer;
+import com.tongbanjie.tevent.rpc.protocol.ProtostuffSerializer;
+import com.tongbanjie.tevent.rpc.protocol.SerializeType;
 
 /**
  * 〈一句话功能简述〉<p>

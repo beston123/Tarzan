@@ -17,6 +17,7 @@ import com.tongbanjie.tevent.common.body.RocketMQBody;
 import com.tongbanjie.tevent.rpc.protocol.header.TransactionMessageHeader;
 import com.tongbanjie.tevent.server.ServerController;
 import com.tongbanjie.tevent.store.Result;
+import com.tongbanjie.tevent.store.service.RocketMQStoreService;
 import com.tongbanjie.tevent.store.service.StoreService;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
@@ -42,7 +43,7 @@ public class RocketMQProducer implements EventProducer {
 
     private final Lock lock = new ReentrantLock();
 
-    private StoreService mQStoreService;
+    private RocketMQStoreService mQStoreService;
 
     private ServerController serverController;
 
@@ -50,7 +51,7 @@ public class RocketMQProducer implements EventProducer {
 
     public RocketMQProducer(ServerController serverController) {
         this.serverController = serverController;
-        this.mQStoreService = this.serverController.getStoreManager().getStoreService();
+        this.mQStoreService = (RocketMQStoreService)this.serverController.getStoreManager().getStoreService();
         this.namesrvAddr = this.serverController.getServerConfig().getRocketMQNamesrv();
     }
 

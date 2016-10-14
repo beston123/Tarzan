@@ -17,7 +17,7 @@
 package com.tongbanjie.tevent.server.client;
 
 
-import com.tongbanjie.tevent.common.ext.NamedThreadFactory;
+import com.tongbanjie.tevent.common.util.NamedThreadFactory;
 import com.tongbanjie.tevent.rpc.netty.ChannelEventListener;
 import com.tongbanjie.tevent.server.ServerController;
 import io.netty.channel.Channel;
@@ -29,7 +29,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class ClientHousekeepingService implements ChannelEventListener {
-    private static final Logger log = LoggerFactory.getLogger(ClientHousekeepingService.class);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClientHousekeepingService.class);
+
     private final ServerController serverController;
 
     private ScheduledExecutorService scheduledExecutorService = Executors
@@ -49,7 +51,7 @@ public class ClientHousekeepingService implements ChannelEventListener {
                     ClientHousekeepingService.this.scanExceptionChannel();
                 }
                 catch (Exception e) {
-                    log.error("", e);
+                    LOGGER.error("", e);
                 }
             }
         }, 1000 * 10, 1000 * 10, TimeUnit.MILLISECONDS);

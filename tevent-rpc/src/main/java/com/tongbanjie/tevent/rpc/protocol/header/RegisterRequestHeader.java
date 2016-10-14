@@ -3,7 +3,7 @@ package com.tongbanjie.tevent.rpc.protocol.header;
 import com.tongbanjie.tevent.rpc.exception.RpcCommandException;
 
 /**
- * 〈一句话功能简述〉<p>
+ * 注册请求 协议头 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao
@@ -19,7 +19,9 @@ public class RegisterRequestHeader implements CustomHeader {
 
     @Override
     public void checkFields() throws RpcCommandException {
-
+        if(group == null){
+            throw new RpcCommandException("group can not be null!");
+        }
     }
 
     public String getClientId() {

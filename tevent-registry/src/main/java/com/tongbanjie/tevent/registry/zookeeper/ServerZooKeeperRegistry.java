@@ -22,8 +22,6 @@ public class ServerZooKeeperRegistry extends AbstractZooKeeperRegistry{
     //已发现的地址
     protected List<Address> discovered = new ArrayList<Address>();
 
-    private Random random = new Random();
-
     public ServerZooKeeperRegistry(String zkAddress){
         super(RegistryType.SERVER, zkAddress);
         setAsServer();
@@ -36,26 +34,6 @@ public class ServerZooKeeperRegistry extends AbstractZooKeeperRegistry{
     }
 
     @Override
-    public Address discover() {
-        List<Address> copy = discovered;
-        int size = copy.size();
-        Address address = null;
-        if(size == 0){
-            LOGGER.warn("Can not find a server.");
-            return null;
-        }else if(size == 1) {
-            // 若只有一个地址，则获取该地址
-            address = copy.get(0);
-        } else {
-            // 若存在多个地址，则随机获取一个地址
-            // TODO 此处要做负载均衡
-            address = copy.get(random.nextInt(size));
-        }
-        LOGGER.debug("Find a server {}", address);
-        return address;
-    }
-
-    @Override
     protected void updateDiscovered(List<String> childrenPathList){
         if (CollectionUtils.isEmpty(childrenPathList)) {
             discovered.clear();
@@ -64,7 +42,7 @@ public class ServerZooKeeperRegistry extends AbstractZooKeeperRegistry{
         // 1 获取所用子节点的数据
         List<Address> addressOnZk = new ArrayList<Address>(childrenPathList.size());
         for(String childPath : childrenPathList){
-            Address address = zkClient.readData(this.getDiscoverPath() + "/" + childPath, true);
+            Address address = zkClient.readData(this.getDiscoverPath() + ZkConstants.PATH_SEPARATOR + childPath, true);
             if(address != null){
                 addressOnZk.add(address);
             }
@@ -87,6 +65,11 @@ public class ServerZooKeeperRegistry extends AbstractZooKeeperRegistry{
 //            }
 //        }
 
+    }
+
+    @Override
+    public List<Address> getDiscovered() {
+        return this.discovered;
     }
 
 }

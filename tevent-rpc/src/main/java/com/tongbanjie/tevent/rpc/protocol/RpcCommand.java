@@ -4,7 +4,6 @@ import com.tongbanjie.tevent.common.TEventVersion;
 import com.tongbanjie.tevent.rpc.exception.RpcCommandException;
 import com.tongbanjie.tevent.rpc.util.ClassUtils;
 import com.tongbanjie.tevent.rpc.util.RpcSerializeUtils;
-import com.tongbanjie.tevent.rpc.codec.SerializeType;
 import com.tongbanjie.tevent.rpc.protocol.header.CustomHeader;
 import org.apache.commons.collections4.MapUtils;
 

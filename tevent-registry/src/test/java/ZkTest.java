@@ -50,7 +50,7 @@ public class ZkTest {
             executorService.execute(new Runnable() {
                 @Override
                 public void run() {
-                    discovery.discover();
+                    //discovery.discover();
                     try {
                         Thread.sleep(1L);
                     } catch (InterruptedException e) {

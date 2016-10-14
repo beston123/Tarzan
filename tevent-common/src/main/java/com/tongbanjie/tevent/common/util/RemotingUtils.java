@@ -1,4 +1,4 @@
-package com.tongbanjie.tevent.server.util;
+package com.tongbanjie.tevent.common.util;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -10,9 +10,9 @@ import java.net.UnknownHostException;
  * @author zixiao
  * @date 16/10/11
  */
-public class ServerUtils {
+public class RemotingUtils {
 
-    private ServerUtils(){}
+    private RemotingUtils(){}
 
     public static InetAddress getInetAddress(){
         try{

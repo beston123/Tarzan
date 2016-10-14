@@ -23,4 +23,7 @@ public abstract class ZkConstants {
 
     public static final String CLIENT_CHILD_PATH = CLIENTS_ROOT + "/client-";
 
+    public final static String PATH_SEPARATOR = "/";
+
+
 }

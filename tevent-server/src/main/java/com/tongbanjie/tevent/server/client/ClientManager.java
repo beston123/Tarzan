@@ -19,11 +19,11 @@ package com.tongbanjie.tevent.server.client;
 
 import com.tongbanjie.tevent.rpc.util.RpcHelper;
 import io.netty.channel.Channel;
+import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -31,7 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 public class ClientManager {
-    private static final Logger log = LoggerFactory.getLogger(ClientManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClientManager.class);
     private static final long LockTimeoutMillis = 3000;
     private static final long ChannelExpiredTimeout = 1000 * 120;
     private final Lock groupChannelLock = new ReentrantLock();
@@ -55,7 +55,7 @@ public class ClientManager {
                 }
             }
         } catch (InterruptedException e) {
-           log.error("",e);
+           LOGGER.error("", e);
         }
         return newGroupChannelTable;
     }
@@ -79,9 +79,9 @@ public class ClientManager {
                             long diff = System.currentTimeMillis() - info.getLastUpdateTimestamp();
                             if (diff > ChannelExpiredTimeout) {
                                 it.remove();
-                                log.warn(
-                                    "SCAN: remove expired channel[{}] from ClientManager groupChannelTable, client group name: {}",
-                                    RpcHelper.parseChannelRemoteAddr(info.getChannel()), group);
+                                LOGGER.warn(
+                                        "SCAN: remove expired channel[{}] from ClientManager groupChannelTable, client group name: {}",
+                                        RpcHelper.parseChannelRemoteAddr(info.getChannel()), group);
                                 RpcHelper.closeChannel(info.getChannel());
                             }
                         }
@@ -92,11 +92,11 @@ public class ClientManager {
                 }
             }
             else {
-                log.warn("ClientManager scanNotActiveChannel lock timeout");
+                LOGGER.warn("ClientManager scanNotActiveChannel lock timeout");
             }
         }
         catch (InterruptedException e) {
-            log.error("", e);
+            LOGGER.error("", e);
         }
     }
 
@@ -114,7 +114,7 @@ public class ClientManager {
                             final ClientChannelInfo clientChannelInfo =
                                     clientChannelInfoTable.remove(channel);
                             if (clientChannelInfo != null) {
-                                log.info(
+                                LOGGER.info(
                                         "NETTY EVENT: remove channel[{}][{}] from ClientManager groupChannelTable, client group: {}",
                                         clientChannelInfo.toString(), remoteAddr, group);
                             }
@@ -126,11 +126,11 @@ public class ClientManager {
                     }
                 }
                 else {
-                    log.warn("ClientManager doChannelCloseEvent lock timeout");
+                    LOGGER.warn("ClientManager doChannelCloseEvent lock timeout");
                 }
             }
             catch (InterruptedException e) {
-                log.error("", e);
+                LOGGER.error("", e);
             }
         }
     }
@@ -150,8 +150,8 @@ public class ClientManager {
                     clientChannelInfoFound = channelTable.get(clientChannelInfo.getChannel());
                     if (null == clientChannelInfoFound) {
                         channelTable.put(clientChannelInfo.getChannel(), clientChannelInfo);
-                        log.info("New client connected, group: {} channel: {}", group,
-                            clientChannelInfo.toString());
+                        LOGGER.info("New client connected, group: {} channel: {}", group,
+                                clientChannelInfo.toString());
                     }
                 }
                 finally {
@@ -159,16 +159,16 @@ public class ClientManager {
                 }
 
                 if (clientChannelInfoFound != null) {
-                    log.debug("Get heartbeat from client, group: {} channel: {}", group, clientChannelInfoFound);
+                    LOGGER.debug("Get heartbeat from client, group: {} channel: {}", group, clientChannelInfoFound);
                     clientChannelInfoFound.setLastUpdateTimestamp(System.currentTimeMillis());
                 }
             }
             else {
-                log.warn("ClientManager register lock timeout");
+                LOGGER.warn("ClientManager register lock timeout");
             }
         }
         catch (InterruptedException e) {
-            log.error("", e);
+            LOGGER.error("", e);
         }
     }
 
@@ -180,13 +180,13 @@ public class ClientManager {
                     if (null != channelTable && !channelTable.isEmpty()) {
                         ClientChannelInfo old = channelTable.remove(clientChannelInfo.getChannel());
                         if (old != null) {
-                            log.info("unregister a client[{}] from groupChannelTable {}", group,
-                                clientChannelInfo.toString());
+                            LOGGER.info("unregister a client[{}] from groupChannelTable {}", group,
+                                    clientChannelInfo.toString());
                         }
 
                         if (channelTable.isEmpty()) {
                             this.groupChannelTable.remove(group);
-                            log.info("unregister a client group[{}] from groupChannelTable", group);
+                            LOGGER.info("unregister a client group[{}] from groupChannelTable", group);
                         }
                     }
                 }
@@ -195,12 +195,21 @@ public class ClientManager {
                 }
             }
             else {
-                log.warn("ClientManager unregister client lock timeout");
+                LOGGER.warn("ClientManager unregister client lock timeout");
             }
         }
         catch (InterruptedException e) {
-            log.error("", e);
+            LOGGER.error("", e);
         }
     }
 
+    public ClientChannelInfo pickClientRandomly(String group){
+        Map<Channel, ClientChannelInfo> map = this.groupChannelTable.get(group);
+        if(MapUtils.isEmpty(map)){
+            return null;
+        }
+        List<ClientChannelInfo> clientChannelInfoList = new ArrayList<ClientChannelInfo>(map.values());
+        int size = clientChannelInfoList.size();
+        return clientChannelInfoList.get(new Random().nextInt(size));
+    }
 }
