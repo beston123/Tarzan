@@ -49,13 +49,11 @@ public class ServerStartup {
             NettySystemConfig.SocketRcvbufSize = 131072;
         }
 
+        final ServerConfig serverConfig = new ServerConfig();
+        final NettyServerConfig nettyServerConfig = new NettyServerConfig();
+        final StoreConfig storeConfig = new StoreConfig();
+
         try {
-            final ServerConfig serverConfig = new ServerConfig();
-            final NettyServerConfig nettyServerConfig = new NettyServerConfig();
-            final NettyClientConfig nettyClientConfig = new NettyClientConfig();
-
-            final StoreConfig storeConfig = new StoreConfig();
-
             if (serverConfig.getServerId() < 0 || serverConfig.getServerId() > 31) {
                 System.out.println("ServerId must between 0 and 31");
                 System.exit(-3);
@@ -64,15 +62,16 @@ public class ServerStartup {
             final ServerController controller = new ServerController(//
                 serverConfig, //
                 nettyServerConfig, //
-                nettyClientConfig, //
-                    storeConfig
+                storeConfig
                 );
+
             boolean initResult = controller.initialize();
             if (!initResult) {
                 controller.shutdown();
                 System.exit(-3);
             }
 
+            //优雅停机
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 private volatile boolean hasShutdown = false;
                 private AtomicInteger shutdownTimes = new AtomicInteger(0);
@@ -105,11 +104,8 @@ public class ServerStartup {
     public static ServerController start(ServerController controller) {
         try {
             controller.start();
-
             String tip = "The tevent server[" + controller.getServerAddress() + "] boot success.";
-
             LOGGER.info(tip);
-
             return controller;
         }
         catch (Throwable e) {

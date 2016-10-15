@@ -28,7 +28,7 @@ public class ServerConfig implements Cloneable{
     /**
      * 客户端管理线程池大小
      */
-    private int clientManageThreadPoolNums = 16;
+    private int clientManageThreadPoolNums = 8+ Runtime.getRuntime().availableProcessors();
 
     /**
      * 消息发送线程池队列容量
@@ -43,7 +43,7 @@ public class ServerConfig implements Cloneable{
     /**
      * 注册中心地址
      */
-    private String registryAddress = System.getProperty(Constants.TEVENT_REGISTRY_ADDRESS, "192.168.1.120:2181");
+    private String registryAddress = System.getProperty(Constants.TEVENT_REGISTRY_ADDRESS, "127.0.0.1:2181");
 
     /**
      * RocketMQ nameserv 地址

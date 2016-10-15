@@ -14,6 +14,12 @@
     <dependencies>
         <dependency>
             <groupId>com.tongbanjie.tevent</groupId>
+            <artifactId>tevent-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.tongbanjie.tevent</groupId>
             <artifactId>tevent-rpc</artifactId>
             <version>${project.version}</version>
         </dependency>

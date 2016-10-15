@@ -10,6 +10,7 @@ import org.apache.commons.collections4.MapUtils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -431,5 +432,18 @@ public class RpcCommand {
         this.customHeader = customHeader;
     }
 
-
+    @Override
+    public String toString() {
+        return "RpcCommand{" +
+                "cmdCode=" + cmdCode +
+                ", serializeType=" + serializeType +
+                ", cmdType=" + cmdType +
+                ", version=" + version +
+                ", opaque=" + opaque +
+                ", oneWayRpc=" + oneWayRpc +
+                ", remark='" + remark + '\'' +
+                ", customHeader=" + customHeader +
+                ", body=" + Arrays.toString(body) +
+                '}';
+    }
 }

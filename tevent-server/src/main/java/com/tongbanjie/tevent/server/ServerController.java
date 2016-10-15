@@ -23,10 +23,9 @@ import com.tongbanjie.tevent.registry.RecoverableRegistry;
 import com.tongbanjie.tevent.registry.zookeeper.ServerZooKeeperRegistry;
 import com.tongbanjie.tevent.rpc.RpcServer;
 import com.tongbanjie.tevent.rpc.protocol.RequestCode;
-import com.tongbanjie.tevent.rpc.netty.NettyClientConfig;
 import com.tongbanjie.tevent.rpc.netty.NettyRpcServer;
 import com.tongbanjie.tevent.rpc.netty.NettyServerConfig;
-import com.tongbanjie.tevent.server.client.ClientHousekeepingService;
+import com.tongbanjie.tevent.server.client.ClientChannelManageService;
 import com.tongbanjie.tevent.server.client.ClientManager;
 import com.tongbanjie.tevent.server.processer.ClientManageProcessor;
 import com.tongbanjie.tevent.server.processer.SendMessageProcessor;
@@ -60,8 +59,6 @@ public class ServerController {
     // 通信层配置
     private final NettyServerConfig nettyServerConfig;
 
-    private final NettyClientConfig nettyClientConfig;
-
     //数据存储层配置
     private final StoreConfig storeConfig;
 
@@ -70,7 +67,7 @@ public class ServerController {
     private final ClientManager clientManager;
 
     // 检测所有客户端连接
-    private final ClientHousekeepingService clientHousekeepingService;
+    private final ClientChannelManageService clientChannelManageService;
 
     /********************** 服务 ***********************/
     //服务注册
@@ -100,20 +97,18 @@ public class ServerController {
 
     public ServerController(final ServerConfig serverConfig, //
                             final NettyServerConfig nettyServerConfig, //
-                            final NettyClientConfig nettyClientConfig, //
                             final StoreConfig storeConfig //
     ) {
         this.serverConfig = serverConfig;
         this.nettyServerConfig = nettyServerConfig;
-        this.nettyClientConfig = nettyClientConfig;
         this.storeConfig = storeConfig;
 
         this.clientManager = new ClientManager();
-        this.clientHousekeepingService = new ClientHousekeepingService(this);
+        this.clientChannelManageService = new ClientChannelManageService(this);
 
         this.sendThreadPoolQueue = new LinkedBlockingQueue<Runnable>(this.serverConfig.getSendThreadPoolQueueCapacity());
 
-        this.serverRegistry = new ServerZooKeeperRegistry(serverConfig.getRegistryAddress());
+        this.serverRegistry = new ServerZooKeeperRegistry(this.serverConfig.getRegistryAddress());
 
     }
 
@@ -121,13 +116,9 @@ public class ServerController {
     public boolean initialize() {
         boolean result = true;
 
-//        result = result && this.topicConfigManager.load();
-//        result = result && this.subscriptionGroupManager.load();
-
         if (result) {
             try {
-                this.storeManager =
-                        new DefaultStoreManager(this.storeConfig);
+                this.storeManager = new DefaultStoreManager(this.storeConfig);
             }
             catch (IOException e) {
                 result = false;
@@ -138,7 +129,7 @@ public class ServerController {
         result = result && this.storeManager.load();
 
         if (result) {
-            this.rpcServer = new NettyRpcServer(this.nettyServerConfig, this.clientHousekeepingService);
+            this.rpcServer = new NettyRpcServer(this.nettyServerConfig, this.clientChannelManageService);
 
             this.sendMessageExecutor = new ThreadPoolExecutor(//
                 this.serverConfig.getSendMessageThreadPoolNums(),//
@@ -152,27 +143,13 @@ public class ServerController {
                             this.serverConfig.getClientManageThreadPoolNums(),
                             new NamedThreadFactory("ClientManageThread_"));
 
+
             this.registerProcessor();
+
+            this.transactionCheckService = new TransactionCheckService(this);
 
             //设置分布式Id生成期 机器Id［每个JVM进程唯一］
             DistributedIdGenerator.setUniqueWorkId(serverConfig.getServerId());
-
-            //服务器地址 [ip]:[port]
-            String localIp = RemotingUtils.getLocalHostIp();
-            if(localIp == null){
-                throw new RuntimeException("Get localHost ip failed.");
-            }
-            serverAddress = new Address(localIp, nettyServerConfig.getListenPort());
-            //注册地址
-            try {
-                serverRegistry.start();
-                serverRegistry.register(serverAddress);
-            } catch (Exception e) {
-                result = false;
-                LOGGER.error("The registry connect failed, address: " + serverConfig.getRegistryAddress(), e);
-            }
-
-            transactionCheckService = new TransactionCheckService(this);
         }
 
         return result;
@@ -210,14 +187,17 @@ public class ServerController {
             this.clientManageExecutor.shutdown();
         }
 
-        if (this.clientHousekeepingService != null) {
-            this.clientHousekeepingService.shutdown();
+        if (this.clientChannelManageService != null) {
+            this.clientChannelManageService.shutdown();
         }
 
-        if(this.transactionCheckService != null){
+        if (this.transactionCheckService != null) {
             this.transactionCheckService.shutdown();
         }
 
+        if (this.serverRegistry != null){
+            this.serverRegistry.shutdown();
+        }
     }
 
     public void start() throws Exception {
@@ -229,8 +209,22 @@ public class ServerController {
             this.rpcServer.start();
         }
 
-        if (this.clientHousekeepingService != null) {
-            this.clientHousekeepingService.start();
+        //服务器地址 [ip]:[port]
+        String localIp = RemotingUtils.getLocalHostIp();
+        if(localIp == null){
+            throw new RuntimeException("Get localHost ip failed.");
+        }
+        serverAddress = new Address(localIp, nettyServerConfig.getListenPort());
+        //注册地址
+        try {
+            serverRegistry.start();
+            serverRegistry.register(serverAddress);
+        } catch (Exception e) {
+            LOGGER.error("The registry connect failed, address: " + serverConfig.getRegistryAddress(), e);
+        }
+
+        if (this.clientChannelManageService != null) {
+            this.clientChannelManageService.start();
         }
 
         if(this.transactionCheckService != null){
@@ -245,10 +239,6 @@ public class ServerController {
 
     public NettyServerConfig getNettyServerConfig() {
         return nettyServerConfig;
-    }
-
-    public NettyClientConfig getNettyClientConfig() {
-        return nettyClientConfig;
     }
 
     public StoreConfig getStoreConfig() {

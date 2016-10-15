@@ -54,7 +54,7 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry {
     public void start() throws Exception {
         // 1、创建根目录
         if (!zkClient.exists(this.registerRootPath)) {
-            zkClient.createPersistent(registerRootPath);
+            zkClient.createPersistent(registerRootPath, true);
             LOGGER.debug("create {} node: {}", registryType, registerRootPath);
         }
 
@@ -63,6 +63,16 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry {
 
         // 3、添加Zk监听器
         addZkListeners();
+    }
+
+    @Override
+    public void shutdown(){
+        //取消注册
+        unregisterAll();
+        //取消所有订阅
+        zkClient.unsubscribeAll();
+        //关闭连接
+        zkClient.close();
     }
 
     protected void addZkListeners(){
@@ -167,7 +177,7 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry {
     protected void discoverAll() {
         String discoverPath = getDiscoverPath();
         if (!zkClient.exists(discoverPath)) {
-            throw new RuntimeException(String.format("can not find node on path: %s", discoverPath));
+            return;
         }
         List<String> childrenPathList = zkClient.getChildren(discoverPath);
 

@@ -67,17 +67,22 @@ public class ServerRequestProcessor implements NettyRequestProcessor {
         return null;
     }
 
-    private RpcCommand checkTransactionStateForRocketMQ(ChannelHandlerContext ctx, RpcCommand request, CheckTransactionStateHeader requestHeader){
+    private RpcCommand checkTransactionStateForRocketMQ(ChannelHandlerContext ctx, RpcCommand request,
+                                                        CheckTransactionStateHeader requestHeader){
+        LOGGER.debug("Received a checkTransactionState request, opaque:{}", request.getOpaque() );
         RocketMQBody requestBody = request.getBody(RocketMQBody.class);
 
         String group = requestBody.getProducerGroup();
+
+        //TODO isOneWayRpc = false;
+        request.isOneWayRpc();
 
         if (group != null) {
             //MQMessageSender producer = this.mqClientFactory.selectProducer(group);
             MQMessageSender mqMessageSender = new RocketMQMessageSender();
             if (mqMessageSender != null) {
                 final String addr = RpcHelper.parseChannelRemoteAddr(ctx.channel());
-                mqMessageSender.checkTransactionState(addr, requestBody.getMessageKey(), requestHeader);
+                mqMessageSender.checkTransactionState(addr, requestBody, requestHeader, this.clientController);
             }
             else {
                 LOGGER.debug("checkTransactionState, pick producer by group[{}] failed", group);

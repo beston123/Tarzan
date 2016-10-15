@@ -24,12 +24,12 @@ public class ClientConfig implements Cloneable{
     /**
      * Heartbeat interval in microseconds with server
      */
-    private int heartbeatBrokerInterval = 1000 * 30;
+    private int heartbeatInterval = 1000 * 30;
 
     /**
      * 注册中心地址
      */
-    private String registryAddress = System.getProperty(Constants.TEVENT_REGISTRY_ADDRESS, "192.168.1.120:2181");
+    private String registryAddress = System.getProperty(Constants.TEVENT_REGISTRY_ADDRESS, "127.0.0.1:2181");
 
     /*********************************** setter getter ***********************************/
 
@@ -50,12 +50,12 @@ public class ClientConfig implements Cloneable{
         this.sendThreadPoolQueueCapacity = sendThreadPoolQueueCapacity;
     }
 
-    public int getHeartbeatBrokerInterval() {
-        return heartbeatBrokerInterval;
+    public int getHeartbeatInterval() {
+        return heartbeatInterval;
     }
 
-    public void setHeartbeatBrokerInterval(int heartbeatBrokerInterval) {
-        this.heartbeatBrokerInterval = heartbeatBrokerInterval;
+    public void setHeartbeatInterval(int heartbeatInterval) {
+        this.heartbeatInterval = heartbeatInterval;
     }
 
     public String getRegistryAddress() {

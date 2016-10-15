@@ -47,18 +47,14 @@ public class ServerManager {
 
     private final RecoverableRegistry clientRegistry;
 
-    private final ClientConfig clientConfig;
-
     private final RpcClient rpcClient;
 
     private final Random random = new Random();
 
     public ServerManager(ClientController clientController) {
         this.clientRegistry = clientController.getClientRegistry();
-        this.clientConfig = clientController.getClientConfig();
         this.rpcClient = clientController.getRpcClient();
     }
-
 
     public void sendHeartbeatToAllServer(){
         List<Address> copy = clientRegistry.getDiscovered();
@@ -66,9 +62,10 @@ public class ServerManager {
         for(Address address : copy){
             HeartbeatData heartbeatData = new HeartbeatData();
             heartbeatData.setClientId("");//TODO clientId
-            heartbeatData.setGroup("");
+            heartbeatData.setGroup("ExampleClientGroup0");
             try {
-                sendHeartbeat(address, heartbeatData, 5000);
+                LOGGER.debug(">>>Send heartbeat '{}' to server {}!", address);
+                sendHeartbeat(address, heartbeatData, 3000);
             } catch (RpcException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {
@@ -84,17 +81,21 @@ public class ServerManager {
 
         RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.HEART_BEAT, null);
         request.setBody(heartbeatData);
-        RpcCommand response = this.rpcClient.invokeSync(serverAddr.getAddress(), request, timeoutMillis);
-        assert response != null;
-        switch (response.getCmdCode()) {
-            case ResponseCode.SUCCESS: {
-                LOGGER.debug(">>>Send heartbeat '{}' to server {} success!",
-                        heartbeatData.getGroup(), serverAddr);
-                return;
-            }
-            default:
-                break;
-        }
+
+        //心跳用 oneWay方式即可
+        this.rpcClient.invokeOneway(serverAddr.getAddress(), request, timeoutMillis);
+
+//        RpcCommand response = this.rpcClient.invokeSync(serverAddr.getAddress(), request, timeoutMillis);
+//        assert response != null;
+//        switch (response.getCmdCode()) {
+//            case ResponseCode.SUCCESS: {
+//                LOGGER.debug(">>>Send heartbeat '{}' to server {} success!",
+//                        heartbeatData.getGroup(), serverAddr);
+//                return;
+//            }
+//            default:
+//                break;
+//        }
     }
 
     public Address discoverOneServer() {

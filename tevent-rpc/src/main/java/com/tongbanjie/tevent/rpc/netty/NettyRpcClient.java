@@ -64,13 +64,9 @@ public class NettyRpcClient extends NettyRpcAbstract implements RpcClient {
     private final ConcurrentHashMap<String /* addr */, ChannelWrapper> channelTables = new ConcurrentHashMap<String, ChannelWrapper>();
     private final Lock lockChannelTables = new ReentrantLock();
 
-//    private final AtomicReference<List<String>> namesrvAddrList = new AtomicReference<List<String>>();
-//    private final AtomicReference<String> namesrvAddrChoosed = new AtomicReference<String>();
-//    private final AtomicInteger namesrvIndex = new AtomicInteger(initValueIndex());
-//    private final Lock lockNamesrvChannel = new ReentrantLock();
-
     /******************************** 线程池 *******************************/
     private final Timer timer = new Timer("ClientHouseKeepingService", true);
+    //共用线程池
     private final ExecutorService publicExecutor;
 
     /******************************** 监听器 *******************************/
@@ -113,12 +109,6 @@ public class NettyRpcClient extends NettyRpcAbstract implements RpcClient {
                 return new Thread(r, String.format("NettyClientSelector_%d", this.threadIndex.incrementAndGet()));
             }
         });
-    }
-
-    private static int initValueIndex() {
-        Random r = new Random();
-
-        return Math.abs(r.nextInt() % 999) % 999;
     }
 
     @Override
@@ -298,35 +288,6 @@ public class NettyRpcClient extends NettyRpcAbstract implements RpcClient {
         }
     }
 
-//    @Override
-//    public void updateNameServerAddressList(List<String> addrs) {
-//        List<String> old = this.namesrvAddrList.get();
-//        boolean update = false;
-//
-//        if (!addrs.isEmpty()) {
-//            if (null == old) {
-//                update = true;
-//            } else if (addrs.size() != old.size()) {
-//                update = true;
-//            } else {
-//                for (int i = 0; i < addrs.size() && !update; i++) {
-//                    if (!old.contains(addrs.get(i))) {
-//                        update = true;
-//                    }
-//                }
-//            }
-//
-//            if (update) {
-//                Collections.shuffle(addrs);
-//                this.namesrvAddrList.set(addrs);
-//            }
-//        }
-//    }
-//
-//    @Override
-//    public List<String> getNameServerAddressList() {
-//        return this.namesrvAddrList.get();
-//    }
 
     @Override
     public RpcCommand invokeSync(String addr, final RpcCommand request, long timeoutMillis)
@@ -372,51 +333,6 @@ public class NettyRpcClient extends NettyRpcAbstract implements RpcClient {
 
         return this.createChannel(addr);
     }
-
-//    private Channel getAndCreateNameserverChannel() throws InterruptedException {
-//        String addr = this.namesrvAddrChoosed.get();
-//        if (addr != null) {
-//            ChannelWrapper cw = this.channelTables.get(addr);
-//            if (cw != null && cw.isOK()) {
-//                return cw.getChannel();
-//            }
-//        }
-//
-//        final List<String> addrList = this.namesrvAddrList.get();
-//        if (this.lockNamesrvChannel.tryLock(LockTimeoutMillis, TimeUnit.MILLISECONDS)) {
-//            try {
-//                addr = this.namesrvAddrChoosed.get();
-//                if (addr != null) {
-//                    ChannelWrapper cw = this.channelTables.get(addr);
-//                    if (cw != null && cw.isOK()) {
-//                        return cw.getChannel();
-//                    }
-//                }
-//
-//                if (addrList != null && !addrList.isEmpty()) {
-//                    for (int i = 0; i < addrList.size(); i++) {
-//                        int index = this.namesrvIndex.incrementAndGet();
-//                        index = Math.abs(index);
-//                        index = index % addrList.size();
-//                        String newAddr = addrList.get(index);
-//
-//                        this.namesrvAddrChoosed.set(newAddr);
-//                        Channel channelNew = this.createChannel(newAddr);
-//                        if (channelNew != null)
-//                            return channelNew;
-//                    }
-//                }
-//            } catch (Exception e) {
-//                LOGGER.error("getAndCreateNameserverChannel: create name server channel exception", e);
-//            } finally {
-//                this.lockNamesrvChannel.unlock();
-//            }
-//        } else {
-//            LOGGER.warn("getAndCreateNameserverChannel: try to lock name server, but timeout, {}ms", LockTimeoutMillis);
-//        }
-//
-//        return null;
-//    }
 
     private Channel createChannel(final String addr) throws InterruptedException {
         ChannelWrapper cw = this.channelTables.get(addr);
@@ -565,9 +481,6 @@ public class NettyRpcClient extends NettyRpcAbstract implements RpcClient {
         return this.publicExecutor;
     }
 
-//    public List<String> getNamesrvAddrList() {
-//        return namesrvAddrList.get();
-//    }
 
     static class ChannelWrapper {
         private final ChannelFuture channelFuture;

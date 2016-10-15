@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -21,8 +22,11 @@ public class ClientZooKeeperRegistry extends AbstractZooKeeperRegistry {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientZooKeeperRegistry.class);
 
-    //已发现的地址
-    protected List<Address> discovered = new ArrayList<Address>();
+    /**
+     * 已发现的地址列表
+     * 使用不可变List，防止并发访问出现IndexOutOfBoundsException
+     */
+    protected List<Address> discovered = Collections.EMPTY_LIST;
 
     private Random random = new Random();
 
@@ -40,10 +44,13 @@ public class ClientZooKeeperRegistry extends AbstractZooKeeperRegistry {
     @Override
     protected void updateDiscovered(List<String> childrenPathList){
         if (CollectionUtils.isEmpty(childrenPathList)) {
-            discovered.clear();
-            return;
+            discovered = Collections.EMPTY_LIST;
+        }else{
+            discovered = toAddressList(childrenPathList);
         }
-        // 1 获取所用子节点的数据
+    }
+
+    private List<Address> toAddressList(List<String> childrenPathList){
         List<Address> addressOnZk = new ArrayList<Address>();
         for(String childPath : childrenPathList){
             Address address = zkClient.readData(this.getDiscoverPath() + ZkConstants.PATH_SEPARATOR + childPath, true);
@@ -51,8 +58,8 @@ public class ClientZooKeeperRegistry extends AbstractZooKeeperRegistry {
                 addressOnZk.add(address);
             }
         }
-        // 2 更新本地列表
-        discovered = addressOnZk;
+        // 返回不可变List
+        return Collections.unmodifiableList(addressOnZk);
     }
 
 

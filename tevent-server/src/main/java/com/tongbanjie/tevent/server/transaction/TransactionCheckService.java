@@ -40,7 +40,7 @@ public class TransactionCheckService {
 
 
     public void start() {
-        this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+        this.scheduledExecutorService.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -50,7 +50,7 @@ public class TransactionCheckService {
                     LOGGER.error("", e);
                 }
             }
-        }, 1000 * 30, 1000 * 30, TimeUnit.MILLISECONDS);
+        }, 1000 * 30, 1000 * 600, TimeUnit.MILLISECONDS);
     }
 
     public void checkTransactionState(){
@@ -59,7 +59,6 @@ public class TransactionCheckService {
             Result<List<RocketMQMessage>> listResult = storeService.selectTrans();
             List<RocketMQMessage> list = listResult.getData();
             for(RocketMQMessage mqMessage : list){
-                mqMessage.getProducerGroup();
                 this.transactionCheckExecutor.gotoCheck(mqMessage.getProducerGroup(), mqMessage);
             }
         }

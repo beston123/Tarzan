@@ -29,22 +29,24 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-
 public class ClientManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientManager.class);
+
     private static final long LockTimeoutMillis = 3000;
+
     private static final long ChannelExpiredTimeout = 1000 * 120;
+
     private final Lock groupChannelLock = new ReentrantLock();
+
     private final HashMap<String /* group name */, HashMap<Channel, ClientChannelInfo>> groupChannelTable =
             new HashMap<String, HashMap<Channel, ClientChannelInfo>>();
-
 
     public ClientManager() {
     }
 
 
     public HashMap<String, HashMap<Channel, ClientChannelInfo>> getGroupChannelTable() {
-        HashMap<String /* group name */, HashMap<Channel, ClientChannelInfo>> newGroupChannelTable =
+        HashMap<String, HashMap<Channel, ClientChannelInfo>> newGroupChannelTable =
                 new HashMap<String, HashMap<Channel, ClientChannelInfo>>();
         try {
             if (this.groupChannelLock.tryLock(LockTimeoutMillis, TimeUnit.MILLISECONDS)){
@@ -99,7 +101,6 @@ public class ClientManager {
             LOGGER.error("", e);
         }
     }
-
 
     public void doChannelCloseEvent(final String remoteAddr, final Channel channel) {
         if (channel != null) {

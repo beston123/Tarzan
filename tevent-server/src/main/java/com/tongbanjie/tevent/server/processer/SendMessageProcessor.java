@@ -2,6 +2,7 @@ package com.tongbanjie.tevent.server.processer;
 
 import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.tongbanjie.tevent.common.message.MQType;
+import com.tongbanjie.tevent.common.message.TransactionState;
 import com.tongbanjie.tevent.rpc.exception.RpcCommandException;
 import com.tongbanjie.tevent.rpc.netty.NettyRequestProcessor;
 import com.tongbanjie.tevent.rpc.protocol.RequestCode;
@@ -42,17 +43,54 @@ public class SendMessageProcessor implements NettyRequestProcessor {
             case RequestCode.TRANSACTION_MESSAGE:
                 return this.transactionMessage(ctx, request);
             default:
-                LOGGER.warn("Unknown request code "+request.getCmdCode());
+                LOGGER.warn("Invalid request，requestCode："+request.getCmdCode());
                 break;
         }
         return RpcCommandBuilder.buildResponse(ResponseCode.INVALID_REQUEST,
-                "未知请求，requestCode："+request.getCmdCode());
+                "Invalid request，requestCode："+request.getCmdCode());
     }
 
-    private RpcCommand transactionMessage(ChannelHandlerContext ctx, RpcCommand request) throws RpcCommandException {
-        TransactionMessageHeader header = (TransactionMessageHeader) request.decodeCustomHeader(TransactionMessageHeader.class);
+    /**
+     * 发送普通消息
+     * @param ctx
+     * @param request
+     * @return
+     * @throws MQClientException
+     * @throws RpcCommandException
+     */
+    private RpcCommand sendMessage(ChannelHandlerContext ctx, RpcCommand request) throws MQClientException, RpcCommandException {
+        //1、解析并校验 消息头
+        SendMessageHeader header = (SendMessageHeader)request.decodeCustomHeader(SendMessageHeader.class);
+
+        //2、获取事件处理者
         EventProducer producer = getProducer(header.getMqType());
-        //TODO 检查producer是否存在
+        if(producer == null){
+            return RpcCommandBuilder.buildResponse(ResponseCode.SYSTEM_ERROR,
+                    "System error：can not find a producer to handle the message {}" + header);
+        }
+        //3、处理事件
+        return producer.sendMessage(ctx, request);
+    }
+
+    /**
+     * 事务消息
+     * @param ctx
+     * @param request
+     * @return
+     * @throws RpcCommandException
+     */
+    private RpcCommand transactionMessage(ChannelHandlerContext ctx, RpcCommand request) throws RpcCommandException {
+        //1、解析并校验 消息头
+        TransactionMessageHeader header = (TransactionMessageHeader) request.decodeCustomHeader(TransactionMessageHeader.class);
+        checkTransactionMessage(header);
+
+        //2、获取事件处理者
+        EventProducer producer = getProducer(header.getMqType());
+        if(producer == null){
+            return RpcCommandBuilder.buildResponse(ResponseCode.SYSTEM_ERROR,
+                    "System error：can not find a producer to handle the message {}"+ header);
+        }
+        //3、处理事件
         switch (header.getTransactionState()){
             case PREPARE:
                 return producer.prepareMessage(ctx, request);
@@ -61,22 +99,30 @@ public class SendMessageProcessor implements NettyRequestProcessor {
             case ROLLBACK:
                 return producer.rollbackMessage(ctx, request, header.getTransactionId());
             case UNKNOWN:
-                break;
+                return producer.unknownMessage(ctx, request, header.getTransactionId());
             default:
                 break;
         }
+        //never goto here
         return RpcCommandBuilder.buildResponse(ResponseCode.INVALID_REQUEST,
-                "未知事务状态, transactionState: "+header.getTransactionState());
+                "Param error: transactionState can not be null");
     }
 
-    private RpcCommand sendMessage(ChannelHandlerContext ctx, RpcCommand request) throws MQClientException, RpcCommandException {
-        SendMessageHeader header = (SendMessageHeader)request.decodeCustomHeader(SendMessageHeader.class);
-        EventProducer producer = getProducer(header.getMqType());
-        //TODO 检查producer是否存在
-        if(producer == null){
-
+    private void checkTransactionMessage(TransactionMessageHeader header) throws RpcCommandException{
+        checkMessage(header);
+        if(header.getTransactionState() != null && header.getTransactionState() != TransactionState.PREPARE
+                && header.getTransactionId() == null){
+            throw new RpcCommandException("Param error: transactionId can not be null when transactionState is " + header.getTransactionState());
         }
-        return producer.sendMessage(ctx, request);
+    }
+
+    private void checkMessage(SendMessageHeader header) throws RpcCommandException{
+        if(header == null){
+            throw new RpcCommandException("Param error: messageHeader can not be null");
+        }
+        if(header.getMqType() == null){
+            throw new RpcCommandException("Param error: mqType can not be null");
+        }
     }
 
     private EventProducer getProducer(MQType mqType){

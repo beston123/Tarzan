@@ -15,12 +15,16 @@
  */
 package com.tongbanjie.tevent.server.transaction;
 
+import com.tongbanjie.tevent.common.body.RocketMQBody;
 import com.tongbanjie.tevent.common.message.MQMessage;
 import com.tongbanjie.tevent.common.message.MQType;
 import com.tongbanjie.tevent.common.message.RocketMQMessage;
+import com.tongbanjie.tevent.rpc.InvokeCallback;
+import com.tongbanjie.tevent.rpc.ResponseFuture;
 import com.tongbanjie.tevent.rpc.RpcServer;
 import com.tongbanjie.tevent.rpc.exception.RpcException;
 import com.tongbanjie.tevent.rpc.protocol.RequestCode;
+import com.tongbanjie.tevent.rpc.protocol.ResponseCode;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommand;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommandBuilder;
 import com.tongbanjie.tevent.rpc.protocol.header.CheckTransactionStateHeader;
@@ -33,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * 用来主动回查Producer的事务状态
+ * 主动回查Producer的事务状态
  *
  */
 public class DefaultTransactionCheckExecutor implements TransactionCheckExecutor {
@@ -73,36 +77,48 @@ public class DefaultTransactionCheckExecutor implements TransactionCheckExecutor
         sendTransactionCheckRequest(clientChannelInfo.getChannel(), result.getData());
     }
 
-    private void sendTransactionCheckRequest(Channel channel, RocketMQMessage rocketMQMessage){
+    private void sendTransactionCheckRequest(final Channel channel, final RocketMQMessage rocketMQMessage){
         final CheckTransactionStateHeader requestHeader = new CheckTransactionStateHeader();
         requestHeader.setMqType(MQType.ROCKET_MQ);
         requestHeader.setMessageKey(rocketMQMessage.getMessageKey());
         requestHeader.setTransactionId(rocketMQMessage.getId());
 
-        RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.CHECK_TRANSACTION_STATE,
-                requestHeader);
+        final RocketMQBody mqBody = new RocketMQBody();
+        mqBody.setTopic(rocketMQMessage.getTopic());
+        mqBody.setProducerGroup(rocketMQMessage.getProducerGroup());
+        mqBody.setMessageBody(rocketMQMessage.getMessageBody());
+        mqBody.setMessageKey(rocketMQMessage.getMessageKey());
+
+        final RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.CHECK_TRANSACTION_STATE,
+                requestHeader, mqBody);
+        LOGGER.info("Send transactionCheck request, opaque:{}", request.getOpaque());
 
         try {
-            rpcServer.invokeOneway(channel, request, 5000);
+            rpcServer.invokeAsync(channel, request, 10 * 1000, new InvokeCallback(){
+                @Override
+                public void operationComplete(ResponseFuture responseFuture) {
+                    RpcCommand response = responseFuture.getResponseCommand();
+                    if(response == null){
+                        if(responseFuture.isSendRequestOK()){
+                            LOGGER.info("Send transactionCheck request success, opaque:{}", request.getOpaque());
+                        }else{
+                            LOGGER.error("Send transactionCheck request failed");
+                        }
+                    }else{
+                        if(response.getCmdCode() == ResponseCode.SUCCESS){
+                            LOGGER.info("Get transactionCheck response, result is success. {}",  mqBody);
+                        }else{
+                            LOGGER.warn("Get transactionCheck response, result is error, code:{}. {}",
+                                    request.getCmdCode(),  mqBody);
+                        }
+                    }
+                }
+            });
         } catch (InterruptedException e) {
             LOGGER.error("InterruptedException", e);
         } catch (RpcException e) {
             LOGGER.error("RpcException", e);
         }
-//        try {
-//            channel.writeAndFlush(fileRegion).addListener(new ChannelFutureListener() {
-//                @Override
-//                public void operationComplete(ChannelFuture future) throws Exception {
-//                    selectMapedBufferResult.release();
-//                    if (!future.isSuccess()) {
-//                        log.error("invokeProducer failed,", future.cause());
-//                    }
-//                }
-//            });
-//        }
-//        catch (Throwable e) {
-//            log.error("invokeProducer exception", e);
-//            selectMapedBufferResult.release();
-//        }
+
     }
 }

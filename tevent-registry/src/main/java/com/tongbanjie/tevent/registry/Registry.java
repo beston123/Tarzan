@@ -18,6 +18,11 @@ public interface Registry {
     void start() throws Exception;
 
     /**
+     * 停止
+     */
+    void shutdown();
+
+    /**
      * 注册到指定路径
      * @param path
      * @param address

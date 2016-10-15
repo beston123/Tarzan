@@ -40,4 +40,9 @@ public class RabbitMQProducer implements EventProducer {
     public RpcCommand rollbackMessage(ChannelHandlerContext ctx, RpcCommand request, Long transactionId) {
         return null;
     }
+
+    @Override
+    public RpcCommand unknownMessage(ChannelHandlerContext ctx, RpcCommand request, Long transactionId) {
+        return null;
+    }
 }

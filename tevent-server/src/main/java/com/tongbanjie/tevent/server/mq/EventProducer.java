@@ -22,4 +22,5 @@ public interface EventProducer {
 
     RpcCommand rollbackMessage(ChannelHandlerContext ctx, RpcCommand request, Long transactionId);
 
+    RpcCommand unknownMessage(ChannelHandlerContext ctx, RpcCommand request, Long transactionId);
 }

@@ -1,12 +1,12 @@
-package com.tongbanjie.tevent.client;
+package client;
 
 import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.common.message.Message;
+import com.tongbanjie.tevent.client.ClientConfig;
 import com.tongbanjie.tevent.client.validator.RocketMQValidators;
 import com.tongbanjie.tevent.common.body.RocketMQBody;
 import com.tongbanjie.tevent.common.message.MQType;
 import com.tongbanjie.tevent.common.message.TransactionState;
-import com.tongbanjie.tevent.common.util.RemotingUtils;
 import com.tongbanjie.tevent.registry.Address;
 import com.tongbanjie.tevent.registry.RecoverableRegistry;
 import com.tongbanjie.tevent.registry.zookeeper.ClientZooKeeperRegistry;
@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.*;
 
@@ -47,13 +48,13 @@ public class ExampleClient {
 
     private ClientConfig clientConfig = new ClientConfig();
 
-    private String producerGroup = "ExampleClientGroup";
+    private String producerGroup = "ExampleClientGroup0";
 
     private String clientId = "123444";
 
     private NettyClientConfig nettyClientConfig = new NettyClientConfig();
 
-    private Address serverAddr = new Address(RemotingUtils.getLocalHostIp(), 7777);
+    private Address serverAddr;
 
     private final ConcurrentHashMap<String/* Server Name */, HashMap<Long/* brokerId */, String/* address */>> serverAddrTable =
             new ConcurrentHashMap<String, HashMap<Long, String>>();
@@ -97,7 +98,7 @@ public class ExampleClient {
                     LOGGER.error("ScheduledTask sendHeartbeatToAllServer exception", e);
                 }
             }
-        }, 30, 30, TimeUnit.SECONDS);
+        }, 30 * 1000, clientConfig.getHeartbeatInterval(), TimeUnit.MILLISECONDS);
     }
 
     private void cleanOfflineServer() {
@@ -119,7 +120,7 @@ public class ExampleClient {
     public void sendHeartbeat(final HeartbeatData heartbeatData,//
                               final long timeoutMillis//
     ) throws RpcException, InterruptedException {
-
+        serverAddr = discoverOneServer();
         RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.HEART_BEAT, null);
         request.setBody(heartbeatData);
 
@@ -139,6 +140,7 @@ public class ExampleClient {
     }
 
     public void unregister() throws RpcException, InterruptedException {
+        serverAddr = discoverOneServer();
         unregister(serverAddr.getAddress(), clientId, producerGroup, 6 << 10);
     }
 
@@ -170,6 +172,7 @@ public class ExampleClient {
     }
 
     public void sendMessage(Message message, String group, boolean trans) throws RpcException, InterruptedException {
+        serverAddr = discoverOneServer();
         if(trans){
             transMessage(message, serverAddr.getAddress(), group, 6 << 10);
         }else{
@@ -360,5 +363,68 @@ public class ExampleClient {
                         + "' fail, 未知原因："+response.getRemark()+", transactionId="+transactionId);
                 break;
         }
+    }
+    private Random random = new Random();
+    public Address discoverOneServer() {
+        List<Address> copy = clientRegistry.getDiscovered();
+        int size = copy.size();
+        Address address = null;
+        if(size == 0){
+            LOGGER.warn("Can not find a server.");
+            return null;
+        }else if(size == 1) {
+            // 若只有一个地址，则获取该地址
+            address = copy.get(0);
+        } else {
+            // 若存在多个地址，则随机获取一个地址
+            // TODO 此处要做负载均衡
+            address = copy.get(random.nextInt(size));
+        }
+        LOGGER.debug("Find a server {}", address);
+        return address;
+    }
+
+
+    public static void main(String[] args){
+        ExampleClient client = new ExampleClient();
+
+        client.init();
+
+        Random random = new Random();
+
+        for(int i=0; i< 3; i++){
+            try {
+                Message message = new Message();
+                message.setTopic("TOPIC_TEVENT_KE");
+                message.setKeys("test_000_" + i);
+                message.setBody(("Hello TEvent " + i).getBytes());
+                client.sendMessage(message, "ExampleClientGroup"+i, true);
+                //Thread.sleep(10<<10);
+            } catch (RpcException e) {
+                e.printStackTrace();
+                try {
+                    Thread.sleep(5<<10);
+                } catch (InterruptedException e1) {
+                    //
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            Thread.sleep(5000<<10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            client.unregister();
+        } catch (RpcException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 }

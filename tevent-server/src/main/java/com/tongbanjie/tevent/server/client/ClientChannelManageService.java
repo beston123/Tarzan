@@ -16,8 +16,7 @@
  */
 package com.tongbanjie.tevent.server.client;
 
-
-import com.tongbanjie.tevent.common.util.NamedThreadFactory;
+import com.tongbanjie.tevent.common.util.NamedSingleThreadFactory;
 import com.tongbanjie.tevent.rpc.netty.ChannelEventListener;
 import com.tongbanjie.tevent.server.ServerController;
 import io.netty.channel.Channel;
@@ -28,30 +27,28 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class ClientHousekeepingService implements ChannelEventListener {
+public class ClientChannelManageService implements ChannelEventListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClientHousekeepingService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClientChannelManageService.class);
 
     private final ServerController serverController;
 
-    private ScheduledExecutorService scheduledExecutorService = Executors
-        .newSingleThreadScheduledExecutor(new NamedThreadFactory("ClientHousekeepingScheduledThread"));
+    private ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(
+            new NamedSingleThreadFactory("ClientManageScheduledThread"));
 
-
-    public ClientHousekeepingService(final ServerController serverController) {
+    public ClientChannelManageService(final ServerController serverController) {
         this.serverController = serverController;
     }
-
 
     public void start() {
         this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 try {
-                    ClientHousekeepingService.this.scanExceptionChannel();
+                    ClientChannelManageService.this.scanExceptionChannel();
                 }
                 catch (Exception e) {
-                    LOGGER.error("", e);
+                    LOGGER.error("ClientChannelManageService scanExceptionChannel exception ", e);
                 }
             }
         }, 1000 * 10, 1000 * 10, TimeUnit.MILLISECONDS);
@@ -65,7 +62,6 @@ public class ClientHousekeepingService implements ChannelEventListener {
 
     private void scanExceptionChannel() {
         this.serverController.getClientManager().scanNotActiveChannel();
-//        this.serverController.getConsumerManager().scanNotActiveChannel();
     }
 
 
@@ -78,20 +74,17 @@ public class ClientHousekeepingService implements ChannelEventListener {
     @Override
     public void onChannelClose(String remoteAddr, Channel channel) {
         this.serverController.getClientManager().doChannelCloseEvent(remoteAddr, channel);
-//        this.serverController.getConsumerManager().doChannelCloseEvent(remoteAddr, channel);
     }
 
 
     @Override
     public void onChannelException(String remoteAddr, Channel channel) {
         this.serverController.getClientManager().doChannelCloseEvent(remoteAddr, channel);
-//        this.serverController.getConsumerManager().doChannelCloseEvent(remoteAddr, channel);
     }
 
 
     @Override
     public void onChannelIdle(String remoteAddr, Channel channel) {
         this.serverController.getClientManager().doChannelCloseEvent(remoteAddr, channel);
-//        this.serverController.getConsumerManager().doChannelCloseEvent(remoteAddr, channel);
     }
 }

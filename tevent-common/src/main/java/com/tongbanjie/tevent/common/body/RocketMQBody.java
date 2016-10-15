@@ -1,5 +1,7 @@
 package com.tongbanjie.tevent.common.body;
 
+import java.util.Arrays;
+
 /**
  * RocketMQ 协议体 <p>
  * 〈功能详细描述〉
@@ -59,5 +61,14 @@ public class RocketMQBody implements CustomBody {
         this.messageBody = messageBody;
     }
 
-
+    @Override
+    public String toString() {
+        return "RocketMQBody{" +
+                "topic='" + topic + '\'' +
+                ", tags='" + tags + '\'' +
+                ", producerGroup='" + producerGroup + '\'' +
+                ", messageKey='" + messageKey + '\'' +
+                ", messageBody=" + Arrays.toString(messageBody) +
+                '}';
+    }
 }

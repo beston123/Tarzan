@@ -22,7 +22,9 @@ public class RpcHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcHelper.class);
 
-    public static String RpcLogName = "TEventRpc";
+    public static final String RpcLogName = "TEventRpc";
+
+    public static final String OS_NAME = System.getProperty("os.name");
 
     private RpcHelper(){}
 
@@ -96,6 +98,9 @@ public class RpcHelper {
 
 
     public static boolean isLinuxPlatform() {
-        return true;
+        if (OS_NAME != null && OS_NAME.toLowerCase().indexOf("linux") >= 0) {
+            return true;
+        }
+        return false;
     }
 }
