@@ -23,7 +23,7 @@ import com.tongbanjie.tevent.rpc.protocol.header.RegisterRequestHeader;
 import com.tongbanjie.tevent.rpc.netty.NettyRequestProcessor;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommand;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommandBuilder;
-import com.tongbanjie.tevent.rpc.protocol.heartbeat.HeartbeatData;
+import com.tongbanjie.tevent.rpc.protocol.body.HeartbeatData;
 import com.tongbanjie.tevent.server.ServerController;
 import com.tongbanjie.tevent.server.client.ClientChannelInfo;
 import io.netty.channel.ChannelHandlerContext;

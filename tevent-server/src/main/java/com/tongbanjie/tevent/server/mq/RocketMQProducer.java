@@ -60,7 +60,9 @@ public class RocketMQProducer implements EventProducer {
         RpcCommand response = null;
         final RocketMQBody mqBody = request.getBody(RocketMQBody.class);
 
-        SendResult sendResult = sendMessage(mqBody);
+        RocketMQMessage mqMessage = RocketMQMessage.build(mqBody, TransactionState.PREPARE);
+
+        SendResult sendResult = sendMessage(mqMessage);
         if(sendResult != null){
             response = RpcCommandBuilder.buildSuccess();
             LOGGER.info("发送消息 messageKey:" + mqBody.getMessageKey()
@@ -72,10 +74,10 @@ public class RocketMQProducer implements EventProducer {
         return response;
     }
 
-    private SendResult sendMessage(RocketMQBody mqBody){
+    private SendResult sendMessage(RocketMQMessage mqMessage){
         MQProducer producer = null;
         try {
-            producer = getMQProducer(mqBody.getProducerGroup());
+            producer = getMQProducer(mqMessage.getProducerGroup());
         } catch (MQClientException e) {
             e.printStackTrace();
         }
@@ -84,11 +86,11 @@ public class RocketMQProducer implements EventProducer {
             throw new RuntimeException();
         }
 
-        Message msg = new Message(mqBody.getTopic(),// topic
-                mqBody.getTags(),       // tag
-                mqBody.getMessageBody() // body
+        Message msg = new Message(mqMessage.getTopic(),// topic
+                mqMessage.getTags(),       // tag
+                mqMessage.getMessageBody() // body
         );
-        msg.setKeys(mqBody.getMessageKey());
+        msg.setKeys(mqMessage.getMessageKey());
         try {
             SendResult sendResult = producer.send(msg);
             LOGGER.info("Send status {}, msgId {}", sendResult.getSendStatus(), sendResult.getMsgId());
@@ -116,15 +118,16 @@ public class RocketMQProducer implements EventProducer {
         //持久化 消息
         Result<Long> putResult = mQStoreService.put(mqMessage);
         if(putResult.isSuccess()){
-            Long tid = putResult.getData();
+            Long transactionId = putResult.getData();
+
+            LOGGER.debug("准备事务消息 topic:{}, messageKey:{}, transactionId:{}" ,
+                    mqMessage.getTopic(), mqMessage.getMessageKey(), transactionId);
 
             TransactionMessageHeader responseHeader = new TransactionMessageHeader();
-            responseHeader.setTransactionId(tid);
+            responseHeader.setTransactionId(transactionId);
 
             response = RpcCommandBuilder.buildSuccess(responseHeader);
-            LOGGER.debug("准备消息 topic:" + mqMessage.getTopic()
-                    + ", messageKey:" + mqMessage.getMessageKey()
-                    + ", transactionId:" + tid);
+
         }else{
             LOGGER.error("准备事务消息失败, topic:{}, messageKey:{}, error:{}",
                     mqMessage.getTopic(), mqMessage.getMessageKey(), putResult.getErrorString());
@@ -147,24 +150,23 @@ public class RocketMQProducer implements EventProducer {
             }else{
                 RocketMQMessage mqMessage = getResult.getData();
                 mqMessage.setTransactionState(TransactionState.COMMIT.getCode());
-                if(newMqBody.getMessageBody() != null){
+                if(newMqBody !=null && newMqBody.getMessageBody() != null){
                     //更新消息体
                     mqMessage.setMessageBody(newMqBody.getMessageBody());
                 }
-                LOGGER.debug("提交事务消息 topic:" + mqMessage.getTopic()
-                        + ", messageKey:" + mqMessage.getMessageKey()
-                        + ", transactionId:" + transactionId);
                 //TODO x锁更新
                 // update transaction_message set transactionState=COMMIT where id=#{transactionId} and transactionState=PREPARE
                 Result<RocketMQMessage> commitResult = mQStoreService.update(transactionId, mqMessage);
                 if(commitResult.isSuccess()){
+                    LOGGER.debug("提交事务消息 topic:{}, messageKey:{}, transactionId:{}" ,
+                            mqMessage.getTopic(), mqMessage.getMessageKey(), transactionId);
                     response = RpcCommandBuilder.buildSuccess();  
                 }else{
                     LOGGER.error("提交事务消息失败, transactionId: " + transactionId+", error: "+ commitResult.getErrorString());
                     response = RpcCommandBuilder.buildFail("提交事务消息失败," + commitResult.getErrorString());
                 }
                 //发送消息
-                sendMessage(newMqBody);
+                sendMessage(mqMessage);
             }
         }else{
             LOGGER.error("提交事务消息失败, transactionId: " + transactionId+", error: "+ getResult.getErrorString());
@@ -184,13 +186,13 @@ public class RocketMQProducer implements EventProducer {
             }else{
                 RocketMQMessage mqMessage = getResult.getData();
                 mqMessage.setTransactionState(TransactionState.ROLLBACK.getCode());
-                LOGGER.info("回滚事务消息 topic:" + mqMessage.getTopic()
-                        + ", messageKey:" + mqMessage.getMessageKey()
-                        + ", transactionId:" + transactionId );
+
                 //TODO x锁更新
                 // update transaction_message set transactionState=ROLLBACK where id=#{transactionId} and transactionState=PREPARE
                 Result<RocketMQMessage> rollbackResult = mQStoreService.update(transactionId, mqMessage);
                 if(rollbackResult.isSuccess()){
+                    LOGGER.debug("回滚事务消息 topic:{}, messageKey:{}, transactionId:{}" ,
+                            mqMessage.getTopic(), mqMessage.getMessageKey(), transactionId);
                     response = RpcCommandBuilder.buildSuccess();
                 }else{
                     LOGGER.error("事务消息回滚失败, transactionId: " + transactionId+", error: "+ rollbackResult.getErrorString());
@@ -215,13 +217,12 @@ public class RocketMQProducer implements EventProducer {
             }else{
                 RocketMQMessage mqMessage = getResult.getData();
 
-                LOGGER.info("事务消息状态更新 topic:" + mqMessage.getTopic()
-                        + ", messageKey:" + mqMessage.getMessageKey()
-                        + ", transactionId:" + transactionId );
                 //TODO x锁更新
                 // update transaction_message set retry_times=retry_times+1 where id=#{transactionId} and transactionState=
                 Result<RocketMQMessage> updateResult = mQStoreService.update(transactionId, mqMessage);
                 if(updateResult.isSuccess()){
+                    LOGGER.debug("事务消息状态更新 topic:{}, messageKey:{}, transactionId:{}" ,
+                            mqMessage.getTopic(), mqMessage.getMessageKey(), transactionId);
                     response = RpcCommandBuilder.buildSuccess();
                 }else{
                     LOGGER.error("事务消息状态更新失败, transactionId: " + transactionId+", error: "+ updateResult.getErrorString());

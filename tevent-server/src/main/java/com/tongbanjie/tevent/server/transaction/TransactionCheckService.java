@@ -50,7 +50,7 @@ public class TransactionCheckService {
                     LOGGER.error("", e);
                 }
             }
-        }, 1000 * 30, 1000 * 600, TimeUnit.MILLISECONDS);
+        }, 1000 * 30, 1000 * 60 * 3, TimeUnit.MILLISECONDS);
     }
 
     public void checkTransactionState(){

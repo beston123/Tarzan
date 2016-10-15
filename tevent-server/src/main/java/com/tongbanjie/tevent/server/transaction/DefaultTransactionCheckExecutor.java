@@ -89,10 +89,9 @@ public class DefaultTransactionCheckExecutor implements TransactionCheckExecutor
         mqBody.setMessageBody(rocketMQMessage.getMessageBody());
         mqBody.setMessageKey(rocketMQMessage.getMessageKey());
 
+        final Long tid = rocketMQMessage.getId();
         final RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.CHECK_TRANSACTION_STATE,
                 requestHeader, mqBody);
-        LOGGER.info("Send transactionCheck request, opaque:{}", request.getOpaque());
-
         try {
             rpcServer.invokeAsync(channel, request, 10 * 1000, new InvokeCallback(){
                 @Override
@@ -100,16 +99,16 @@ public class DefaultTransactionCheckExecutor implements TransactionCheckExecutor
                     RpcCommand response = responseFuture.getResponseCommand();
                     if(response == null){
                         if(responseFuture.isSendRequestOK()){
-                            LOGGER.info("Send transactionCheck request success, opaque:{}", request.getOpaque());
+                            LOGGER.info("Send transactionCheck request success, transactionId:{}", tid);
                         }else{
-                            LOGGER.error("Send transactionCheck request failed");
+                            LOGGER.error("Send transactionCheck request failed, transactionId:{}", tid);
                         }
                     }else{
                         if(response.getCmdCode() == ResponseCode.SUCCESS){
-                            LOGGER.info("Get transactionCheck response, result is success. {}",  mqBody);
+                            LOGGER.info("Get transactionCheck response, result is success, transactionId:{}",  tid);
                         }else{
-                            LOGGER.warn("Get transactionCheck response, result is error, code:{}. {}",
-                                    request.getCmdCode(),  mqBody);
+                            LOGGER.warn("Get transactionCheck response, result is error, errorCode:{}, transactionId:{}",
+                                    request.getCmdCode(),  tid);
                         }
                     }
                 }
