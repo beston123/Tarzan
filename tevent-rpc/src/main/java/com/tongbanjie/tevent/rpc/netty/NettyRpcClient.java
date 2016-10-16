@@ -323,8 +323,8 @@ public class NettyRpcClient extends NettyRpcAbstract implements RpcClient {
 
     private Channel getAndCreateChannel(final String addr) throws InterruptedException {
         if (null == addr) {
-            //return getAndCreateNameserverChannel();
-            throw new IllegalArgumentException("没有可用的server地址");
+            //TODO 是否需要重新获取服务端一次？
+            return null;
         }
         ChannelWrapper cw = this.channelTables.get(addr);
         if (cw != null && cw.isOK()) {

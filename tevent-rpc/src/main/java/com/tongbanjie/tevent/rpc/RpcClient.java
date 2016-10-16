@@ -53,10 +53,5 @@ public interface RpcClient extends RpcService {
 
     /****************************** 更新服务器地址 *****************************/
 
-//    void updateNameServerAddressList(final List<String> addrs);
-//
-//    List<String> getNameServerAddressList();
-//
-
     boolean isChannelWritable(final String addr);
 }

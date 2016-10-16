@@ -17,22 +17,21 @@
 package com.tongbanjie.tevent.client;
 
 
+import com.tongbanjie.tevent.client.sender.MQMessageSender;
+import com.tongbanjie.tevent.common.Constants;
 import com.tongbanjie.tevent.registry.Address;
 import com.tongbanjie.tevent.registry.RecoverableRegistry;
 import com.tongbanjie.tevent.rpc.RpcClient;
-import com.tongbanjie.tevent.rpc.exception.RpcException;
+import com.tongbanjie.tevent.rpc.exception.*;
 import com.tongbanjie.tevent.rpc.protocol.RequestCode;
-import com.tongbanjie.tevent.rpc.protocol.ResponseCode;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommand;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommandBuilder;
-import com.tongbanjie.tevent.rpc.protocol.heartbeat.HeartbeatData;
-import io.netty.channel.Channel;
-import org.apache.commons.collections4.MapUtils;
+import com.tongbanjie.tevent.rpc.protocol.body.HeartbeatData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -41,48 +40,60 @@ public class ServerManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerManager.class);
 
-    private static final long LockTimeoutMillis = 3000;
-
-    private final Lock groupChannelLock = new ReentrantLock();
-
     private final RecoverableRegistry clientRegistry;
 
     private final RpcClient rpcClient;
+
+    private final ConcurrentHashMap<String/* group */, MQMessageSender> messageSenderTable;
 
     private final Random random = new Random();
 
     public ServerManager(ClientController clientController) {
         this.clientRegistry = clientController.getClientRegistry();
         this.rpcClient = clientController.getRpcClient();
+        this.messageSenderTable = clientController.getMessageSenderTable();
     }
 
     public void sendHeartbeatToAllServer(){
         List<Address> copy = clientRegistry.getDiscovered();
-        LOGGER.debug("Start send heartbeat to {} servers....",  copy.size());
+        if(LOGGER.isDebugEnabled()){
+            LOGGER.debug("Start to send heartbeat to {} servers.",  copy.size());
+        }
         for(Address address : copy){
-            HeartbeatData heartbeatData = new HeartbeatData();
-            heartbeatData.setClientId("");//TODO clientId
-            heartbeatData.setGroup("ExampleClientGroup0");
-            try {
-                LOGGER.debug(">>>Send heartbeat '{}' to server {}!", address);
-                sendHeartbeat(address, heartbeatData, 3000);
-            } catch (RpcException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            sendHeartbeatToServer(address);
         }
     }
 
-    public void sendHeartbeat(final Address serverAddr,
+    private void sendHeartbeatToServer(final Address serverAddr){
+        for(String producerGroup : this.messageSenderTable.keySet()){
+            HeartbeatData heartbeatData = new HeartbeatData();
+            heartbeatData.setClientId("");//TODO clientId
+            heartbeatData.setGroup(producerGroup);
+            try {
+                sendHeartbeat(serverAddr, heartbeatData, 3000);
+            } catch (RpcConnectException e) {
+                LOGGER.warn("Send heartbeat to server " + serverAddr +
+                        " exception, maybe lose connection with the sever.", e);
+            } catch (RpcException e) {
+                LOGGER.warn("Send heartbeat to server " + serverAddr + " exception.", e);
+            } catch (Exception e) {
+                LOGGER.warn("Send heartbeat to server " + serverAddr + " exception.", e);
+            }
+        }
+
+    }
+
+    private void sendHeartbeat(final Address serverAddr,
                               final HeartbeatData heartbeatData,//
                               final long timeoutMillis//
-    ) throws RpcException, InterruptedException {
-
+    ) throws InterruptedException, RpcConnectException, RpcTooMuchRequestException, RpcSendRequestException, RpcTimeoutException {
+        if(LOGGER.isDebugEnabled()){
+            LOGGER.debug("Send heartbeat '{}' to server {}.", serverAddr);
+        }
         RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.HEART_BEAT, null);
         request.setBody(heartbeatData);
 
-        //心跳用 oneWay方式即可
+        //用oneWay方式即可
         this.rpcClient.invokeOneway(serverAddr.getAddress(), request, timeoutMillis);
 
 //        RpcCommand response = this.rpcClient.invokeSync(serverAddr.getAddress(), request, timeoutMillis);
@@ -98,7 +109,7 @@ public class ServerManager {
 //        }
     }
 
-    public Address discoverOneServer() {
+    public Address discover() {
         List<Address> copy = clientRegistry.getDiscovered();
         int size = copy.size();
         Address address = null;
@@ -113,7 +124,9 @@ public class ServerManager {
             // TODO 此处要做负载均衡
             address = copy.get(random.nextInt(size));
         }
-        LOGGER.debug("Find a server {}", address);
+        if(LOGGER.isDebugEnabled()){
+            LOGGER.debug("Find a server {}", address);
+        }
         return address;
     }
 

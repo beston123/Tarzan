@@ -13,6 +13,9 @@ public abstract class Constants {
 
     public static final String TEVENT_ROCKETMQ_NAMESRV = "tevent.rocketmq.namesrv";
 
+    public static final String TEVENT_TEST_P_GROUP = "%TEVENT_TEST_P_GROUP%";
+
+    public static final String TEVENT_TEST_TOPIC = "%TEVENT_TEST_TOPIC%";
 
 
 }

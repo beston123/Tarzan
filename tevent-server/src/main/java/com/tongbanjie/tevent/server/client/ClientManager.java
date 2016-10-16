@@ -211,6 +211,7 @@ public class ClientManager {
         }
         List<ClientChannelInfo> clientChannelInfoList = new ArrayList<ClientChannelInfo>(map.values());
         int size = clientChannelInfoList.size();
+        //TODO 均衡负载
         return clientChannelInfoList.get(new Random().nextInt(size));
     }
 }

@@ -71,7 +71,7 @@ public class NettyRpcServer extends NettyRpcAbstract implements RpcServer {
     /******************************** 其他 *******************************/
     private RpcHook rpcHook;
 
-    private int port = 7777;
+    private int port;
 
     public NettyRpcServer(final NettyServerConfig nettyServerConfig) {
         this(nettyServerConfig, null);

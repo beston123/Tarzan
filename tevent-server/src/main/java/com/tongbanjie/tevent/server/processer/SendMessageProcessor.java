@@ -82,7 +82,7 @@ public class SendMessageProcessor implements NettyRequestProcessor {
     private RpcCommand transactionMessage(ChannelHandlerContext ctx, RpcCommand request) throws RpcCommandException {
         //1、解析并校验 消息头
         TransactionMessageHeader header = (TransactionMessageHeader) request.decodeCustomHeader(TransactionMessageHeader.class);
-        checkTransactionMessage(header);
+        validateTransactionMessage(header);
 
         //2、获取事件处理者
         EventProducer producer = getProducer(header.getMqType());
@@ -108,15 +108,15 @@ public class SendMessageProcessor implements NettyRequestProcessor {
                 "Param error: transactionState can not be null");
     }
 
-    private void checkTransactionMessage(TransactionMessageHeader header) throws RpcCommandException{
-        checkMessage(header);
+    private void validateTransactionMessage(TransactionMessageHeader header) throws RpcCommandException{
+        validateMessage(header);
         if(header.getTransactionState() != null && header.getTransactionState() != TransactionState.PREPARE
                 && header.getTransactionId() == null){
             throw new RpcCommandException("Param error: transactionId can not be null when transactionState is " + header.getTransactionState());
         }
     }
 
-    private void checkMessage(SendMessageHeader header) throws RpcCommandException{
+    private void validateMessage(SendMessageHeader header) throws RpcCommandException{
         if(header == null){
             throw new RpcCommandException("Param error: messageHeader can not be null");
         }

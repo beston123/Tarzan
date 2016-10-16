@@ -1,4 +1,4 @@
-package com.tongbanjie.tevent.rpc.protocol.heartbeat;
+package com.tongbanjie.tevent.rpc.protocol.body;
 
 import com.tongbanjie.tevent.common.body.CustomBody;
 

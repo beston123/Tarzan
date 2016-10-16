@@ -9,7 +9,7 @@ import java.util.Arrays;
  * @author zixiao
  * @date 16/10/9
  */
-public class RocketMQBody implements CustomBody {
+public class RocketMQBody implements MQBody {
 
     private String topic;
 

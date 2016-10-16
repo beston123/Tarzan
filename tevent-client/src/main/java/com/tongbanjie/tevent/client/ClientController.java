@@ -1,7 +1,10 @@
 package com.tongbanjie.tevent.client;
 
+import com.tongbanjie.tevent.client.example.TransactionCheckListenerExample;
 import com.tongbanjie.tevent.client.processer.ServerRequestProcessor;
 import com.tongbanjie.tevent.client.sender.MQMessageSender;
+import com.tongbanjie.tevent.client.sender.RocketMQMessageSender;
+import com.tongbanjie.tevent.common.Constants;
 import com.tongbanjie.tevent.common.util.NamedSingleThreadFactory;
 import com.tongbanjie.tevent.common.util.NamedThreadFactory;
 import com.tongbanjie.tevent.registry.RecoverableRegistry;
@@ -34,7 +37,7 @@ public class ClientController {
 
     private final ConcurrentHashMap<String/* group */, MQMessageSender> messageSenderTable = new ConcurrentHashMap<String,MQMessageSender>();
 
-    private final ConcurrentHashMap<Integer/* brokerId */, String/* address */> serverAddressTable = new ConcurrentHashMap<Integer, String>();
+    private final ConcurrentHashMap<Integer/* serverId */, String/* address */> serverAddressTable = new ConcurrentHashMap<Integer, String>();
 
 
     /********************** client manager ***********************/
@@ -69,6 +72,10 @@ public class ClientController {
 
     public boolean initialize() {
         boolean result = true;
+
+        //TODO test code, should be deleted
+        MQMessageSender mqMessageSender = new RocketMQMessageSender(new TransactionCheckListenerExample());
+        this.messageSenderTable.put(Constants.TEVENT_TEST_P_GROUP, mqMessageSender);
 
         if (result) {
             this.rpcClient = new NettyRpcClient(this.nettyClientConfig);
@@ -146,5 +153,13 @@ public class ClientController {
 
     public RecoverableRegistry getClientRegistry() {
         return clientRegistry;
+    }
+
+    public ConcurrentHashMap<String, MQMessageSender> getMessageSenderTable() {
+        return messageSenderTable;
+    }
+
+    public ServerManager getServerManager() {
+        return serverManager;
     }
 }

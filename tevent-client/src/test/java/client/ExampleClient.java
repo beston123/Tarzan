@@ -3,13 +3,17 @@ package client;
 import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.common.message.Message;
 import com.tongbanjie.tevent.client.ClientConfig;
+import com.tongbanjie.tevent.client.ClientController;
+import com.tongbanjie.tevent.client.ServerManager;
 import com.tongbanjie.tevent.client.validator.RocketMQValidators;
+import com.tongbanjie.tevent.common.Constants;
 import com.tongbanjie.tevent.common.body.RocketMQBody;
 import com.tongbanjie.tevent.common.message.MQType;
 import com.tongbanjie.tevent.common.message.TransactionState;
 import com.tongbanjie.tevent.registry.Address;
 import com.tongbanjie.tevent.registry.RecoverableRegistry;
 import com.tongbanjie.tevent.registry.zookeeper.ClientZooKeeperRegistry;
+import com.tongbanjie.tevent.rpc.RpcClient;
 import com.tongbanjie.tevent.rpc.protocol.SerializeType;
 import com.tongbanjie.tevent.rpc.exception.*;
 import com.tongbanjie.tevent.rpc.netty.NettyClientConfig;
@@ -21,7 +25,7 @@ import com.tongbanjie.tevent.rpc.protocol.RpcCommandBuilder;
 import com.tongbanjie.tevent.rpc.protocol.header.SendMessageHeader;
 import com.tongbanjie.tevent.rpc.protocol.header.RegisterRequestHeader;
 import com.tongbanjie.tevent.rpc.protocol.header.TransactionMessageHeader;
-import com.tongbanjie.tevent.rpc.protocol.heartbeat.HeartbeatData;
+import com.tongbanjie.tevent.rpc.protocol.body.HeartbeatData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,89 +46,35 @@ public class ExampleClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExampleClient.class);
 
-    private NettyRpcClient remotingClient;
+    private final RpcClient rpcClient;
 
-    private RecoverableRegistry clientRegistry;
+    private final ClientConfig clientConfig = new ClientConfig();
 
-    private ClientConfig clientConfig = new ClientConfig();
-
-    private String producerGroup = "ExampleClientGroup0";
+    private final String producerGroup;
 
     private String clientId = "123444";
-
-    private NettyClientConfig nettyClientConfig = new NettyClientConfig();
-
-    private Address serverAddr;
-
-    private final ConcurrentHashMap<String/* Server Name */, HashMap<Long/* brokerId */, String/* address */>> serverAddrTable =
-            new ConcurrentHashMap<String, HashMap<Long, String>>();
 
     private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
         @Override
         public Thread newThread(Runnable r) {
-            return new Thread(r, "MQClientFactoryScheduledThread");
+            return new Thread(r, "ClientExampleScheduledThread");
         }
     });
 
-    public void init(){
-        clientRegistry = new ClientZooKeeperRegistry(clientConfig.getRegistryAddress());
-        try {
-            clientRegistry.start();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        remotingClient = new NettyRpcClient(nettyClientConfig, null);
-        remotingClient.start();
-        try {
-            sendHeartbeat();
-        } catch (RpcException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        this.startScheduledTask();
-    }
-
-    private void startScheduledTask(){
-        this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    ExampleClient.this.cleanOfflineServer();
-                    ExampleClient.this.sendHeartbeatToAllServerWithLock();
-                } catch (Exception e) {
-                    LOGGER.error("ScheduledTask sendHeartbeatToAllServer exception", e);
-                }
-            }
-        }, 30 * 1000, clientConfig.getHeartbeatInterval(), TimeUnit.MILLISECONDS);
-    }
-
-    private void cleanOfflineServer() {
-        //
-    }
-
-    private void sendHeartbeatToAllServerWithLock() throws RpcException, InterruptedException {
-        sendHeartbeat();
+    public ExampleClient(ClientController clientController, String producerGroup){
+        this.rpcClient = clientController.getRpcClient();
+        this.producerGroup = producerGroup;
     }
 
 
-    public void sendHeartbeat() throws RpcException, InterruptedException {
-        HeartbeatData heartbeatData = new HeartbeatData();
-        heartbeatData.setClientId(clientId);
-        heartbeatData.setGroup(producerGroup);
-        sendHeartbeat(heartbeatData, 1000);
-    }
-
-    public void sendHeartbeat(final HeartbeatData heartbeatData,//
+    public void sendHeartbeat(final Address serverAddr,
+                              final HeartbeatData heartbeatData,//
                               final long timeoutMillis//
     ) throws RpcException, InterruptedException {
-        serverAddr = discoverOneServer();
         RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.HEART_BEAT, null);
         request.setBody(heartbeatData);
 
-        RpcCommand response = this.remotingClient.invokeSync(serverAddr.getAddress(), request, timeoutMillis);
+        RpcCommand response = this.rpcClient.invokeSync(serverAddr.getAddress(), request, timeoutMillis);
         assert response != null;
         switch (response.getCmdCode()) {
             case ResponseCode.SUCCESS: {
@@ -139,8 +89,7 @@ public class ExampleClient {
         //throw new MQBrokerException(response.getCode(), response.getRemark());
     }
 
-    public void unregister() throws RpcException, InterruptedException {
-        serverAddr = discoverOneServer();
+    public void unregister(final Address serverAddr) throws RpcException, InterruptedException {
         unregister(serverAddr.getAddress(), clientId, producerGroup, 6 << 10);
     }
 
@@ -156,7 +105,7 @@ public class ExampleClient {
         RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.UNREGISTER_CLIENT, requestHeader);
         request.setSerializeType(SerializeType.PROTOSTUFF);
 
-        RpcCommand response = this.remotingClient.invokeSync(addr, request, timeoutMillis);
+        RpcCommand response = this.rpcClient.invokeSync(addr, request, timeoutMillis);
         assert response != null;
         switch (response.getCmdCode()) {
             case ResponseCode.SUCCESS: {
@@ -171,8 +120,10 @@ public class ExampleClient {
         //throw new MQBrokerException(response.getCode(), response.getRemark());
     }
 
-    public void sendMessage(Message message, String group, boolean trans) throws RpcException, InterruptedException {
-        serverAddr = discoverOneServer();
+    public void sendMessage(final Message message,
+                            final Address serverAddr,
+                            final String group,
+                            final boolean trans) throws RpcException, InterruptedException {
         if(trans){
             transMessage(message, serverAddr.getAddress(), group, 6 << 10);
         }else{
@@ -180,7 +131,7 @@ public class ExampleClient {
         }
     }
 
-    public void sendMessage(Message message,
+    public void sendMessage(final Message message,
                             final String addr,//
                             final String producerGroup,//
                             final long timeoutMillis
@@ -206,7 +157,7 @@ public class ExampleClient {
 
         request.setBody(mqBody);
 
-        RpcCommand response = this.remotingClient.invokeSync(addr, request, timeoutMillis);
+        RpcCommand response = this.rpcClient.invokeSync(addr, request, timeoutMillis);
         assert response != null;
         switch (response.getCmdCode()) {
             case ResponseCode.SUCCESS: {
@@ -220,7 +171,7 @@ public class ExampleClient {
     }
 
 
-    public void transMessage(Message message,
+    public void transMessage(final Message message,
                             final String addr,//
                             final String producerGroup,//
                             final long timeoutMillis
@@ -247,7 +198,7 @@ public class ExampleClient {
 
         request.setBody(mqBody);
 
-        RpcCommand response = this.remotingClient.invokeSync(addr, request, timeoutMillis);
+        RpcCommand response = this.rpcClient.invokeSync(addr, request, timeoutMillis);
         assert response != null;
         Long transactionId = null;
         switch (response.getCmdCode()) {
@@ -259,23 +210,27 @@ public class ExampleClient {
                     e.printStackTrace();
                 }
                 transactionId = responseHeader.getTransactionId();
+                LOGGER.info(">>>Prepared message '{}' to server {} success, transactionId={} .",
+                        message.getKeys(), transactionId);
                 break;
             default:
+                LOGGER.error(">>>Prepared message '{}' to server {} failed, errorCode:{}, error:{}",
+                        message.getKeys(), response.getCmdCode(), response.getRemark());
                 break;
         }
-        if(transactionId != null){
-            LOGGER.info(">>>Prepare message '{}' to server {}, transactionId={}",
-                    message.getKeys(), addr, transactionId);
-            Thread.sleep(3000L);
-            if(new Random().nextBoolean()){
-                commitMessage(message, transactionId + new Random().nextInt(2),addr,  timeoutMillis);
-            }else{
-                roolbackMessage(message, transactionId + new Random().nextInt(2),addr,  timeoutMillis);
-            }
-        }
+//        if(transactionId != null){
+//            LOGGER.info(">>>Prepare message '{}' to server {}, transactionId={}",
+//                    message.getKeys(), addr, transactionId);
+//            Thread.sleep(3000L);
+//            if(new Random().nextBoolean()){
+//                commitMessage(message, transactionId + new Random().nextInt(2),addr,  timeoutMillis);
+//            }else{
+//                roolbackMessage(message, transactionId + new Random().nextInt(2),addr,  timeoutMillis);
+//            }
+//        }
     }
 
-    public void commitMessage(Message message, Long transactionId,
+    private void commitMessage(Message message, Long transactionId,
                                      final String addr,//
                                      final long timeoutMillis
     ) throws InterruptedException, RpcTimeoutException, RpcConnectException, RpcSendRequestException {
@@ -302,7 +257,7 @@ public class ExampleClient {
 
         request.setBody(mqBody);
 
-        RpcCommand response = this.remotingClient.invokeSync(addr, request, timeoutMillis);
+        RpcCommand response = this.rpcClient.invokeSync(addr, request, timeoutMillis);
         assert response != null;
         switch (response.getCmdCode()) {
             case ResponseCode.SUCCESS:
@@ -324,7 +279,7 @@ public class ExampleClient {
         }
     }
 
-    public void roolbackMessage(Message message, Long transactionId,
+    private void roolbackMessage(Message message, Long transactionId,
                               final String addr,//
                               final long timeoutMillis
     ) throws InterruptedException, RpcTimeoutException, RpcConnectException, RpcSendRequestException {
@@ -343,7 +298,7 @@ public class ExampleClient {
         RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.TRANSACTION_MESSAGE, requestHeader);
         request.setSerializeType(SerializeType.PROTOSTUFF);
 
-        RpcCommand response = this.remotingClient.invokeSync(addr, request, timeoutMillis);
+        RpcCommand response = this.rpcClient.invokeSync(addr, request, timeoutMillis);
         assert response != null;
         switch (response.getCmdCode()) {
             case ResponseCode.SUCCESS:
@@ -364,67 +319,6 @@ public class ExampleClient {
                 break;
         }
     }
-    private Random random = new Random();
-    public Address discoverOneServer() {
-        List<Address> copy = clientRegistry.getDiscovered();
-        int size = copy.size();
-        Address address = null;
-        if(size == 0){
-            LOGGER.warn("Can not find a server.");
-            return null;
-        }else if(size == 1) {
-            // 若只有一个地址，则获取该地址
-            address = copy.get(0);
-        } else {
-            // 若存在多个地址，则随机获取一个地址
-            // TODO 此处要做负载均衡
-            address = copy.get(random.nextInt(size));
-        }
-        LOGGER.debug("Find a server {}", address);
-        return address;
-    }
 
 
-    public static void main(String[] args){
-        ExampleClient client = new ExampleClient();
-
-        client.init();
-
-        Random random = new Random();
-
-        for(int i=0; i< 3; i++){
-            try {
-                Message message = new Message();
-                message.setTopic("TOPIC_TEVENT_KE");
-                message.setKeys("test_000_" + i);
-                message.setBody(("Hello TEvent " + i).getBytes());
-                client.sendMessage(message, "ExampleClientGroup"+i, true);
-                //Thread.sleep(10<<10);
-            } catch (RpcException e) {
-                e.printStackTrace();
-                try {
-                    Thread.sleep(5<<10);
-                } catch (InterruptedException e1) {
-                    //
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        try {
-            Thread.sleep(5000<<10);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            client.unregister();
-        } catch (RpcException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-    }
 }

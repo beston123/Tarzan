@@ -1,5 +1,7 @@
 package com.tongbanjie.tevent.client.sender;
 
+import com.tongbanjie.tevent.common.body.MQBody;
+
 /**
  * 〈一句话功能简述〉<p>
  * 〈功能详细描述〉
@@ -7,8 +9,8 @@ package com.tongbanjie.tevent.client.sender;
  * @author zixiao
  * @date 16/10/13
  */
-public interface TransactionCheckListener{
+public interface TransactionCheckListener<T extends MQBody>{
 
-    LocalTransactionState checkTransactionState(final String messageKey);
+    LocalTransactionState checkTransactionState(final T mqBody);
 
 }

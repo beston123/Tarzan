@@ -2,6 +2,8 @@ package com.tongbanjie.tevent.client.sender;
 
 import com.tongbanjie.tevent.client.ClientController;
 import com.tongbanjie.tevent.common.body.CustomBody;
+import com.tongbanjie.tevent.common.body.MQBody;
+import com.tongbanjie.tevent.rpc.RpcClient;
 import com.tongbanjie.tevent.rpc.protocol.header.CheckTransactionStateHeader;
 
 /**
@@ -11,7 +13,7 @@ import com.tongbanjie.tevent.rpc.protocol.header.CheckTransactionStateHeader;
  * @author zixiao
  * @date 16/10/13
  */
-public interface MQMessageSender<T extends CustomBody> {
+public interface MQMessageSender<T extends MQBody> {
 
     int checkThreadPoolCoreSize = 1;
 
@@ -22,8 +24,8 @@ public interface MQMessageSender<T extends CustomBody> {
     TransactionCheckListener transactionCheckListener();
 
     void checkTransactionState(final String addr, final T mqBody,
-                               final CheckTransactionStateHeader checkTransactionStateHeader,
-                               final ClientController clientController);
+                               final CheckTransactionStateHeader requestHeader,
+                               final RpcClient rpcClient);
 
 
 }

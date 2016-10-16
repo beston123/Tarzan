@@ -17,29 +17,40 @@
 package com.tongbanjie.tevent.client.processer;
 
 import com.tongbanjie.tevent.client.ClientController;
+import com.tongbanjie.tevent.client.example.TransactionCheckListenerExample;
 import com.tongbanjie.tevent.client.sender.MQMessageSender;
 import com.tongbanjie.tevent.client.sender.RocketMQMessageSender;
 import com.tongbanjie.tevent.common.body.RocketMQBody;
+import com.tongbanjie.tevent.rpc.RpcClient;
 import com.tongbanjie.tevent.rpc.exception.RpcCommandException;
 import com.tongbanjie.tevent.rpc.netty.NettyRequestProcessor;
 import com.tongbanjie.tevent.rpc.protocol.RequestCode;
+import com.tongbanjie.tevent.rpc.protocol.ResponseCode;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommand;
+import com.tongbanjie.tevent.rpc.protocol.RpcCommandBuilder;
 import com.tongbanjie.tevent.rpc.protocol.header.CheckTransactionStateHeader;
 import com.tongbanjie.tevent.rpc.util.RpcHelper;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 
 public class ServerRequestProcessor implements NettyRequestProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerRequestProcessor.class);
 
+    private final ClientController clientController;
 
-    private ClientController clientController;
+    private final ConcurrentHashMap<String/* group */, MQMessageSender> messageSenderTable;
+
+    private final RpcClient rpcClient;
     
     public ServerRequestProcessor(ClientController clientController) {
         this.clientController = clientController;
+        this.messageSenderTable = this.clientController.getMessageSenderTable();
+        this.rpcClient = this.clientController.getRpcClient();
     }
 
 
@@ -49,15 +60,20 @@ public class ServerRequestProcessor implements NettyRequestProcessor {
         case RequestCode.CHECK_TRANSACTION_STATE:
             return this.checkTransactionState(ctx, request);
         default:
+            LOGGER.warn("Invalid request，requestCode：" + request.getCmdCode());
             break;
         }
-        return null;
+        return RpcCommandBuilder.buildResponse(ResponseCode.INVALID_REQUEST,
+                "Invalid request，requestCode：" + request.getCmdCode());
     }
 
 
     public RpcCommand checkTransactionState(ChannelHandlerContext ctx, RpcCommand request) throws RpcCommandException {
         final CheckTransactionStateHeader requestHeader =
                 (CheckTransactionStateHeader) request.decodeCustomHeader(CheckTransactionStateHeader.class);
+
+        validateCheckTransactionRequest(requestHeader);
+
         switch (requestHeader.getMqType()){
             case ROCKET_MQ:
                 return checkTransactionStateForRocketMQ(ctx, request, requestHeader);
@@ -67,29 +83,38 @@ public class ServerRequestProcessor implements NettyRequestProcessor {
         return null;
     }
 
+    private void validateCheckTransactionRequest(CheckTransactionStateHeader requestHeader) throws RpcCommandException{
+        if(requestHeader == null){
+            throw new RpcCommandException("Param error: requestHeader can not be null");
+        }
+        if(requestHeader.getMqType() == null){
+            throw new RpcCommandException("Param error: mqType can not be null");
+        }
+    }
     private RpcCommand checkTransactionStateForRocketMQ(ChannelHandlerContext ctx, RpcCommand request,
-                                                        CheckTransactionStateHeader requestHeader){
-        LOGGER.debug("Received a checkTransactionState request, opaque:{}", request.getOpaque() );
-        RocketMQBody requestBody = request.getBody(RocketMQBody.class);
-
+                                                        CheckTransactionStateHeader requestHeader) throws RpcCommandException {
+        final RocketMQBody requestBody = request.getBody(RocketMQBody.class);
+        if(requestBody == null){
+            throw new RpcCommandException("Param error: request can not be null");
+        }
+        if(LOGGER.isDebugEnabled()){
+            LOGGER.debug("Received a checkTransactionState request, messageKey:{}, topic:{}, transactionId:{}",
+                    requestHeader.getMessageKey(), requestBody.getTopic(), requestHeader.getTransactionId() );
+        }
         String group = requestBody.getProducerGroup();
-
-        //TODO isOneWayRpc = false;
-        request.isOneWayRpc();
-
         if (group != null) {
-            //MQMessageSender producer = this.mqClientFactory.selectProducer(group);
-            MQMessageSender mqMessageSender = new RocketMQMessageSender();
+            //按group查询生产者
+            MQMessageSender mqMessageSender = this.messageSenderTable.get(group);
             if (mqMessageSender != null) {
                 final String addr = RpcHelper.parseChannelRemoteAddr(ctx.channel());
-                mqMessageSender.checkTransactionState(addr, requestBody, requestHeader, this.clientController);
+                mqMessageSender.checkTransactionState(addr, requestBody, requestHeader, this.rpcClient);
             }
             else {
                 LOGGER.debug("checkTransactionState, pick producer by group[{}] failed", group);
             }
         }
         else {
-            LOGGER.warn("checkTransactionState, pick producer group failed");
+            throw new RpcCommandException("checkTransactionState faild, producer group can not be null");
         }
         return null;
 

@@ -1,11 +1,9 @@
 package com.tongbanjie.tevent.client.sender;
 
-import com.tongbanjie.tevent.client.ClientController;
 import com.tongbanjie.tevent.common.body.RocketMQBody;
 import com.tongbanjie.tevent.common.message.TransactionState;
 import com.tongbanjie.tevent.rpc.RpcClient;
 import com.tongbanjie.tevent.rpc.protocol.RequestCode;
-import com.tongbanjie.tevent.rpc.protocol.ResponseCode;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommand;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommandBuilder;
 import com.tongbanjie.tevent.rpc.protocol.header.CheckTransactionStateHeader;
@@ -33,7 +31,8 @@ public class RocketMQMessageSender implements MQMessageSender<RocketMQBody> {
 
     protected ExecutorService checkExecutor;
 
-    public RocketMQMessageSender(){
+    public RocketMQMessageSender(TransactionCheckListener transactionCheckListener){
+        this.transactionCheckListener = transactionCheckListener;
         this.checkRequestQueue = new LinkedBlockingQueue<Runnable>(checkRequestHoldMax);
         this.checkExecutor = new ThreadPoolExecutor(//
                 checkThreadPoolCoreSize, //
@@ -49,20 +48,15 @@ public class RocketMQMessageSender implements MQMessageSender<RocketMQBody> {
     }
 
     @Override
-    public void checkTransactionState(final String addr, final RocketMQBody mqBody,
-                                      final CheckTransactionStateHeader checkTransactionStateHeader,
-                                      final ClientController clientController) {
+    public void checkTransactionState(final String serverAddr, final RocketMQBody rocketMQBody,
+                                      final CheckTransactionStateHeader requestHeader,
+                                      final RpcClient rpcClient) {
         final Runnable request = new Runnable() {
-            private final String serverAddr = addr;
-            private final RocketMQBody rocketMQBody = mqBody;
-            private final CheckTransactionStateHeader checkRequestHeader = checkTransactionStateHeader;
-            private final RpcClient rpcClient = clientController.getRpcClient();
-
             private final String group = rocketMQBody.getProducerGroup();
             private final String messageKey = rocketMQBody.getMessageKey();
             private final String topic = rocketMQBody.getTopic();
-
-
+            String logMsg = " [message group:"+ group+", messageKey:"+ messageKey +", topic:"+ topic +"]";
+            
             @Override
             public void run() {
                 TransactionCheckListener transactionCheckListener = RocketMQMessageSender.this.transactionCheckListener();
@@ -70,7 +64,7 @@ public class RocketMQMessageSender implements MQMessageSender<RocketMQBody> {
                 if (transactionCheckListener != null) {
                     Throwable exception = null;
                     try {
-                        localTransactionState = transactionCheckListener.checkTransactionState(messageKey);
+                        localTransactionState = transactionCheckListener.checkTransactionState(rocketMQBody);
                     } catch (Throwable e) {
                         LOGGER.error("Server call checkTransactionState, but checkLocalTransactionState exception", e);
                         exception = e;
@@ -91,9 +85,9 @@ public class RocketMQMessageSender implements MQMessageSender<RocketMQBody> {
                                                  final LocalTransactionState localTransactionState, //
                                                  final Throwable exception) {
                 final TransactionMessageHeader thisHeader = new TransactionMessageHeader();
-                thisHeader.setMqType(checkRequestHeader.getMqType());
-                thisHeader.setTransactionId(checkRequestHeader.getTransactionId());
-
+                thisHeader.setMqType(requestHeader.getMqType());
+                thisHeader.setTransactionId(requestHeader.getTransactionId());
+                
                 switch (localTransactionState) {
                     case COMMIT:
                         thisHeader.setTransactionState(TransactionState.COMMIT);
@@ -112,13 +106,12 @@ public class RocketMQMessageSender implements MQMessageSender<RocketMQBody> {
                         break;
                 }
 
-                RpcCommand request = null;
+                String remark = null;
                 if (exception != null) {
-                    String remark = "checkLocalTransactionState Exception: " + RpcHelper.exceptionToString(exception);
-                    request = RpcCommandBuilder.buildRequest(RequestCode.TRANSACTION_MESSAGE, thisHeader, remark);
-                }else{
-                    request = RpcCommandBuilder.buildRequest(RequestCode.TRANSACTION_MESSAGE, thisHeader);
+                    remark = "checkLocalTransactionState Exception: " + RpcHelper.exceptionToString(exception);
                 }
+
+                RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.TRANSACTION_MESSAGE, thisHeader, remark);
                 try {
                     rpcClient.invokeOneway(serverAddr, request, 3000);
                 } catch (Exception e) {
