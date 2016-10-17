@@ -36,7 +36,7 @@ public class ClientMain {
         }
 
         try {
-            Thread.sleep(3000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
 
         }
@@ -64,7 +64,7 @@ public class ClientMain {
             }
             Message message = new Message();
             message.setTopic(Constants.TEVENT_TEST_TOPIC);
-            message.setKeys("test_000_" + i);
+            message.setKeys("msg_" + i);
             message.setBody(("Hello TEvent " + i).getBytes());
             try {
                 client.sendMessage( message, serverAddr, Constants.TEVENT_TEST_P_GROUP, true);

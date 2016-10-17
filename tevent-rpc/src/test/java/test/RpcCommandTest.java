@@ -22,15 +22,10 @@ import java.nio.ByteBuffer;
 public class RpcCommandTest {
 
     public static void main(String[] args) {
-        test();
-
-        //System.out.println(getHeaderLength(16777217));
-
-        //System.out.println(1<<24);
-
+        testSerialize();
     }
 
-    private static void test() {
+    private static void testSerialize() {
         byte[] bytes = "紫箫3".getBytes();
 
         TransactionMessageHeader customHeader = new TransactionMessageHeader();
@@ -47,8 +42,6 @@ public class RpcCommandTest {
         }
         System.out.print("Total length: " + byteBuffer.getInt());
 
-//        byte[] headerData = RpcSerializeUtils.serialize(cmd);
-//        System.out.println(", header length: "+headerData.length);
 
         System.out.println("-----After decode----");
         ByteBuffer databf = byteBuffer.slice();

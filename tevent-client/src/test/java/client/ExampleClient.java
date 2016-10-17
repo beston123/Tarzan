@@ -5,6 +5,7 @@ import com.alibaba.rocketmq.common.message.Message;
 import com.tongbanjie.tevent.client.ClientConfig;
 import com.tongbanjie.tevent.client.ClientController;
 import com.tongbanjie.tevent.client.ServerManager;
+import com.tongbanjie.tevent.client.sender.LocalTransactionState;
 import com.tongbanjie.tevent.client.validator.RocketMQValidators;
 import com.tongbanjie.tevent.common.Constants;
 import com.tongbanjie.tevent.common.body.RocketMQBody;
@@ -29,6 +30,7 @@ import com.tongbanjie.tevent.rpc.protocol.body.HeartbeatData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -48,11 +50,11 @@ public class ExampleClient {
 
     private final RpcClient rpcClient;
 
-    private final ClientConfig clientConfig = new ClientConfig();
-
     private final String producerGroup;
 
     private String clientId = "123444";
+
+    private final Random random = new Random();
 
     private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
         @Override
@@ -103,7 +105,6 @@ public class ExampleClient {
         requestHeader.setClientId(clientID);
         requestHeader.setGroup(producerGroup);
         RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.UNREGISTER_CLIENT, requestHeader);
-        request.setSerializeType(SerializeType.PROTOSTUFF);
 
         RpcCommand response = this.rpcClient.invokeSync(addr, request, timeoutMillis);
         assert response != null;
@@ -147,7 +148,6 @@ public class ExampleClient {
         requestHeader.setMqType(MQType.ROCKET_MQ);
 
         RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.SEND_MESSAGE, requestHeader);
-        request.setSerializeType(SerializeType.PROTOSTUFF);
 
         RocketMQBody mqBody = new RocketMQBody();
         mqBody.setTopic(message.getTopic());
@@ -183,21 +183,20 @@ public class ExampleClient {
             return;
         }
 
+        //1、组装消息
         final TransactionMessageHeader requestHeader = new TransactionMessageHeader();
         requestHeader.setMqType(MQType.ROCKET_MQ);
         requestHeader.setTransactionState(TransactionState.PREPARE);
 
-        RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.TRANSACTION_MESSAGE, requestHeader);
-        request.setSerializeType(SerializeType.PROTOSTUFF);
-
-        RocketMQBody mqBody = new RocketMQBody();
+        final RocketMQBody mqBody = new RocketMQBody();
         mqBody.setTopic(message.getTopic());
         mqBody.setProducerGroup(producerGroup);
         mqBody.setMessageBody(message.getBody());
         mqBody.setMessageKey(message.getKeys());
 
-        request.setBody(mqBody);
+        RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.TRANSACTION_MESSAGE, requestHeader, mqBody);
 
+        //2、发送消息
         RpcCommand response = this.rpcClient.invokeSync(addr, request, timeoutMillis);
         assert response != null;
         Long transactionId = null;
@@ -211,13 +210,38 @@ public class ExampleClient {
                 }
                 transactionId = responseHeader.getTransactionId();
                 LOGGER.info(">>>Prepared message '{}' to server {} success, transactionId={} .",
-                        message.getKeys(), transactionId);
+                        message.getKeys(), addr, transactionId);
                 break;
             default:
                 LOGGER.error(">>>Prepared message '{}' to server {} failed, errorCode:{}, error:{}",
-                        message.getKeys(), response.getCmdCode(), response.getRemark());
+                        message.getKeys(), addr, response.getCmdCode(), response.getRemark());
                 break;
         }
+
+        //3、执行本地事务
+        if(transactionId != null){
+            try {
+                LocalTransactionState state = localTransaction(message.getKeys());
+                LOGGER.info("本地事务执行结果: {},  message '{}'", state, message.getKeys());
+                switch (state){
+                    case COMMIT:
+                        commitMessage(message, transactionId, addr, timeoutMillis);
+                        break;
+                    case ROLLBACK:
+                        roolbackMessage(message, transactionId, addr, timeoutMillis);
+                        break;
+                    default:
+                        break;
+                }
+            } catch (IOException e) {
+                LOGGER.error("执行本地事务异常, message '"+message.getKeys()+"' ", e);
+                        roolbackMessage(message, transactionId, addr, timeoutMillis);
+            } catch (Throwable throwable) {
+                //
+                LOGGER.error("未知数据结果, message '"+message.getKeys()+"' ", throwable);
+            }
+        }
+
 //        if(transactionId != null){
 //            LOGGER.info(">>>Prepare message '{}' to server {}, transactionId={}",
 //                    message.getKeys(), addr, transactionId);
@@ -228,6 +252,30 @@ public class ExampleClient {
 //                roolbackMessage(message, transactionId + new Random().nextInt(2),addr,  timeoutMillis);
 //            }
 //        }
+
+    }
+
+    /**
+     * 模拟本地事务
+     * @return
+     */
+    private LocalTransactionState localTransaction(String msgKey) throws IOException, Throwable {
+        //模拟查询事务状态
+        Thread.sleep(300L);
+        int state = Integer.valueOf(msgKey.split("_")[1]);
+
+        switch (state){
+            case 0: //事务处理异常
+                throw new IOException("Check local transaction exception, db is down.");
+            case 1: //事务需要提交
+                return LocalTransactionState.COMMIT;
+            case 2: //事务需要回滚
+                return LocalTransactionState.ROLLBACK;
+            default: // state>=3 应用挂掉了,没有事务结果
+                break;
+        }
+        //state>=3
+        throw new Throwable("应用挂掉了,没有事务结果");
     }
 
     private void commitMessage(Message message, Long transactionId,
@@ -247,7 +295,6 @@ public class ExampleClient {
         requestHeader.setTransactionId(transactionId);
 
         RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.TRANSACTION_MESSAGE, requestHeader);
-        request.setSerializeType(SerializeType.PROTOSTUFF);
 
         RocketMQBody mqBody = new RocketMQBody();
         mqBody.setTopic(message.getTopic());
@@ -296,7 +343,6 @@ public class ExampleClient {
         requestHeader.setTransactionId(transactionId);
 
         RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.TRANSACTION_MESSAGE, requestHeader);
-        request.setSerializeType(SerializeType.PROTOSTUFF);
 
         RpcCommand response = this.rpcClient.invokeSync(addr, request, timeoutMillis);
         assert response != null;

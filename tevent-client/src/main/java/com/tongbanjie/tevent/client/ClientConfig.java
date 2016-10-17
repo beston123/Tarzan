@@ -29,7 +29,7 @@ public class ClientConfig implements Cloneable{
     /**
      * 注册中心地址
      */
-    private String registryAddress = System.getProperty(Constants.TEVENT_REGISTRY_ADDRESS, "127.0.0.1:2181");
+    private String registryAddress = System.getProperty(Constants.TEVENT_REGISTRY_ADDRESS, "192.168.1.120:2181");
 
     /*********************************** setter getter ***********************************/
 

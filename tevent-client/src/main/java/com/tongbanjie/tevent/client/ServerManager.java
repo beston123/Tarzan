@@ -88,7 +88,7 @@ public class ServerManager {
                               final long timeoutMillis//
     ) throws InterruptedException, RpcConnectException, RpcTooMuchRequestException, RpcSendRequestException, RpcTimeoutException {
         if(LOGGER.isDebugEnabled()){
-            LOGGER.debug("Send heartbeat '{}' to server {}.", serverAddr);
+            LOGGER.debug("Send heartbeat to server {}.", serverAddr);
         }
         RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.HEART_BEAT, null);
         request.setBody(heartbeatData);

@@ -14,22 +14,29 @@ public class RpcCommandBuilder {
     /************************************ Request Command ************************************/
 
     public static RpcCommand buildRequest(int cmdCode, CustomHeader customHeader) {
-        return buildRequest(cmdCode, customHeader, null);
+        return buildRequest(cmdCode, customHeader, null/* remark */);
     }
 
     public static RpcCommand buildRequest(int cmdCode, CustomHeader customHeader, String remark) {
-        return buildRequest(cmdCode, customHeader, null, remark);
+        return buildRequest(cmdCode, customHeader, null/* serializeType */, null/* body */, remark);
     }
 
     public static RpcCommand buildRequest(int cmdCode, CustomHeader customHeader, Object body) {
-        return buildRequest(cmdCode, customHeader, body, null);
+        return buildRequest(cmdCode, customHeader, null/* serializeType */, body);
     }
 
-    public static RpcCommand buildRequest(int cmdCode, CustomHeader customHeader, Object body, String remark) {
+    public static RpcCommand buildRequest(int cmdCode, CustomHeader customHeader, SerializeType serializeType, Object body) {
+        return buildRequest(cmdCode, customHeader, serializeType, body, null/* remark */);
+    }
+
+    public static RpcCommand buildRequest(int cmdCode, CustomHeader customHeader, SerializeType serializeType, Object body, String remark) {
         RpcCommand cmd = new RpcCommand();
         cmd.setCmdCode(cmdCode);
         cmd.setCmdType(RpcCommand.REQUEST_COMMAND);
         cmd.setCustomHeader(customHeader);
+        if(serializeType != null){
+            cmd.setSerializeType(serializeType);
+        }
         if(body != null){
             cmd.setBody(body);
         }
@@ -38,6 +45,12 @@ public class RpcCommandBuilder {
     }
 
     /************************************ Response Command ************************************/
+
+    public static RpcCommand buildResponse() {
+        RpcCommand cmd = new RpcCommand();
+        cmd.setCmdType(RpcCommand.RESPONSE_COMMAND);
+        return cmd;
+    }
 
     public static RpcCommand buildResponse(int cmdCode, String remark, CustomHeader customHeader) {
         RpcCommand cmd = new RpcCommand();
@@ -49,23 +62,11 @@ public class RpcCommandBuilder {
     }
 
     public static RpcCommand buildResponse(int cmdCode, String remark){
-        return buildResponse(cmdCode, remark, null);
-    }
-
-
-    public static RpcCommand buildResponse(CustomHeader customHeader){
-        RpcCommand cmd = new RpcCommand();
-        cmd.setCmdType(RpcCommand.RESPONSE_COMMAND);
-        cmd.setCustomHeader(customHeader);
-        return cmd;
-    }
-
-    public static RpcCommand buildResponse() {
-        return buildResponse(null);
+        return buildResponse(cmdCode, remark, null/* customHeader */);
     }
 
     public static RpcCommand buildSuccess() {
-        return buildResponse(ResponseCode.SUCCESS, null);
+        return buildSuccess(null/* customHeader */);
     }
 
     public static RpcCommand buildSuccess(CustomHeader customHeader) {

@@ -14,13 +14,13 @@ import java.nio.ByteBuffer;
  * @see [相关类/方法]（可选）
  * @since [产品/模块版本] （可选）
  */
-public class Test {
+public class RemotingCommandTest {
 
     public static void main(String[] args) {
         EndTransactionRequestHeader responseHeader = new EndTransactionRequestHeader();
         responseHeader.setMsgId("433333");
         responseHeader.setTransactionId("TTTTTT");
-        RemotingCommand cmd = RemotingCommand.createRequestCommand(1, responseHeader);
+        com.alibaba.rocketmq.remoting.protocol.RemotingCommand cmd = com.alibaba.rocketmq.remoting.protocol.RemotingCommand.createRequestCommand(1, responseHeader);
         cmd.setSerializeTypeCurrentRPC(SerializeType.JSON);
         cmd.setBody("Test".getBytes());
 
@@ -29,7 +29,7 @@ public class Test {
 
         System.out.println("-----After decode----");
         ByteBuffer databf = byteBuffer.slice();
-        RemotingCommand newCmd = RemotingCommand.decode(databf);
+        com.alibaba.rocketmq.remoting.protocol.RemotingCommand newCmd = com.alibaba.rocketmq.remoting.protocol.RemotingCommand.decode(databf);
 
         System.out.print("Body:" + new String(newCmd.getBody())
                 + ", cmdCode:" + newCmd.getCode()

@@ -19,6 +19,8 @@ public class TransactionCheckListenerExample implements TransactionCheckListener
     @Override
     public LocalTransactionState checkTransactionState(RocketMQBody mqBody) {
         LOGGER.info("Check local transaction state, msgKey:{}, group:{}", mqBody.getMessageKey(), mqBody.getProducerGroup());
+
+        //模拟查询事务状态
         int state = random.nextInt(4);
         switch (state){
             case 0:
@@ -32,4 +34,6 @@ public class TransactionCheckListenerExample implements TransactionCheckListener
         }
         throw new RuntimeException("Check local transaction exception, db is down.");
     }
+
+
 }
