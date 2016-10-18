@@ -3,7 +3,7 @@ package com.tongbanjie.tevent.registry;
 import java.util.List;
 
 /**
- * 〈一句话功能简述〉<p>
+ * 注册表 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao
@@ -31,7 +31,7 @@ public interface Registry {
     String register(String path, Address address);
 
     /**
-     * 注册
+     * 注册到注册中心
      * @param address
      * @return  返回注册路径
      */
@@ -43,6 +43,12 @@ public interface Registry {
      * @return
      */
     boolean unregister(String path);
+
+    /**
+     * 是否连接上注册中心
+     * @return
+     */
+    boolean isConnected();
 
     /**
      * 发现

@@ -17,20 +17,29 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 〈一句话功能简述〉<p>
+ *  zk注册表服务<p>
  * 〈功能详细描述〉
  *
  * @author zixiao
  * @date 16/10/12
  */
-public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry {
+public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry, ZooKeeperListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractZooKeeperRegistry.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractZooKeeperRegistry.class);
 
+    /**
+     * @see RegistryType
+     */
     private final RegistryType registryType;
 
+    /**
+     * zk地址
+     */
     private final String zkAddress;
 
+    /**
+     * zk client
+     */
     protected final ZkClient zkClient;
 
     /**
@@ -43,10 +52,19 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry {
      */
     private final Map<Address /* address */, String/* absolutePath */> registered = new ConcurrentHashMap<Address, String>();
 
+    /**
+     * 注册的根路径
+     */
     private String registerRootPath;
 
+    /**
+     * 注册的子路径
+     */
     private String registerChildPath;
 
+    /**
+     * 发现的路径
+     */
     private String discoverPath;
 
     protected AbstractZooKeeperRegistry(RegistryType registryType, String zkAddress) {
@@ -56,7 +74,7 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry {
         // 创建 ZooKeeper 客户端
         zkClient = new ZkClient(this.zkAddress, ZkConstants.SESSION_TIMEOUT, ZkConstants.CONNECTION_TIMEOUT);
         this.connected = true;
-        LOGGER.debug("connect zookeeper {} success.", zkAddress);
+        LOGGER.debug("connect to zookeeper {} success.", zkAddress);
     }
 
     @Override
@@ -82,6 +100,8 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry {
         zkClient.unsubscribeAll();
         //关闭连接
         zkClient.close();
+
+        LOGGER.info("close this connection to zookeeper {}.", zkAddress);
     }
 
     protected void addZkListeners(){
@@ -98,13 +118,7 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry {
              */
             @Override
             public void handleChildChange(String parentPath, List<String> currentChildren) throws Exception {
-                if (currentChildren == null) {
-                    LOGGER.info("Parent path '{}' has been deleted." + parentPath);
-                } else {
-                    LOGGER.info("Children changed in path {}, children count: {}", parentPath, currentChildren.size());
-                }
-                //更新本地地址列表
-                updateDiscovered(currentChildren);
+                onChildChanged(parentPath, currentChildren);
             }
         });
 
@@ -119,25 +133,20 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry {
             @Override
             public void handleStateChanged(Watcher.Event.KeeperState keeperState) throws Exception {
                 if (keeperState == Watcher.Event.KeeperState.Disconnected) {
-                    LOGGER.warn(">>>Zookeeper session disconnected.");
-                    //与zk断开后，可能未删除
-                    connected = false;
+                    onSessionDisconnected();
                 } else if (keeperState == Watcher.Event.KeeperState.SyncConnected) {
-                    LOGGER.info(">>>Zookeeper session connected.");
-                    //与zk重新连接后，马上恢复
-                    connected = true;
-                    recover();
+                    onSessionSyncConnected();
                 }
+                //onStateChanged();
             }
 
             /**
-             * 与zk建立连接上时 触发
+             * 与zk建立新Session
              * @throws Exception
              */
             @Override
             public void handleNewSession() throws Exception {
-                //不作任何操作，因为在handleStateChanged已处理
-                LOGGER.info(">>>Zookeeper session reconnected.");
+                onNewSession();
             }
 
             /**
@@ -147,11 +156,68 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry {
              */
             @Override
             public void handleSessionEstablishmentError(Throwable throwable) throws Exception {
-                LOGGER.error(">>>Zookeeper session establish error.", throwable);
-                throw new Exception("Zookeeper session establish error.", throwable);
+                onSessionConnectError(throwable);
             }
         });
     }
+
+    /**
+     * 指定目录下 节点列表变化时
+     * @param parentPath        对应的父节点的路径
+     * @param currentChildren   子节点的相对路径
+     * @throws Exception
+     */
+    @Override
+    public void onChildChanged(String parentPath, List<String> currentChildren){
+        if (currentChildren == null) {
+            LOGGER.info("Parent path '{}' has been deleted." + parentPath);
+        } else {
+            LOGGER.info("Children changed in path {}, children count: {}", parentPath, currentChildren.size());
+        }
+        //
+        onDiscoverChanged(currentChildren);
+    }
+
+    /**
+     * 与zk 断开连接上时 触发
+     */
+    @Override
+    public void onSessionDisconnected(){
+        connected = false;
+        LOGGER.warn(">>>Zookeeper session disconnected.");
+    }
+
+    /**
+     * 与zk 连接上时 触发
+     */
+    @Override
+    public void onSessionSyncConnected(){
+        connected = true;
+
+        LOGGER.info(">>>Zookeeper session connected.");
+
+        //与zk重新连接后，马上恢复
+        recover();
+    }
+
+    /**
+     * 与zk 建立新Session
+     */
+    @Override
+    public void onNewSession(){
+        //不作任何操作，因为在 onSessionSyncConnected() 已处理
+        LOGGER.info(">>>Zookeeper session created.");
+    }
+
+    /**
+     * 与zk 建立连接异常时 触发
+     */
+    @Override
+    public void onSessionConnectError(Throwable throwable) throws Exception {
+        LOGGER.error(">>>Zookeeper session establish error.", throwable);
+        throw new Exception("Zookeeper session establish error.", throwable);
+    }
+
 
     @Override
     public String register(String path, Address address) {
@@ -176,12 +242,18 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry {
     }
 
     @Override
+    public boolean isConnected(){
+        return this.connected;
+    }
+
+    @Override
     public void recover(){
         //重新发现
         discoverAll();
         //重新注册
         registerAll();
     }
+
 
     protected void discoverAll() {
         String discoverPath = getDiscoverPath();
@@ -190,10 +262,10 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry {
         }
         List<String> childrenPathList = zkClient.getChildren(discoverPath);
 
-        updateDiscovered(childrenPathList);
+        onDiscoverChanged(childrenPathList);
     }
 
-    abstract protected void updateDiscovered(List<String> childrenPathList);
+    abstract protected void onDiscoverChanged(List<String> childrenPathList);
 
     protected void registerAll(){
         //反注册，在闪断的情况下，zk上的临时节点未及时删除

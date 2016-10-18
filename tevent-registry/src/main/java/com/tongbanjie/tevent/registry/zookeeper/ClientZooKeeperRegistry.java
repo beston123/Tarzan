@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 〈一句话功能简述〉<p>
+ * 客户端zk注册服务 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao
@@ -20,15 +20,11 @@ import java.util.Random;
  */
 public class ClientZooKeeperRegistry extends AbstractZooKeeperRegistry {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClientZooKeeperRegistry.class);
-
     /**
      * 已发现的地址列表
      * 使用不可变List，防止并发访问出现IndexOutOfBoundsException
      */
     protected List<Address> discovered = Collections.EMPTY_LIST;
-
-    private Random random = new Random();
 
     public ClientZooKeeperRegistry(String zkAddress){
         super(RegistryType.CLIENT, zkAddress);
@@ -42,7 +38,7 @@ public class ClientZooKeeperRegistry extends AbstractZooKeeperRegistry {
     }
 
     @Override
-    protected void updateDiscovered(List<String> childrenPathList){
+    protected void onDiscoverChanged(List<String> childrenPathList){
         if (CollectionUtils.isEmpty(childrenPathList)) {
             discovered = Collections.EMPTY_LIST;
         }else{
@@ -61,7 +57,6 @@ public class ClientZooKeeperRegistry extends AbstractZooKeeperRegistry {
         // 返回不可变List
         return Collections.unmodifiableList(addressOnZk);
     }
-
 
     @Override
     public List<Address> getDiscovered() {

@@ -9,15 +9,13 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 /**
- * 〈一句话功能简述〉<p>
+ * 服务端zk注册服务 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao
  * @date 16/10/12
  */
 public class ServerZooKeeperRegistry extends AbstractZooKeeperRegistry{
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServerZooKeeperRegistry.class);
 
     //已发现的地址
     protected List<Address> discovered = new ArrayList<Address>();
@@ -34,37 +32,24 @@ public class ServerZooKeeperRegistry extends AbstractZooKeeperRegistry{
     }
 
     @Override
-    protected void updateDiscovered(List<String> childrenPathList){
+    protected void onDiscoverChanged(List<String> childrenPathList){
         if (CollectionUtils.isEmpty(childrenPathList)) {
-            discovered.clear();
-            return;
+            discovered = Collections.EMPTY_LIST;
+        }else{
+            discovered = toAddressList(childrenPathList);
         }
-        // 1 获取所用子节点的数据
-        List<Address> addressOnZk = new ArrayList<Address>(childrenPathList.size());
+    }
+
+    private List<Address> toAddressList(List<String> childrenPathList){
+        List<Address> addressOnZk = new ArrayList<Address>();
         for(String childPath : childrenPathList){
             Address address = zkClient.readData(this.getDiscoverPath() + ZkConstants.PATH_SEPARATOR + childPath, true);
             if(address != null){
                 addressOnZk.add(address);
             }
         }
-        // 2 更新本地列表
-        discovered = addressOnZk;
-
-//        Iterator<Address> iterator = discovered.iterator();
-//        //2 剔除已经失效的节点
-//        while(iterator.hasNext()){
-//            Address address = iterator.next();
-//            if(!addressOnZk.contains(address)){
-//                iterator.remove();
-//            }
-//        }
-//        //3 添加 新增的节点
-//        for(Address address : addressOnZk){
-//            if(!discovered.contains(address)){
-//                discovered.add(address);
-//            }
-//        }
-
+        // 返回不可变List
+        return Collections.unmodifiableList(addressOnZk);
     }
 
     @Override

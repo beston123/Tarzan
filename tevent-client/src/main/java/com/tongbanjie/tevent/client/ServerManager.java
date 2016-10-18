@@ -18,9 +18,10 @@ package com.tongbanjie.tevent.client;
 
 
 import com.tongbanjie.tevent.client.sender.MQMessageSender;
-import com.tongbanjie.tevent.common.Constants;
 import com.tongbanjie.tevent.registry.Address;
 import com.tongbanjie.tevent.registry.RecoverableRegistry;
+import com.tongbanjie.tevent.registry.cluster.LoadBalance;
+import com.tongbanjie.tevent.registry.cluster.RandomLoadBalance;
 import com.tongbanjie.tevent.rpc.RpcClient;
 import com.tongbanjie.tevent.rpc.exception.*;
 import com.tongbanjie.tevent.rpc.protocol.RequestCode;
@@ -32,8 +33,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 
 public class ServerManager {
@@ -46,7 +45,7 @@ public class ServerManager {
 
     private final ConcurrentHashMap<String/* group */, MQMessageSender> messageSenderTable;
 
-    private final Random random = new Random();
+    private LoadBalance<Address> loadBalance = new RandomLoadBalance();
 
     public ServerManager(ClientController clientController) {
         this.clientRegistry = clientController.getClientRegistry();
@@ -111,18 +110,12 @@ public class ServerManager {
 
     public Address discover() {
         List<Address> copy = clientRegistry.getDiscovered();
-        int size = copy.size();
-        Address address = null;
-        if(size == 0){
+
+        Address address = loadBalance.select(copy);
+
+        if(address == null){
             LOGGER.warn("Can not find a server.");
             return null;
-        }else if(size == 1) {
-            // 若只有一个地址，则获取该地址
-            address = copy.get(0);
-        } else {
-            // 若存在多个地址，则随机获取一个地址
-            // TODO 此处要做负载均衡
-            address = copy.get(random.nextInt(size));
         }
         if(LOGGER.isDebugEnabled()){
             LOGGER.debug("Find a server {}", address);
