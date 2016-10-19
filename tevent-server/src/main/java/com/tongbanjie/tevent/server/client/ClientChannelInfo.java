@@ -17,7 +17,7 @@
 package com.tongbanjie.tevent.server.client;
 
 import com.tongbanjie.tevent.common.TEventVersion;
-import com.tongbanjie.tevent.cluster.loadbalance.Weighable;
+import com.tongbanjie.tevent.common.Weighable;
 import io.netty.channel.Channel;
 
 public class ClientChannelInfo implements Weighable{
