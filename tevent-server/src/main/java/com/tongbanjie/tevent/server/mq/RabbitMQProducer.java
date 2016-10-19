@@ -15,7 +15,7 @@ import io.netty.channel.ChannelHandlerContext;
  */
 public class RabbitMQProducer implements EventProducer {
 
-    private ServerController serverController;
+    private final ServerController serverController;
 
     public RabbitMQProducer(ServerController serverController) {
         this.serverController = serverController;

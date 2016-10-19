@@ -25,7 +25,7 @@ public class RocketMQStoreService implements StoreService<RocketMQMessage> {
     //模拟数据库
     private static Map<Long /*storeId*/, MQMessage> storage = new ConcurrentHashMap<Long, MQMessage>();
 
-    private StoreConfig storeConfig;
+    private final StoreConfig storeConfig;
 
     public RocketMQStoreService(StoreConfig storeConfig){
         this.storeConfig = storeConfig;
@@ -75,7 +75,7 @@ public class RocketMQStoreService implements StoreService<RocketMQMessage> {
 
     @Override
     public Result<List<RocketMQMessage>> selectTrans() {
-        Result<List<RocketMQMessage>> result = new Result<List<RocketMQMessage>>();
+        Result<List<RocketMQMessage>> result;
         try {
             List<RocketMQMessage> mqMessages = new ArrayList<RocketMQMessage>();
             Set<Map.Entry<Long, MQMessage>> set = storage.entrySet();

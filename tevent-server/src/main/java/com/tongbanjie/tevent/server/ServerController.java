@@ -103,7 +103,7 @@ public class ServerController {
         this.nettyServerConfig = nettyServerConfig;
         this.storeConfig = storeConfig;
 
-        this.clientManager = new ClientManager();
+        this.clientManager = new ClientManager(this.serverConfig);
         this.clientChannelManageService = new ClientChannelManageService(this);
 
         this.sendThreadPoolQueue = new LinkedBlockingQueue<Runnable>(this.serverConfig.getSendThreadPoolQueueCapacity());

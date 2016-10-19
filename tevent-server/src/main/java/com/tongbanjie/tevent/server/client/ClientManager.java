@@ -18,6 +18,7 @@ package com.tongbanjie.tevent.server.client;
 
 
 import com.tongbanjie.tevent.rpc.util.RpcHelper;
+import com.tongbanjie.tevent.server.ServerConfig;
 import io.netty.channel.Channel;
 import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
@@ -29,6 +30,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * 客户端 管理者<p>
+ * 〈功能详细描述〉
+ *
+ * @author zixiao
+ * @date 16/10/15
+ */
 public class ClientManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientManager.class);
 
@@ -41,7 +49,10 @@ public class ClientManager {
     private final HashMap<String /* group name */, HashMap<Channel, ClientChannelInfo>> groupChannelTable =
             new HashMap<String, HashMap<Channel, ClientChannelInfo>>();
 
-    public ClientManager() {
+    private final Random random = new Random();
+
+    public ClientManager(ServerConfig serverConfig) {
+
     }
 
 
@@ -212,6 +223,6 @@ public class ClientManager {
         List<ClientChannelInfo> clientChannelInfoList = new ArrayList<ClientChannelInfo>(map.values());
         int size = clientChannelInfoList.size();
         //TODO 均衡负载
-        return clientChannelInfoList.get(new Random().nextInt(size));
+        return clientChannelInfoList.get(random.nextInt(size));
     }
 }

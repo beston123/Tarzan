@@ -14,10 +14,9 @@ public class IdGeneratorFactory {
 
     private static final IdGeneratorFactory idGeneratorFactory = new IdGeneratorFactory();
 
-    private ReentrantLock createLock = new ReentrantLock();
+    private final ReentrantLock createLock = new ReentrantLock();
 
-    private ConcurrentHashMap<Integer/* workerId */, IdWorker> idWorkerTable =
-            new ConcurrentHashMap<Integer, IdWorker>(1);
+    private final ConcurrentHashMap<Integer/* workerId */, IdWorker> idWorkerTable = new ConcurrentHashMap<Integer, IdWorker>(1);
 
     private IdGeneratorFactory(){}
 
@@ -40,7 +39,7 @@ public class IdGeneratorFactory {
             }
 
             instance = new IdWorker(workerId);
-            this.idWorkerTable.putIfAbsent(workerId, instance);
+            this.idWorkerTable.put(workerId, instance);
 
             return instance;
         }finally {

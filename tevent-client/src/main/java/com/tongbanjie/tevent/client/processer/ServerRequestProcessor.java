@@ -114,7 +114,7 @@ public class ServerRequestProcessor implements NettyRequestProcessor {
             }
         }
         else {
-            throw new RpcCommandException("checkTransactionState faild, producer group can not be null");
+            throw new RpcCommandException("checkTransactionState failed, producer group can not be null");
         }
         return null;
 

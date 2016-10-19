@@ -9,7 +9,7 @@ import com.tongbanjie.tevent.common.Constants;
  * @author zixiao
  * @date 16/10/12
  */
-public class ClientConfig implements Cloneable{
+public class ClientConfig{
 
     /**
      * 消息发送线程池大小

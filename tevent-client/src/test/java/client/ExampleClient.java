@@ -205,12 +205,12 @@ public class ExampleClient {
                 TransactionMessageHeader responseHeader = null;
                 try {
                     responseHeader = (TransactionMessageHeader) response.decodeCustomHeader(TransactionMessageHeader.class);
+                    transactionId = responseHeader.getTransactionId();
+                    LOGGER.info(">>>Prepared message '{}' to server {} success, transactionId={} .",
+                            message.getKeys(), addr, transactionId);
                 } catch (RpcCommandException e) {
                     e.printStackTrace();
                 }
-                transactionId = responseHeader.getTransactionId();
-                LOGGER.info(">>>Prepared message '{}' to server {} success, transactionId={} .",
-                        message.getKeys(), addr, transactionId);
                 break;
             default:
                 LOGGER.error(">>>Prepared message '{}' to server {} failed, errorCode:{}, error:{}",

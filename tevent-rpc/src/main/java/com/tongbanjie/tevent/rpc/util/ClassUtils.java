@@ -1,5 +1,7 @@
 package com.tongbanjie.tevent.rpc.util;
 
+import com.tongbanjie.tevent.common.util.DateUtils;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
@@ -43,7 +45,7 @@ public class ClassUtils {
 
     private static final String utilDateClass = java.util.Date.class.getCanonicalName();
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     //简单数据类型set
     private static final Set<String /**/> simpleTypeSet = new HashSet<String>();
@@ -93,7 +95,7 @@ public class ClassUtils {
             valueParsed = Boolean.parseBoolean(value);
         } else if (type.equals(utilDateClass)) {
             try {
-                valueParsed = dateFormat.parse(value);
+                valueParsed = DateUtils.parse(value, DATE_PATTERN);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -110,7 +112,7 @@ public class ClassUtils {
     public static String simpleValueToString(String type, Object value){
         if(simpleTypeSet.contains(type)){
             if(utilDateClass.equals(type)){
-                return dateFormat.format((java.util.Date)value);
+                return DateUtils.format((java.util.Date)value, DATE_PATTERN);
             }else{
                 return value.toString();
             }

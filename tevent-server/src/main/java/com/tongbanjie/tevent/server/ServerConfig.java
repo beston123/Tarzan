@@ -18,7 +18,7 @@ package com.tongbanjie.tevent.server;
 
 import com.tongbanjie.tevent.common.Constants;
 
-public class ServerConfig implements Cloneable{
+public class ServerConfig{
 
     /**
      * 消息发送线程池大小

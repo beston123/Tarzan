@@ -55,10 +55,12 @@ public class RocketMQMessageSender implements MQMessageSender<RocketMQBody> {
             private final String group = rocketMQBody.getProducerGroup();
             private final String messageKey = rocketMQBody.getMessageKey();
             private final String topic = rocketMQBody.getTopic();
-            String logMsg = " [message group:"+ group+", messageKey:"+ messageKey +", topic:"+ topic +"]";
-            
+
             @Override
             public void run() {
+                LOGGER.debug("Start tp  check localTransactionState, messageKey:{}, topic:{}, transactionId:{}",
+                        messageKey, topic, requestHeader.getTransactionId());
+
                 TransactionCheckListener transactionCheckListener = RocketMQMessageSender.this.transactionCheckListener();
                 LocalTransactionState localTransactionState = LocalTransactionState.UNKNOWN;
                 if (transactionCheckListener != null) {
@@ -66,7 +68,7 @@ public class RocketMQMessageSender implements MQMessageSender<RocketMQBody> {
                     try {
                         localTransactionState = transactionCheckListener.checkTransactionState(rocketMQBody);
                     } catch (Throwable e) {
-                        LOGGER.error("Server call checkTransactionState, but checkLocalTransactionState exception", e);
+                        LOGGER.error("Server call checkTransactionState, but checkLocalTransactionState exception.", e);
                         exception = e;
                     }
 
@@ -74,10 +76,11 @@ public class RocketMQMessageSender implements MQMessageSender<RocketMQBody> {
                             localTransactionState, //
                             exception);
                 } else {
-                    LOGGER.warn("checkTransactionState, pick transactionCheckListener by group[{}] failed", group);
+                    LOGGER.error("CheckTransactionState failed: MQMessageSender of group '{}', has not been set a transactionCheckListener.", group);
                     this.processTransactionState(//
                             localTransactionState, //
-                            new RuntimeException("checkTransactionState, pick transactionCheckListener by group[" + group + "] failed"));
+                            new RuntimeException("CheckTransactionState failed: MQMessageSender of group '" + group
+                                    + "', has not been set a transactionCheckListener."));
                 }
             }
 
@@ -91,18 +94,23 @@ public class RocketMQMessageSender implements MQMessageSender<RocketMQBody> {
                 switch (localTransactionState) {
                     case COMMIT:
                         thisHeader.setTransactionState(TransactionState.COMMIT);
+                        LOGGER.info("Client commit this transaction, {}, messageKey:{}, topic:{}",
+                                thisHeader, messageKey, topic);
                         break;
                     case ROLLBACK:
                         thisHeader.setTransactionState(TransactionState.ROLLBACK);
-                        LOGGER.warn("Client rollback this transaction, {}", thisHeader);
+                        LOGGER.info("Client rollback this transaction, {}, messageKey:{}, topic:{}",
+                                thisHeader, messageKey, topic);
                         break;
                     case UNKNOWN:
                         thisHeader.setTransactionState(TransactionState.UNKNOWN);
-                        LOGGER.warn("Client do not know this transaction state, {}", thisHeader);
+                        LOGGER.warn("Client do not know this transaction state, {}, messageKey:{}, topic:{}",
+                                thisHeader, messageKey, topic);
                         break;
                     default:
                         thisHeader.setTransactionState(TransactionState.UNKNOWN);
-                        LOGGER.warn("Client do not know this transaction state, {}", thisHeader);
+                        LOGGER.warn("Client do not know this transaction state, {}, messageKey:{}, topic:{}",
+                                thisHeader, messageKey, topic);
                         break;
                 }
 
@@ -115,7 +123,7 @@ public class RocketMQMessageSender implements MQMessageSender<RocketMQBody> {
                 try {
                     rpcClient.invokeOneway(serverAddr, request, 3000);
                 } catch (Exception e) {
-                    LOGGER.error("Response checkLocalTransactionState exception", e);
+                    LOGGER.error("Response checkLocalTransactionState exception. " + thisHeader, e);
                 }
             }
         };

@@ -24,12 +24,11 @@ public class EventProducerFactory {
 
     private static final EventProducerFactory eventProducerFactory = new EventProducerFactory();
 
-    private AtomicInteger indexGenerator = new AtomicInteger(0);
+    private final AtomicInteger indexGenerator = new AtomicInteger(0);
 
-    private ReentrantLock createLock = new ReentrantLock();
+    private final ReentrantLock createLock = new ReentrantLock();
 
-    private ConcurrentHashMap<MQType/* key */, EventProducer> producerTable =
-            new ConcurrentHashMap<MQType, EventProducer>();
+    private final ConcurrentHashMap<MQType/* key */, EventProducer> producerTable = new ConcurrentHashMap<MQType, EventProducer>();
 
     private EventProducerFactory(){}
 
@@ -65,7 +64,7 @@ public class EventProducerFactory {
     }
 
     private EventProducer createProducer(MQType mqType, ServerController serverController){
-        LOGGER.info("Create {} Producer, count: {}", mqType, indexGenerator.addAndGet(1));
+        LOGGER.debug("Create {} Producer, count: {}", mqType, indexGenerator.addAndGet(1));
         switch (mqType){
             case ROCKET_MQ:
                 return new RocketMQProducer(serverController);

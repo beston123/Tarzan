@@ -1,7 +1,5 @@
 package com.tongbanjie.tevent.client.sender;
 
-import com.tongbanjie.tevent.client.ClientController;
-import com.tongbanjie.tevent.common.body.CustomBody;
 import com.tongbanjie.tevent.common.body.MQBody;
 import com.tongbanjie.tevent.rpc.RpcClient;
 import com.tongbanjie.tevent.rpc.protocol.header.CheckTransactionStateHeader;
@@ -19,7 +17,7 @@ public interface MQMessageSender<T extends MQBody> {
 
     int checkThreadPoolMaxSize = 1;
 
-    int checkRequestHoldMax = 2000;
+    int checkRequestHoldMax = 1000;
 
     TransactionCheckListener transactionCheckListener();
 

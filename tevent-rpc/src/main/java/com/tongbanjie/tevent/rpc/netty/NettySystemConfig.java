@@ -31,7 +31,7 @@ public class NettySystemConfig {
 
     public static int SocketRcvbufSize = 65535;
 
-    public static int ClientAsyncSemaphoreValue = 2048;
+    public static final int ClientAsyncSemaphoreValue = 2048;
 
-    public static int ClientOnewaySemaphoreValue = 2048;
+    public static final int ClientOnewaySemaphoreValue = 2048;
 }
