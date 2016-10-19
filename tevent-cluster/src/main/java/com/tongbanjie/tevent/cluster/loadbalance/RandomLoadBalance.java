@@ -1,6 +1,6 @@
-package com.tongbanjie.tevent.registry.cluster;
+package com.tongbanjie.tevent.cluster.loadbalance;
 
-import com.tongbanjie.tevent.registry.Address;
+import com.tongbanjie.tevent.common.Weighable;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
@@ -13,12 +13,11 @@ import java.util.Random;
  * @author zixiao
  * @date 16/10/18
  */
-public class RandomLoadBalance extends AbstractLoadBalance{
+public class RandomLoadBalance<T extends Weighable> extends AbstractLoadBalance<T>{
 
     private final Random random = new Random();
 
-    @Override
-    public Address select(List<Address> list) {
+    public T doSelect(List<T> list) {
         if(CollectionUtils.isEmpty(list)){
             return null;
         }
@@ -33,6 +32,11 @@ public class RandomLoadBalance extends AbstractLoadBalance{
             lastSelected = list.get(random.nextInt(size));
         }
         return lastSelected;
+    }
+
+    @Override
+    public T select(List<T> list) {
+        return doSelect(list);
     }
 
 }

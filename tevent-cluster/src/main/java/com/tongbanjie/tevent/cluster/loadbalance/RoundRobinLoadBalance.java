@@ -1,5 +1,6 @@
-package com.tongbanjie.tevent.registry.cluster;
+package com.tongbanjie.tevent.cluster.loadbalance;
 
+import com.tongbanjie.tevent.common.Weighable;
 import com.tongbanjie.tevent.registry.Address;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -14,12 +15,12 @@ import java.util.List;
  * @author zixiao
  * @date 16/10/18
  */
-public class RoundRobinLoadBalance extends AbstractLoadBalance {
+public class RoundRobinLoadBalance<T extends Weighable> extends AbstractLoadBalance<T> {
 
     protected int lastIndex = -1;
 
     @Override
-    public Address select(List<Address> list) {
+    public T select(List<T> list) {
         if(CollectionUtils.isEmpty(list)){
             return null;
         }
@@ -32,7 +33,7 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
         return lastSelected;
     }
 
-    private Address doRoundRobin(List<Address> list){
+    private T doRoundRobin(List<T> list){
         //初次执行
         if(lastIndex == -1){
             lastIndex ++;
@@ -64,7 +65,7 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
         List<Address> list = new ArrayList<Address>();
 
         init(list);
-        LoadBalance<Address> loadBalance = new RoundRobinLoadBalance();
+        LoadBalance<Address> loadBalance = new RoundRobinLoadBalance<Address>();
 
         for(int j=0; j< 12; j++){
             System.out.println(">>>>"+j+":"+loadBalance.select(list));

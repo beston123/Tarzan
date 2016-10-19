@@ -16,13 +16,11 @@
  */
 package com.tongbanjie.tevent.client;
 
-
-
 import com.tongbanjie.tevent.client.sender.MQMessageSender;
 import com.tongbanjie.tevent.registry.Address;
 import com.tongbanjie.tevent.registry.RecoverableRegistry;
-import com.tongbanjie.tevent.registry.cluster.LoadBalance;
-import com.tongbanjie.tevent.registry.cluster.RandomLoadBalance;
+import com.tongbanjie.tevent.cluster.loadbalance.LoadBalance;
+import com.tongbanjie.tevent.cluster.loadbalance.RandomLoadBalance;
 import com.tongbanjie.tevent.rpc.RpcClient;
 import com.tongbanjie.tevent.rpc.exception.*;
 import com.tongbanjie.tevent.rpc.protocol.RequestCode;

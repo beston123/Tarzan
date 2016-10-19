@@ -1,4 +1,4 @@
-package com.tongbanjie.tevent.common.util;
+package com.tongbanjie.tevent.common;
 
 import java.util.AbstractSet;
 import java.util.ConcurrentModificationException;

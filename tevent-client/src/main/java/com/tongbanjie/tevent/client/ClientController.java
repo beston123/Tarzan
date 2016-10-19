@@ -1,5 +1,7 @@
 package com.tongbanjie.tevent.client;
 
+import com.tongbanjie.tevent.client.cluster.ClusterClient;
+import com.tongbanjie.tevent.client.cluster.FailoverClusterClient;
 import com.tongbanjie.tevent.client.example.TransactionCheckListenerExample;
 import com.tongbanjie.tevent.client.processer.ServerRequestProcessor;
 import com.tongbanjie.tevent.client.sender.MQMessageSender;
@@ -7,7 +9,11 @@ import com.tongbanjie.tevent.client.sender.RocketMQMessageSender;
 import com.tongbanjie.tevent.common.Constants;
 import com.tongbanjie.tevent.common.util.NamedSingleThreadFactory;
 import com.tongbanjie.tevent.common.util.NamedThreadFactory;
+import com.tongbanjie.tevent.registry.Address;
 import com.tongbanjie.tevent.registry.RecoverableRegistry;
+import com.tongbanjie.tevent.cluster.loadbalance.LoadBalance;
+import com.tongbanjie.tevent.cluster.loadbalance.LoadBalanceFactory;
+import com.tongbanjie.tevent.cluster.loadbalance.LoadBalanceStrategy;
 import com.tongbanjie.tevent.registry.zookeeper.ClientZooKeeperRegistry;
 import com.tongbanjie.tevent.rpc.RpcClient;
 import com.tongbanjie.tevent.rpc.netty.NettyClientConfig;
@@ -44,6 +50,9 @@ public class ClientController {
     // 服务端连接管理
     private ServerManager serverManager;
 
+    //集群客户端，支持failover和loadBalance
+    private ClusterClient clusterClient;
+
     /********************** 服务 ***********************/
     //服务注册
     private final RecoverableRegistry clientRegistry;
@@ -79,6 +88,12 @@ public class ClientController {
 
         if (result) {
             this.rpcClient = new NettyRpcClient(this.nettyClientConfig);
+            this.clusterClient = new FailoverClusterClient(new ThreadLocal<LoadBalance<Address>>(){
+                @Override
+                protected LoadBalance<Address> initialValue() {
+                    return LoadBalanceFactory.getLoadBalance(LoadBalanceStrategy.RoundRobin);
+                }
+            }, this.rpcClient);
 
             this.serverManager = new ServerManager(this);
 
@@ -151,6 +166,10 @@ public class ClientController {
         return rpcClient;
     }
 
+    public ClusterClient getClusterClient() {
+        return clusterClient;
+    }
+
     public RecoverableRegistry getClientRegistry() {
         return clientRegistry;
     }
@@ -162,4 +181,5 @@ public class ClientController {
     public ServerManager getServerManager() {
         return serverManager;
     }
+
 }

@@ -198,6 +198,7 @@
         <module>tevent-registry</module>
         <module>tevent-rpc</module>
         <module>tevent-store</module>
+        <module>tevent-cluster</module>
     </modules>
 
 </project>

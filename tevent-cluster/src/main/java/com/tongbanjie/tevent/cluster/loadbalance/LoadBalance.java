@@ -1,4 +1,6 @@
-package com.tongbanjie.tevent.registry.cluster;
+package com.tongbanjie.tevent.cluster.loadbalance;
+
+import com.tongbanjie.tevent.common.Weighable;
 
 import java.util.List;
 
@@ -9,7 +11,7 @@ import java.util.List;
  * @author zixiao
  * @date 16/10/18
  */
-public interface LoadBalance<T> {
+public interface LoadBalance<T extends Weighable> {
 
     T select(List<T> list);
 

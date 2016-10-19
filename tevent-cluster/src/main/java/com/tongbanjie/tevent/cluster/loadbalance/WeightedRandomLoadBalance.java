@@ -1,5 +1,6 @@
-package com.tongbanjie.tevent.registry.cluster;
+package com.tongbanjie.tevent.cluster.loadbalance;
 
+import com.tongbanjie.tevent.common.Weighable;
 import com.tongbanjie.tevent.registry.Address;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -13,11 +14,10 @@ import java.util.List;
  * @author zixiao
  * @date 16/10/18
  */
-public class WeightedRandomLoadBalance extends RandomLoadBalance{
-
+public class WeightedRandomLoadBalance<T extends Weighable> extends RandomLoadBalance<T>{
 
     @Override
-    public Address select(List<Address> list) {
+    public T select(List<T> list) {
         if(CollectionUtils.isEmpty(list)){
             return null;
         }
@@ -26,21 +26,21 @@ public class WeightedRandomLoadBalance extends RandomLoadBalance{
             return super.select(list);
         }
         //如果权重相同，则使用Weighted Random算法
-        List<Address> virtualList = new ArrayList<Address>();
-        for (Address address : list){
-            short weight = address.getWeight();
+        List<T> virtualList = new ArrayList<T>();
+        for (T item : list){
+            short weight = item.getWeight();
             for(int i=0; i< weight; i++){
-                virtualList.add(address);
+                virtualList.add(item);
             }
         }
         return super.select(virtualList);
     }
 
-    private boolean isSameWeight(List<Address> list){
+    private boolean isSameWeight(List<? extends Weighable> list){
         boolean sameWeight = true;
         short firstWeight = 0;
-        for(Address address : list){
-            short weight = address.getWeight();
+        for(Weighable item : list){
+            short weight = item.getWeight();
             if(firstWeight == 0){
                 firstWeight = weight;
             }
@@ -57,7 +57,7 @@ public class WeightedRandomLoadBalance extends RandomLoadBalance{
         List<Address> list = new ArrayList<Address>();
 
         init(list);
-        LoadBalance<Address> loadBalance = new WeightedRandomLoadBalance();
+        LoadBalance<Address> loadBalance = new WeightedRandomLoadBalance<Address>();
 
         for(int j=0; j< 100; j++){
             System.out.println(">>>>"+j+":"+loadBalance.select(list));

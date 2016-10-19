@@ -1,20 +1,17 @@
 package com.tongbanjie.tevent.registry;
 
+import com.tongbanjie.tevent.common.Weighable;
+
 import java.io.Serializable;
 
 /**
- * 〈一句话功能简述〉<p>
+ * 服务地址 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao
  * @date 16/10/12
  */
-public class Address implements Serializable{
-
-    /**
-     * 权重默认值
-     */
-    public static final short DEFAULT_WEIGHT = 1;
+public class Address implements Serializable, Weighable {
 
     /**
      * 地址
@@ -32,12 +29,12 @@ public class Address implements Serializable{
 
 
     public Address(String address){
-        this(address, DEFAULT_WEIGHT);
+        this(address, Weighable.DEFAULT_WEIGHT);
     }
 
     public Address(String address, short weight){
         this.address = address;
-        this.weight = weight <= 0 ? DEFAULT_WEIGHT : weight;
+        this.weight = weight <= 0 ? Weighable.DEFAULT_WEIGHT : weight;
     }
 
     public Address(String ip, int port){
@@ -56,6 +53,7 @@ public class Address implements Serializable{
         this.address = address;
     }
 
+    @Override
     public short getWeight() {
         return weight;
     }
@@ -71,13 +69,16 @@ public class Address implements Serializable{
 
         Address address1 = (Address) o;
 
-        return !(address != null ? !address.equals(address1.address) : address1.address != null);
+        if (weight != address1.weight) return false;
+        return address.equals(address1.address);
 
     }
 
     @Override
     public int hashCode() {
-        return address != null ? address.hashCode() : 0;
+        int result = address.hashCode();
+        result = 31 * result + (int) weight;
+        return result;
     }
 
     @Override

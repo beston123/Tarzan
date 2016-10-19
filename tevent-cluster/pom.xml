@@ -5,11 +5,11 @@
     <parent>
         <artifactId>tevent</artifactId>
         <groupId>com.tongbanjie.tevent</groupId>
-        <version>${project.version}</version>
+        <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>tevent-client</artifactId>
+    <artifactId>tevent-cluster</artifactId>
 
     <dependencies>
         <dependency>
@@ -20,26 +20,9 @@
 
         <dependency>
             <groupId>com.tongbanjie.tevent</groupId>
-            <artifactId>tevent-rpc</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.tongbanjie.tevent</groupId>
             <artifactId>tevent-registry</artifactId>
             <version>${project.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.tongbanjie.tevent</groupId>
-            <artifactId>tevent-cluster</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.alibaba.rocketmq</groupId>
-            <artifactId>rocketmq-client</artifactId>
-        </dependency>
     </dependencies>
-
 </project>
