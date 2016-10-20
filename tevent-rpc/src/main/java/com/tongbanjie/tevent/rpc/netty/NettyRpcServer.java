@@ -233,7 +233,7 @@ public class NettyRpcServer extends NettyRpcAbstract implements RpcServer {
 
     @Override
     public RpcCommand invokeSync(final Channel channel, final RpcCommand request, final long timeoutMillis)
-            throws InterruptedException, RpcSendRequestException, RpcTimeoutException {
+            throws InterruptedException, RpcTooMuchRequestException, RpcSendRequestException, RpcTimeoutException {
         return this.invokeSyncImpl(channel, request, timeoutMillis);
     }
 

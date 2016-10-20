@@ -247,7 +247,14 @@ public abstract class NettyRpcAbstract {
     }
 
     public RpcCommand invokeSyncImpl(final Channel channel, final RpcCommand request, final long timeoutMillis)
-            throws InterruptedException, RpcSendRequestException, RpcTimeoutException {
+            throws InterruptedException, RpcTooMuchRequestException, RpcSendRequestException, RpcTimeoutException {
+        //check channel writable
+        if(!channel.isWritable()){
+            throw new RpcTooMuchRequestException(
+                    String.format("Invoke request too much, the channel[%s] is not writable", channel.toString())
+            );
+        }
+
         final int opaque = request.getOpaque();
 
         try {
@@ -290,6 +297,13 @@ public abstract class NettyRpcAbstract {
     public void invokeAsyncImpl(final Channel channel, final RpcCommand request, final long timeoutMillis,
                                 final InvokeCallback invokeCallback)
             throws InterruptedException, RpcTooMuchRequestException, RpcTimeoutException, RpcSendRequestException {
+        //check channel writable
+        if(!channel.isWritable()){
+            throw new RpcTooMuchRequestException(
+                    String.format("Invoke request too much, the channel[%s] is not writable", channel.toString())
+            );
+        }
+
         final int opaque = request.getOpaque();
         boolean acquired = this.semaphoreAsync.tryAcquire(timeoutMillis, TimeUnit.MILLISECONDS);
         if (acquired) {
@@ -327,19 +341,30 @@ public abstract class NettyRpcAbstract {
                 throw new RpcSendRequestException(RpcHelper.parseChannelRemoteAddr(channel), e);
             }
         } else {
-            String info =
-                    String.format("invokeAsyncImpl tryAcquire semaphore timeout, %dms, waiting thread nums: %d semaphoreAsyncValue: %d", //
-                            timeoutMillis, //
-                            this.semaphoreAsync.getQueueLength(), //
-                            this.semaphoreAsync.availablePermits()//
-                    );
-            LOGGER.warn(info);
-            throw new RpcTooMuchRequestException(info);
+            if (timeoutMillis <= 0) {
+                throw new RpcTooMuchRequestException("invokeAsyncImpl invoke too fast");
+            }else{
+                String info =
+                        String.format("invokeAsyncImpl tryAcquire semaphore timeout, %dms, waiting thread nums: %d semaphoreAsyncValue: %d", //
+                                timeoutMillis, //
+                                this.semaphoreAsync.getQueueLength(), //
+                                this.semaphoreAsync.availablePermits()//
+                        );
+                LOGGER.warn(info);
+                throw new RpcTimeoutException(info);
+            }
         }
     }
 
     public void invokeOnewayImpl(final Channel channel, final RpcCommand request, final long timeoutMillis)
             throws InterruptedException, RpcTooMuchRequestException, RpcTimeoutException, RpcSendRequestException {
+        //check channel writable
+        if(!channel.isWritable()){
+            throw new RpcTooMuchRequestException(
+                    String.format("Invoke request too much, the channel[%s] is not writable", channel.toString())
+            );
+        }
+
         request.setOneWayRpc(true);
         boolean acquired = this.semaphoreOneway.tryAcquire(timeoutMillis, TimeUnit.MILLISECONDS);
         if (acquired) {

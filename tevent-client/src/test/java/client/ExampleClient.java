@@ -2,39 +2,32 @@ package client;
 
 import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.common.message.Message;
-import com.tongbanjie.tevent.client.ClientConfig;
 import com.tongbanjie.tevent.client.ClientController;
-import com.tongbanjie.tevent.client.ServerManager;
+import com.tongbanjie.tevent.client.cluster.ClusterClient;
 import com.tongbanjie.tevent.client.sender.LocalTransactionState;
 import com.tongbanjie.tevent.client.validator.RocketMQValidators;
-import com.tongbanjie.tevent.common.Constants;
 import com.tongbanjie.tevent.common.body.RocketMQBody;
 import com.tongbanjie.tevent.common.message.MQType;
 import com.tongbanjie.tevent.common.message.TransactionState;
 import com.tongbanjie.tevent.registry.Address;
-import com.tongbanjie.tevent.registry.RecoverableRegistry;
-import com.tongbanjie.tevent.registry.zookeeper.ClientZooKeeperRegistry;
 import com.tongbanjie.tevent.rpc.RpcClient;
-import com.tongbanjie.tevent.rpc.protocol.SerializeType;
 import com.tongbanjie.tevent.rpc.exception.*;
-import com.tongbanjie.tevent.rpc.netty.NettyClientConfig;
-import com.tongbanjie.tevent.rpc.netty.NettyRpcClient;
 import com.tongbanjie.tevent.rpc.protocol.RequestCode;
 import com.tongbanjie.tevent.rpc.protocol.ResponseCode;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommand;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommandBuilder;
-import com.tongbanjie.tevent.rpc.protocol.header.SendMessageHeader;
-import com.tongbanjie.tevent.rpc.protocol.header.RegisterRequestHeader;
-import com.tongbanjie.tevent.rpc.protocol.header.TransactionMessageHeader;
 import com.tongbanjie.tevent.rpc.protocol.body.HeartbeatData;
+import com.tongbanjie.tevent.rpc.protocol.header.RegisterRequestHeader;
+import com.tongbanjie.tevent.rpc.protocol.header.SendMessageHeader;
+import com.tongbanjie.tevent.rpc.protocol.header.TransactionMessageHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Random;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 
 
 /**
@@ -49,6 +42,8 @@ public class ExampleClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExampleClient.class);
 
     private final RpcClient rpcClient;
+
+    private final ClusterClient clusterClient;
 
     private final String producerGroup;
 
@@ -66,6 +61,7 @@ public class ExampleClient {
     public ExampleClient(ClientController clientController, String producerGroup){
         this.rpcClient = clientController.getRpcClient();
         this.producerGroup = producerGroup;
+        this.clusterClient = clientController.getClusterClient();
     }
 
 
@@ -121,22 +117,52 @@ public class ExampleClient {
         //throw new MQBrokerException(response.getCode(), response.getRemark());
     }
 
-    public void sendMessage(final Message message,
-                            final Address serverAddr,
-                            final String group,
-                            final boolean trans) throws RpcException, InterruptedException {
-        if(trans){
-            transMessage(message, serverAddr.getAddress(), group, 6 << 10);
-        }else{
-            sendMessage(message, serverAddr.getAddress(), group, 6 << 10);
+    public void sendClusterMessage(final Message message,final int tryTimes,//
+                                   final long timeoutMillis ) throws RpcException, InterruptedException {
+        try {
+            RocketMQValidators.checkMessage(message);
+        } catch (MQClientException e) {
+            e.printStackTrace();
+            return;
         }
+        RpcCommand request = buildRequest(message);
+        RpcCommand response = this.clusterClient.invokeSync(timeoutMillis, request);
+        assert response != null;
+        switch (response.getCmdCode()) {
+            case ResponseCode.SUCCESS: {
+                LOGGER.info(">>>Send message '{}' to server success!",
+                        message.getKeys());
+                return;
+            }
+            default:
+                LOGGER.info(">>>Send message '{}' to server failed, error:{}, {}",
+                        message.getKeys(), response.getCmdCode(), response.getRemark());
+                break;
+        }
+    }
+
+    private RpcCommand buildRequest(final Message message){
+        final SendMessageHeader requestHeader = new SendMessageHeader();
+        requestHeader.setMqType(MQType.ROCKET_MQ);
+
+        RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.SEND_MESSAGE, requestHeader);
+
+        RocketMQBody mqBody = new RocketMQBody();
+        mqBody.setTopic(message.getTopic());
+        mqBody.setProducerGroup(producerGroup);
+        mqBody.setMessageBody(message.getBody());
+        mqBody.setMessageKey(message.getKeys());
+
+        request.setBody(mqBody);
+
+        return request;
     }
 
     public void sendMessage(final Message message,
                             final String addr,//
                             final String producerGroup,//
                             final long timeoutMillis
-    ) throws InterruptedException, RpcTimeoutException, RpcConnectException, RpcSendRequestException {
+    ) throws InterruptedException, RpcTimeoutException, RpcConnectException, RpcSendRequestException, RpcTooMuchRequestException {
         try {
             RocketMQValidators.checkMessage(message);
         } catch (MQClientException e) {
@@ -175,7 +201,7 @@ public class ExampleClient {
                             final String addr,//
                             final String producerGroup,//
                             final long timeoutMillis
-    ) throws InterruptedException, RpcTimeoutException, RpcConnectException, RpcSendRequestException {
+    ) throws InterruptedException, RpcTimeoutException, RpcConnectException, RpcSendRequestException, RpcTooMuchRequestException {
         try {
             RocketMQValidators.checkMessage(message);
         } catch (MQClientException e) {
@@ -281,7 +307,7 @@ public class ExampleClient {
     private void commitMessage(Message message, Long transactionId,
                                      final String addr,//
                                      final long timeoutMillis
-    ) throws InterruptedException, RpcTimeoutException, RpcConnectException, RpcSendRequestException {
+    ) throws InterruptedException, RpcTimeoutException, RpcConnectException, RpcSendRequestException, RpcTooMuchRequestException {
         try {
             RocketMQValidators.checkMessage(message);
         } catch (MQClientException e) {
@@ -329,7 +355,7 @@ public class ExampleClient {
     private void roolbackMessage(Message message, Long transactionId,
                               final String addr,//
                               final long timeoutMillis
-    ) throws InterruptedException, RpcTimeoutException, RpcConnectException, RpcSendRequestException {
+    ) throws InterruptedException, RpcTimeoutException, RpcConnectException, RpcSendRequestException, RpcTooMuchRequestException {
         try {
             RocketMQValidators.checkMessage(message);
         } catch (MQClientException e) {

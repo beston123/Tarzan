@@ -291,7 +291,8 @@ public class NettyRpcClient extends NettyRpcAbstract implements RpcClient {
 
     @Override
     public RpcCommand invokeSync(String addr, final RpcCommand request, long timeoutMillis)
-            throws InterruptedException, RpcConnectException, RpcSendRequestException, RpcTimeoutException {
+            throws InterruptedException, RpcConnectException, RpcTooMuchRequestException,
+            RpcSendRequestException, RpcTimeoutException {
         final Channel channel = this.getAndCreateChannel(addr);
         if (channel != null && channel.isActive()) {
             try {
@@ -323,7 +324,6 @@ public class NettyRpcClient extends NettyRpcAbstract implements RpcClient {
 
     private Channel getAndCreateChannel(final String addr) throws InterruptedException {
         if (null == addr) {
-            //TODO 是否需要重新获取服务端一次？
             return null;
         }
         ChannelWrapper cw = this.channelTables.get(addr);
@@ -399,8 +399,8 @@ public class NettyRpcClient extends NettyRpcAbstract implements RpcClient {
 
     @Override
     public void invokeAsync(String addr, RpcCommand request, long timeoutMillis, InvokeCallback invokeCallback)
-            throws InterruptedException, RpcConnectException, RpcTooMuchRequestException, RpcTimeoutException,
-            RpcSendRequestException {
+            throws InterruptedException, RpcConnectException, RpcTooMuchRequestException,
+            RpcTimeoutException, RpcSendRequestException {
         final Channel channel = this.getAndCreateChannel(addr);
         if (channel != null && channel.isActive()) {
             try {
@@ -420,8 +420,9 @@ public class NettyRpcClient extends NettyRpcAbstract implements RpcClient {
     }
 
     @Override
-    public void invokeOneway(String addr, RpcCommand request, long timeoutMillis) throws InterruptedException,
-            RpcConnectException, RpcTooMuchRequestException, RpcTimeoutException, RpcSendRequestException {
+    public void invokeOneway(String addr, RpcCommand request, long timeoutMillis)
+            throws InterruptedException, RpcConnectException, RpcTooMuchRequestException,
+            RpcTimeoutException, RpcSendRequestException {
         final Channel channel = this.getAndCreateChannel(addr);
         if (channel != null && channel.isActive()) {
             try {

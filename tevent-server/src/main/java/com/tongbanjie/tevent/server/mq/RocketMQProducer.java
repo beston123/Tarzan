@@ -94,6 +94,7 @@ public class RocketMQProducer implements EventProducer {
         try {
             SendResult sendResult = producer.send(msg);
             LOGGER.info("Send status {}, msgId {}", sendResult.getSendStatus(), sendResult.getMsgId());
+            return sendResult;
         } catch (MQClientException e) {
             e.printStackTrace();
         } catch (RemotingException e) {

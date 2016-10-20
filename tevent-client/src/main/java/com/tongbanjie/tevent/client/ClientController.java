@@ -93,7 +93,7 @@ public class ClientController {
                 protected LoadBalance<Address> initialValue() {
                     return LoadBalanceFactory.getLoadBalance(LoadBalanceStrategy.RoundRobin);
                 }
-            }, this.rpcClient);
+            }, this.rpcClient, this.clientRegistry);
 
             this.serverManager = new ServerManager(this);
 

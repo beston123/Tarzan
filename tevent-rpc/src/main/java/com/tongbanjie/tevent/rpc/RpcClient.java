@@ -32,13 +32,15 @@ public interface RpcClient extends RpcService {
     /****************************** invoke 方法 *****************************/
 
     RpcCommand invokeSync(String addr, final RpcCommand request,
-                                      long timeoutMillis) throws InterruptedException, RpcConnectException,
+                                      long timeoutMillis)
+            throws InterruptedException, RpcConnectException, RpcTooMuchRequestException,
             RpcSendRequestException, RpcTimeoutException;
 
 
     void invokeAsync(final String addr, final RpcCommand request, final long timeoutMillis,
-                            final InvokeCallback invokeCallback) throws InterruptedException, RpcConnectException,
-            RpcTimeoutException, RpcSendRequestException, RpcTooMuchRequestException;
+                            final InvokeCallback invokeCallback)
+            throws InterruptedException, RpcConnectException, RpcTooMuchRequestException,
+            RpcTimeoutException, RpcSendRequestException;
 
 
     void invokeOneway(final String addr, final RpcCommand request, final long timeoutMillis)

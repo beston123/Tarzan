@@ -3,6 +3,7 @@ package com.tongbanjie.tevent.client.cluster;
 import com.tongbanjie.tevent.cluster.Cluster;
 import com.tongbanjie.tevent.registry.Address;
 import com.tongbanjie.tevent.cluster.loadbalance.LoadBalance;
+import com.tongbanjie.tevent.registry.Registry;
 import com.tongbanjie.tevent.rpc.InvokeCallback;
 import com.tongbanjie.tevent.rpc.RpcClient;
 import com.tongbanjie.tevent.rpc.exception.RpcConnectException;
@@ -22,13 +23,18 @@ import java.util.List;
  */
 public abstract class ClusterClient implements Cluster<RpcCommand, Address, RpcCommand, InvokeCallback> {
 
-    protected ThreadLocal<LoadBalance<Address>> loadBalance;
+    protected final ThreadLocal<LoadBalance<Address>> loadBalance;
 
-    protected RpcClient rpcClient;
+    private final RpcClient rpcClient;
 
-    public ClusterClient(ThreadLocal<LoadBalance<Address>> loadBalance, RpcClient rpcClient){
+    private final Registry registry;
+
+    private int defaultRetryTimes = 1;
+
+    public ClusterClient(ThreadLocal<LoadBalance<Address>> loadBalance, RpcClient rpcClient, Registry registry){
         this.loadBalance = loadBalance;
         this.rpcClient = rpcClient;
+        this.registry = registry;
     }
 
     protected Address select(List<Address> addressList){
@@ -36,22 +42,111 @@ public abstract class ClusterClient implements Cluster<RpcCommand, Address, RpcC
     }
 
     /**
+     * 同步调用
+     * @param timeoutMillis
+     * @param arg
+     * @return
+     * @throws InterruptedException
+     * @throws RpcConnectException
+     * @throws RpcTooMuchRequestException
+     * @throws RpcTimeoutException
+     * @throws RpcSendRequestException
+     */
+    public RpcCommand invokeSync(long timeoutMillis, RpcCommand arg)
+            throws InterruptedException, RpcConnectException, RpcTooMuchRequestException,
+            RpcTimeoutException, RpcSendRequestException{
+        return invokeSync(timeoutMillis, defaultRetryTimes, arg);
+    }
+
+    /**
+     * 异步调用
+     * @param timeoutMillis
+     * @param arg
+     * @param callback
+     * @throws InterruptedException
+     * @throws RpcConnectException
+     * @throws RpcTooMuchRequestException
+     * @throws RpcTimeoutException
+     * @throws RpcSendRequestException
+     */
+    public void invokeAsync(long timeoutMillis, RpcCommand arg, InvokeCallback callback)
+            throws InterruptedException, RpcConnectException, RpcTooMuchRequestException,
+            RpcTimeoutException, RpcSendRequestException{
+        invokeAsync(timeoutMillis, defaultRetryTimes, arg, callback);
+    }
+
+    /**
      * oneway方式调用
      * @param timeoutMillis
-     * @param retryTimes
-     * @param targetList
      * @param arg
      * @throws InterruptedException
      * @throws RpcConnectException
+     * @throws RpcTooMuchRequestException
      * @throws RpcTimeoutException
      * @throws RpcSendRequestException
-     * @throws RpcTooMuchRequestException
      */
-    public void invokeOneway(long timeoutMillis, int retryTimes, List<Address> targetList, RpcCommand arg)
-            throws InterruptedException, RpcConnectException,
-            RpcTimeoutException, RpcSendRequestException, RpcTooMuchRequestException {
-        invokeAsync(timeoutMillis, retryTimes, targetList, arg, null);
+    public void invokeOneway(long timeoutMillis, RpcCommand arg)
+            throws InterruptedException, RpcConnectException, RpcTooMuchRequestException,
+            RpcTimeoutException, RpcSendRequestException  {
+        invokeOneway(timeoutMillis, defaultRetryTimes, arg);
     }
+
+    /**
+     * 同步调用
+     * @param timeoutMillis
+     * @param retryTimes
+     * @param arg
+     * @return
+     * @throws InterruptedException
+     * @throws RpcConnectException
+     * @throws RpcTooMuchRequestException
+     * @throws RpcTimeoutException
+     * @throws RpcSendRequestException
+     */
+    public RpcCommand invokeSync(long timeoutMillis, int retryTimes, RpcCommand arg)
+            throws InterruptedException, RpcConnectException, RpcTooMuchRequestException,
+            RpcTimeoutException, RpcSendRequestException{
+        List<Address> addressList = this.registry.getDiscovered();
+        return invokeSync(timeoutMillis, retryTimes, addressList, arg);
+    }
+
+    /**
+     * 异步调用
+     * @param timeoutMillis
+     * @param retryTimes
+     * @param arg
+     * @param callback
+     * @throws InterruptedException
+     * @throws RpcConnectException
+     * @throws RpcTooMuchRequestException
+     * @throws RpcTimeoutException
+     * @throws RpcSendRequestException
+     */
+    public void invokeAsync(long timeoutMillis, int retryTimes, RpcCommand arg, InvokeCallback callback)
+            throws InterruptedException, RpcConnectException, RpcTooMuchRequestException,
+            RpcTimeoutException, RpcSendRequestException{
+        List<Address> addressList = this.registry.getDiscovered();
+        invokeAsync(timeoutMillis, retryTimes, addressList, arg, callback);
+    }
+
+    /**
+     * oneway方式调用
+     * @param timeoutMillis
+     * @param retryTimes
+     * @param arg
+     * @throws InterruptedException
+     * @throws RpcConnectException
+     * @throws RpcTooMuchRequestException
+     * @throws RpcTimeoutException
+     * @throws RpcSendRequestException
+     */
+    public void invokeOneway(long timeoutMillis, int retryTimes, RpcCommand arg)
+            throws InterruptedException, RpcConnectException, RpcTooMuchRequestException,
+            RpcTimeoutException, RpcSendRequestException  {
+        List<Address> addressList = this.registry.getDiscovered();
+        invokeOneway(timeoutMillis, retryTimes, addressList, arg);
+    }
+
 
     /**
      * 同步调用
@@ -63,14 +158,14 @@ public abstract class ClusterClient implements Cluster<RpcCommand, Address, RpcC
      * @return
      * @throws InterruptedException
      * @throws RpcConnectException
+     * @throws RpcTooMuchRequestException
      * @throws RpcTimeoutException
      * @throws RpcSendRequestException
-     * @throws RpcTooMuchRequestException
      */
     @Override
     public abstract RpcCommand invokeSync(long timeoutMillis, int retryTimes, List<Address> targetList, RpcCommand arg)
-            throws InterruptedException, RpcConnectException,
-            RpcTimeoutException, RpcSendRequestException, RpcTooMuchRequestException;
+            throws InterruptedException, RpcConnectException, RpcTooMuchRequestException,
+            RpcTimeoutException, RpcSendRequestException;
 
     /**
      * 异步调用
@@ -82,19 +177,38 @@ public abstract class ClusterClient implements Cluster<RpcCommand, Address, RpcC
      * @param callback
      * @throws InterruptedException
      * @throws RpcConnectException
+     * @throws RpcTooMuchRequestException
      * @throws RpcTimeoutException
      * @throws RpcSendRequestException
-     * @throws RpcTooMuchRequestException
      */
     @Override
     public abstract void invokeAsync(long timeoutMillis, int retryTimes, List<Address> targetList, RpcCommand arg, InvokeCallback callback)
-            throws InterruptedException, RpcConnectException,
-            RpcTimeoutException, RpcSendRequestException, RpcTooMuchRequestException;
+            throws InterruptedException, RpcConnectException, RpcTooMuchRequestException,
+            RpcTimeoutException, RpcSendRequestException;
+
+
+    /**
+     * oneway方式调用
+     * @param timeoutMillis
+     * @param retryTimes
+     * @param targetList
+     * @param arg
+     * @throws InterruptedException
+     * @throws RpcConnectException
+     * @throws RpcTooMuchRequestException
+     * @throws RpcTimeoutException
+     * @throws RpcSendRequestException
+     */
+    public void invokeOneway(long timeoutMillis, int retryTimes, List<Address> targetList, RpcCommand arg)
+            throws InterruptedException, RpcConnectException, RpcTooMuchRequestException,
+            RpcTimeoutException, RpcSendRequestException  {
+        invokeAsync(timeoutMillis, retryTimes, targetList, arg, null);
+    }
 
 
     protected RpcCommand doInvokeSync(long timeoutMillis, Address address, RpcCommand request)
-            throws InterruptedException, RpcConnectException,
-            RpcTimeoutException, RpcSendRequestException, RpcTooMuchRequestException
+            throws InterruptedException, RpcConnectException, RpcTooMuchRequestException,
+            RpcTimeoutException, RpcSendRequestException
     {
         if(address == null){
             throw new RpcConnectException("Invoke failed, address is null.");
@@ -103,8 +217,8 @@ public abstract class ClusterClient implements Cluster<RpcCommand, Address, RpcC
     }
 
     protected void doInvokeAsync(long timeoutMillis, Address address, RpcCommand request, InvokeCallback invokeCallback)
-            throws InterruptedException, RpcConnectException,
-            RpcTimeoutException, RpcSendRequestException, RpcTooMuchRequestException
+            throws InterruptedException, RpcConnectException, RpcTooMuchRequestException,
+            RpcTimeoutException, RpcSendRequestException
     {
         if(address == null){
             throw new RpcConnectException("Invoke failed, address is null.");

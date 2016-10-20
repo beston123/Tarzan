@@ -31,18 +31,17 @@ public interface RpcServer extends RpcService {
 
     /****************************** invoke 方法 *****************************/
 
-    RpcCommand invokeSync(final Channel channel, final RpcCommand request,
-                               final long timeoutMillis) throws InterruptedException, RpcSendRequestException,
-            RpcTimeoutException;
+    RpcCommand invokeSync(final Channel channel, final RpcCommand request, final long timeoutMillis)
+            throws InterruptedException, RpcTooMuchRequestException, RpcSendRequestException, RpcTimeoutException;
 
 
     void invokeAsync(final Channel channel, final RpcCommand request, final long timeoutMillis,
-                     final InvokeCallback invokeCallback) throws InterruptedException,
-            RpcTimeoutException, RpcSendRequestException, RpcTooMuchRequestException;
+                     final InvokeCallback invokeCallback)
+            throws InterruptedException, RpcTimeoutException, RpcTooMuchRequestException, RpcSendRequestException;
 
 
     void invokeOneway(final Channel channel, final RpcCommand request, final long timeoutMillis)
-            throws InterruptedException, RpcTimeoutException, RpcSendRequestException, RpcTooMuchRequestException;
+            throws InterruptedException, RpcTimeoutException, RpcTooMuchRequestException, RpcSendRequestException;
 
     /****************************** 处理器注册 *****************************/
 
@@ -56,6 +55,5 @@ public interface RpcServer extends RpcService {
     /****************************** 本地监听端口 *****************************/
 
     int localListenPort();
-
 
 }

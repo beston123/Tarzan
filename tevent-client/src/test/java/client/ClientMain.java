@@ -41,8 +41,8 @@ public class ClientMain {
 
         }
 
+        //transactionMessageTest(clientController);
         sendMessageTest(clientController);
-
     }
 
     public static ClientController startup(){
@@ -51,7 +51,7 @@ public class ClientMain {
         return clientController;
     }
 
-    public static void sendMessageTest(final ClientController clientController){
+    public static void transactionMessageTest(final ClientController clientController){
         ExampleClient client = new ExampleClient(clientController, Constants.TEVENT_TEST_P_GROUP);
 
         Random random = new Random();
@@ -67,7 +67,7 @@ public class ClientMain {
             message.setKeys("msg_" + i);
             message.setBody(("Hello TEvent " + i).getBytes());
             try {
-                client.sendMessage( message, serverAddr, Constants.TEVENT_TEST_P_GROUP, true);
+                client.transMessage(message, serverAddr.getAddress(), Constants.TEVENT_TEST_P_GROUP, 3000);
                 //Thread.sleep(10<<10);
             } catch (RpcException e) {
                 LOGGER.error(">>>Send message '"+message.getKeys()+"' to server "+serverAddr+" failed", e);
@@ -90,5 +90,36 @@ public class ClientMain {
     }
 
 
+    public static void sendMessageTest(final ClientController clientController){
+        ExampleClient client = new ExampleClient(clientController, Constants.TEVENT_TEST_P_GROUP);
 
-}
+        for(int i=0; i< 5; i++){
+            Message message = new Message();
+            message.setTopic(Constants.TEVENT_TEST_TOPIC);
+            message.setKeys("cluster_msg_" + i);
+            message.setBody(("Hello TEvent " + i).getBytes());
+            try {
+                client.sendClusterMessage(message, 1, 3000);
+                //Thread.sleep(10<<10);
+            } catch (RpcException e) {
+                LOGGER.error(">>>Send message '"+message.getKeys()+"' to server  failed", e);
+                try {
+                    Thread.sleep(5<<10);
+                } catch (InterruptedException e1) {
+                    //
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            Thread.sleep(5000<<10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    }
