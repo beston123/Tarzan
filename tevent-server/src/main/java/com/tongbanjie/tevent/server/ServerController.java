@@ -18,18 +18,18 @@ package com.tongbanjie.tevent.server;
 
 
 import com.tongbanjie.tevent.common.util.NamedThreadFactory;
+import com.tongbanjie.tevent.common.util.RemotingUtils;
 import com.tongbanjie.tevent.registry.Address;
 import com.tongbanjie.tevent.registry.RecoverableRegistry;
 import com.tongbanjie.tevent.registry.zookeeper.ServerZooKeeperRegistry;
 import com.tongbanjie.tevent.rpc.RpcServer;
-import com.tongbanjie.tevent.rpc.protocol.RequestCode;
 import com.tongbanjie.tevent.rpc.netty.NettyRpcServer;
 import com.tongbanjie.tevent.rpc.netty.NettyServerConfig;
+import com.tongbanjie.tevent.rpc.protocol.RequestCode;
 import com.tongbanjie.tevent.server.client.ClientChannelManageService;
 import com.tongbanjie.tevent.server.client.ClientManager;
 import com.tongbanjie.tevent.server.processer.ClientManageProcessor;
 import com.tongbanjie.tevent.server.processer.SendMessageProcessor;
-import com.tongbanjie.tevent.common.util.RemotingUtils;
 import com.tongbanjie.tevent.server.transaction.TransactionCheckService;
 import com.tongbanjie.tevent.store.DefaultStoreManager;
 import com.tongbanjie.tevent.store.StoreManager;
@@ -116,16 +116,13 @@ public class ServerController {
     public boolean initialize() {
         boolean result = true;
 
-        if (result) {
-            try {
-                this.storeManager = new DefaultStoreManager(this.storeConfig);
-            }
-            catch (IOException e) {
-                result = false;
-                e.printStackTrace();
-            }
+        try {
+            this.storeManager = new DefaultStoreManager(this.storeConfig);
         }
-
+        catch (IOException e) {
+            result = false;
+            e.printStackTrace();
+        }
         result = result && this.storeManager.load();
 
         if (result) {
@@ -148,13 +145,30 @@ public class ServerController {
 
             this.transactionCheckService = new TransactionCheckService(this);
 
-            //设置分布式Id生成期 机器Id［每个JVM进程唯一］
-            DistributedIdGenerator.setUniqueWorkId(serverConfig.getServerId());
+            //服务器地址 [ip]:[port]
+            String localIp = RemotingUtils.getLocalHostIp();
+            if(localIp == null){
+                throw new RuntimeException("Get localHost ip failed.");
+            }
+            serverAddress = new Address(localIp, nettyServerConfig.getListenPort(), serverConfig.getServerWeight());
         }
 
         return result;
     }
 
+    private boolean register(int serverId, Address serverAddress) {
+        if (serverRegistry.isConnected()) {
+            boolean flag = ((ServerZooKeeperRegistry) this.serverRegistry).registerId(serverId, serverAddress);
+            if (flag) {
+                serverRegistry.register(serverAddress);
+                return true;
+            }else {
+                throw new IllegalArgumentException("The server id '" +serverConfig.getServerId()+
+                        "' already in use, it must be unique.");
+            }
+        }
+        return false;
+    }
 
     public void registerProcessor() {
         SendMessageProcessor sendProcessor = new SendMessageProcessor(this);
@@ -209,18 +223,19 @@ public class ServerController {
             this.rpcServer.start();
         }
 
-        //服务器地址 [ip]:[port]
-        String localIp = RemotingUtils.getLocalHostIp();
-        if(localIp == null){
-            throw new RuntimeException("Get localHost ip failed.");
-        }
-        serverAddress = new Address(localIp, nettyServerConfig.getListenPort());
         //注册地址
         try {
             serverRegistry.start();
-            serverRegistry.register(serverAddress);
         } catch (Exception e) {
-            LOGGER.error("The registry connect failed, address: " + serverConfig.getRegistryAddress(), e);
+            throw new RuntimeException("The registry connect failed, address: " + serverConfig.getRegistryAddress(), e);
+        }
+
+        if(register(serverConfig.getServerId(), serverAddress)){
+            //设置分布式Id生成器的WorkId
+            DistributedIdGenerator.setUniqueWorkId(serverConfig.getServerId());
+        }else{
+            throw new RuntimeException("Register failed, address: " + serverConfig.getRegistryAddress()
+                    +", server id: "+serverConfig.getServerId());
         }
 
         if (this.clientChannelManageService != null) {

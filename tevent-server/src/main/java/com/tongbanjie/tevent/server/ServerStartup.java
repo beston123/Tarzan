@@ -16,13 +16,17 @@
  */
 package com.tongbanjie.tevent.server;
 
-import com.tongbanjie.tevent.rpc.netty.NettyClientConfig;
+import com.tongbanjie.tevent.common.Constants;
 import com.tongbanjie.tevent.rpc.netty.NettyServerConfig;
-import com.tongbanjie.tevent.rpc.netty.NettySystemConfig;
 import com.tongbanjie.tevent.store.config.StoreConfig;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -41,12 +45,23 @@ public class ServerStartup {
     }
 
     public static ServerController createServerController(String[] args) {
-        if (null == System.getProperty(NettySystemConfig.SystemPropertySocketSndbufSize)) {
-            NettySystemConfig.SocketSndbufSize = 131072;
-        }
-
-        if (null == System.getProperty(NettySystemConfig.SystemPropertySocketRcvbufSize)) {
-            NettySystemConfig.SocketRcvbufSize = 131072;
+        //配置加载
+        String conf = System.getProperty(Constants.TEVENT_SERVER_CONF, "classpath:config.properties");
+        try {
+            Properties properties = new Properties();
+            if (conf.startsWith(Constants.CLASSPATH_PREFIX)) {
+                conf = StringUtils.substringAfter(conf, Constants.CLASSPATH_PREFIX);
+                properties.load(ServerStartup.class.getClassLoader().getResourceAsStream(conf));
+            } else {
+                properties.load(new FileInputStream(conf));
+            }
+            Set<String> propNames = properties.stringPropertyNames();
+            for(String propName : propNames){
+                System.setProperty(propName, properties.getProperty(propName));
+            }
+        } catch (IOException e) {
+            System.out.println("Configuration load failed, file:" + conf);
+            System.exit(-3);
         }
 
         final ServerConfig serverConfig = new ServerConfig();

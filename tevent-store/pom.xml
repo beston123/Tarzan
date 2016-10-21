@@ -17,6 +17,13 @@
             <artifactId>tevent-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.2.5</version>
+        </dependency>
+
     </dependencies>
 
 </project>

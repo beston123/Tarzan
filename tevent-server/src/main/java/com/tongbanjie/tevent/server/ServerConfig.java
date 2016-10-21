@@ -18,7 +18,7 @@ package com.tongbanjie.tevent.server;
 
 import com.tongbanjie.tevent.common.Constants;
 
-public class ServerConfig{
+public class ServerConfig {
 
     /**
      * 消息发送线程池大小
@@ -33,22 +33,27 @@ public class ServerConfig{
     /**
      * 消息发送线程池队列容量
      */
-    private int sendThreadPoolQueueCapacity = 100000;
+    private int sendThreadPoolQueueCapacity = 50000;
 
     /**
-     * serverId，每个server必须唯一
+     * ServerId，每个server必须唯一， 取值范围 0-31
      */
-    private int serverId = 1;
+    private int serverId = Integer.valueOf(System.getProperty(Constants.TEVENT_SERVER_ID, "0"));
+
+    /**
+     * Server权重，取值范围 1~32767
+     */
+    private short serverWeight = Short.valueOf(System.getProperty(Constants.TEVENT_SERVER_WEIGHT, "1"));
 
     /**
      * 注册中心地址
      */
-    private String registryAddress = System.getProperty(Constants.TEVENT_REGISTRY_ADDRESS, "192.168.1.120:2181");
+    private String registryAddress = System.getProperty(Constants.TEVENT_REGISTRY_ADDRESS);
 
     /**
      * RocketMQ nameserv 地址
      */
-    private String rocketMQNamesrv =  System.getProperty(Constants.TEVENT_ROCKETMQ_NAMESRV, "192.168.1.42:9876");
+    private String rocketMQNamesrv =  System.getProperty(Constants.TEVENT_ROCKETMQ_NAMESRV);
 
 
     public int getSendMessageThreadPoolNums() {
@@ -83,6 +88,14 @@ public class ServerConfig{
         this.serverId = serverId;
     }
 
+    public short getServerWeight() {
+        return serverWeight;
+    }
+
+    public void setServerWeight(short serverWeight) {
+        this.serverWeight = serverWeight;
+    }
+
     public String getRegistryAddress() {
         return registryAddress;
     }
@@ -97,5 +110,18 @@ public class ServerConfig{
 
     public void setRocketMQNamesrv(String rocketMQNamesrv) {
         this.rocketMQNamesrv = rocketMQNamesrv;
+    }
+
+    @Override
+    public String toString() {
+        return "ServerConfig{" +
+                "sendMessageThreadPoolNums=" + sendMessageThreadPoolNums +
+                ", clientManageThreadPoolNums=" + clientManageThreadPoolNums +
+                ", sendThreadPoolQueueCapacity=" + sendThreadPoolQueueCapacity +
+                ", serverId=" + serverId +
+                ", serverWeight=" + serverWeight +
+                ", registryAddress='" + registryAddress + '\'' +
+                ", rocketMQNamesrv='" + rocketMQNamesrv + '\'' +
+                '}';
     }
 }

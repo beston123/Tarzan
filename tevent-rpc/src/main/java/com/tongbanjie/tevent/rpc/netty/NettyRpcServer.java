@@ -210,6 +210,8 @@ public class NettyRpcServer extends NettyRpcAbstract implements RpcServer {
                 }
             }
         }, 1000 * 3, 1000);
+
+        LOGGER.info("Rpc server [port:{}] start success", port);
     }
 
 

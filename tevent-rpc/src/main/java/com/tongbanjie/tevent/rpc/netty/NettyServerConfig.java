@@ -17,11 +17,11 @@
 package com.tongbanjie.tevent.rpc.netty;
 
 
-import java.util.Random;
+import com.tongbanjie.tevent.common.Constants;
 
 public class NettyServerConfig implements Cloneable{
 
-    private int listenPort = 7770 + new Random().nextInt(10);
+    private int listenPort = Integer.valueOf(System.getProperty(Constants.TEVENT_SERVER_PORT, "7700"));
 
     private int serverWorkerThreads = 8;
     private int serverCallbackExecutorThreads = 0;
@@ -29,10 +29,11 @@ public class NettyServerConfig implements Cloneable{
 
     private int serverOnewaySemaphoreValue = 256;
     private int serverAsyncSemaphoreValue = 64;
+
     private int serverChannelMaxIdleTimeSeconds = 120;
 
-    private int serverSocketSndBufSize = NettySystemConfig.SocketSndbufSize;
-    private int serverSocketRcvBufSize = NettySystemConfig.SocketRcvbufSize;
+    private int serverSocketSndBufSize = 65535 * 2;
+    private int serverSocketRcvBufSize = 65535 * 2;
 
     private boolean serverPooledByteBufAllocatorEnable = true;
 
@@ -45,117 +46,55 @@ public class NettyServerConfig implements Cloneable{
      */
     private boolean useEpollNativeSelector = false;
 
-
     public int getListenPort() {
         return listenPort;
     }
-
 
     public void setListenPort(int listenPort) {
         this.listenPort = listenPort;
     }
 
-
     public int getServerWorkerThreads() {
         return serverWorkerThreads;
     }
-
-
-    public void setServerWorkerThreads(int serverWorkerThreads) {
-        this.serverWorkerThreads = serverWorkerThreads;
-    }
-
-
-    public int getServerSelectorThreads() {
-        return serverSelectorThreads;
-    }
-
-
-    public void setServerSelectorThreads(int serverSelectorThreads) {
-        this.serverSelectorThreads = serverSelectorThreads;
-    }
-
-
-    public int getServerOnewaySemaphoreValue() {
-        return serverOnewaySemaphoreValue;
-    }
-
-
-    public void setServerOnewaySemaphoreValue(int serverOnewaySemaphoreValue) {
-        this.serverOnewaySemaphoreValue = serverOnewaySemaphoreValue;
-    }
-
 
     public int getServerCallbackExecutorThreads() {
         return serverCallbackExecutorThreads;
     }
 
-
-    public void setServerCallbackExecutorThreads(int serverCallbackExecutorThreads) {
-        this.serverCallbackExecutorThreads = serverCallbackExecutorThreads;
+    public int getServerSelectorThreads() {
+        return serverSelectorThreads;
     }
 
+    public int getServerOnewaySemaphoreValue() {
+        return serverOnewaySemaphoreValue;
+    }
 
     public int getServerAsyncSemaphoreValue() {
         return serverAsyncSemaphoreValue;
     }
 
-
-    public void setServerAsyncSemaphoreValue(int serverAsyncSemaphoreValue) {
-        this.serverAsyncSemaphoreValue = serverAsyncSemaphoreValue;
-    }
-
-
     public int getServerChannelMaxIdleTimeSeconds() {
         return serverChannelMaxIdleTimeSeconds;
     }
-
-
-    public void setServerChannelMaxIdleTimeSeconds(int serverChannelMaxIdleTimeSeconds) {
-        this.serverChannelMaxIdleTimeSeconds = serverChannelMaxIdleTimeSeconds;
-    }
-
 
     public int getServerSocketSndBufSize() {
         return serverSocketSndBufSize;
     }
 
-
-    public void setServerSocketSndBufSize(int serverSocketSndBufSize) {
-        this.serverSocketSndBufSize = serverSocketSndBufSize;
-    }
-
-
     public int getServerSocketRcvBufSize() {
         return serverSocketRcvBufSize;
     }
-
-
-    public void setServerSocketRcvBufSize(int serverSocketRcvBufSize) {
-        this.serverSocketRcvBufSize = serverSocketRcvBufSize;
-    }
-
 
     public boolean isServerPooledByteBufAllocatorEnable() {
         return serverPooledByteBufAllocatorEnable;
     }
 
-
-    public void setServerPooledByteBufAllocatorEnable(boolean serverPooledByteBufAllocatorEnable) {
-        this.serverPooledByteBufAllocatorEnable = serverPooledByteBufAllocatorEnable;
-    }
-
-
     public boolean isUseEpollNativeSelector() {
         return useEpollNativeSelector;
     }
 
-
-    public void setUseEpollNativeSelector(boolean useEpollNativeSelector) {
-        this.useEpollNativeSelector = useEpollNativeSelector;
-    }
-    
-    @Override  
+    @Override
     public Object clone() throws CloneNotSupportedException {  
         return (NettyServerConfig)super.clone();  
     }  

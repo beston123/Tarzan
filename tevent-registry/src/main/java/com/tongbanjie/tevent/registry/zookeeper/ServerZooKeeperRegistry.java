@@ -57,4 +57,24 @@ public class ServerZooKeeperRegistry extends AbstractZooKeeperRegistry{
         return this.discovered;
     }
 
+    public boolean registerId(int id, Address address){
+        String path = ZkConstants.SERVER_IDS_ROOT + ZkConstants.PATH_SEPARATOR + id;
+        if(!zkClient.exists(path)){
+            if(!zkClient.exists(ZkConstants.SERVER_IDS_ROOT)){
+                zkClient.createPersistent(ZkConstants.SERVER_IDS_ROOT);
+            }
+            zkClient.createPersistent(path, address.getAddress());
+            LOGGER.info("create persistent node {} success", path);
+            return true;
+        }
+
+        String existedAddr = zkClient.readData(path, true);
+        if(address.getAddress().equals(existedAddr)){
+            return true;
+        }else{
+            LOGGER.error("The server id '{}' has been used by server '{}'.", id, existedAddr);
+            return false;
+        }
+    }
+
 }

@@ -222,7 +222,7 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry, 
     @Override
     public String register(String path, Address address) {
         String absolutePath = zkClient.createEphemeralSequential(path, address);
-        LOGGER.info("create address node: {}", absolutePath);
+        LOGGER.info("create ephemeral address node: {}", absolutePath);
 
         //更新已注册地址
         registered.put(address, absolutePath);

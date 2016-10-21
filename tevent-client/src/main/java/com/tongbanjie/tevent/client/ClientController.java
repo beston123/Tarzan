@@ -91,7 +91,7 @@ public class ClientController {
             this.clusterClient = new FailoverClusterClient(new ThreadLocal<LoadBalance<Address>>(){
                 @Override
                 protected LoadBalance<Address> initialValue() {
-                    return LoadBalanceFactory.getLoadBalance(LoadBalanceStrategy.RoundRobin);
+                    return LoadBalanceFactory.getLoadBalance(LoadBalanceStrategy.WeightedRandom);
                 }
             }, this.rpcClient, this.clientRegistry);
 
