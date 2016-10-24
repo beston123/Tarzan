@@ -41,7 +41,10 @@ public class ClientMain {
 
         }
 
+        //1、事务消息
         //transactionMessageTest(clientController);
+
+        //2、集群测试
         sendMessageTest(clientController);
     }
 
@@ -51,6 +54,22 @@ public class ClientMain {
         return clientController;
     }
 
+    /**
+     * 事务消息
+     *
+     * 模拟本地事务各种情况
+     case 0: //事务处理异常
+        throw new IOException("Check local transaction exception, db is down.");
+     case 1: //事务需要提交
+        return LocalTransactionState.COMMIT;
+     case 2: //事务需要回滚
+        return LocalTransactionState.ROLLBACK;
+
+     default: // state>=3 应用挂掉了,没有事务结果
+        break;
+
+     * @param clientController
+     */
     public static void transactionMessageTest(final ClientController clientController){
         ExampleClient client = new ExampleClient(clientController, Constants.TEVENT_TEST_P_GROUP);
 
@@ -90,6 +109,11 @@ public class ClientMain {
     }
 
 
+    /**
+     * 集群方式发送消息，
+     * 负载均衡，调用失败策略
+     * @param clientController
+     */
     public static void sendMessageTest(final ClientController clientController){
         ExampleClient client = new ExampleClient(clientController, Constants.TEVENT_TEST_P_GROUP);
 

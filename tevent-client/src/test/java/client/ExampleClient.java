@@ -254,14 +254,14 @@ public class ExampleClient {
                         commitMessage(message, transactionId, addr, timeoutMillis);
                         break;
                     case ROLLBACK:
-                        roolbackMessage(message, transactionId, addr, timeoutMillis);
+                        rollbackMessage(message, transactionId, addr, timeoutMillis);
                         break;
                     default:
                         break;
                 }
             } catch (IOException e) {
                 LOGGER.error("执行本地事务异常, message '"+message.getKeys()+"' ", e);
-                        roolbackMessage(message, transactionId, addr, timeoutMillis);
+                        rollbackMessage(message, transactionId, addr, timeoutMillis);
             } catch (Throwable throwable) {
                 //
                 LOGGER.error("未知数据结果, message '"+message.getKeys()+"' ", throwable);
@@ -275,7 +275,7 @@ public class ExampleClient {
 //            if(new Random().nextBoolean()){
 //                commitMessage(message, transactionId + new Random().nextInt(2),addr,  timeoutMillis);
 //            }else{
-//                roolbackMessage(message, transactionId + new Random().nextInt(2),addr,  timeoutMillis);
+//                rollbackMessage(message, transactionId + new Random().nextInt(2),addr,  timeoutMillis);
 //            }
 //        }
 
@@ -352,9 +352,9 @@ public class ExampleClient {
         }
     }
 
-    private void roolbackMessage(Message message, Long transactionId,
-                              final String addr,//
-                              final long timeoutMillis
+    private void rollbackMessage(Message message, Long transactionId,
+                                 final String addr,//
+                                 final long timeoutMillis
     ) throws InterruptedException, RpcTimeoutException, RpcConnectException, RpcSendRequestException, RpcTooMuchRequestException {
         try {
             RocketMQValidators.checkMessage(message);

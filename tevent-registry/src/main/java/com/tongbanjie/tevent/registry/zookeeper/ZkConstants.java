@@ -2,7 +2,22 @@ package com.tongbanjie.tevent.registry.zookeeper;
 
 /**
  * 〈一句话功能简述〉<p>
- * 〈功能详细描述〉
+ *
+ * 在ZooKeepr目录结构
+ * + /tevent
+ *         + /servers
+ *                  + /server-000001  [Ephemeral & Seq]
+ *                  + /server-000002  [Ephemeral & Seq]
+ *                  ...
+ *         + /clients
+ *                  + /client-000001  [Ephemeral & Seq]
+ *                  + /client-000002  [Ephemeral & Seq]
+ *                  ...
+ *         + /serverIds
+ *                  + /0
+ *                  + /1
+ *                  ...
+ *                  + /31
  *
  * @author zixiao
  * @date 16/10/10
