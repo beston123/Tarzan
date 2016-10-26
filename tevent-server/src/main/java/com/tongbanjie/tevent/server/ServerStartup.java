@@ -18,7 +18,7 @@ package com.tongbanjie.tevent.server;
 
 import com.tongbanjie.tevent.common.Constants;
 import com.tongbanjie.tevent.rpc.netty.NettyServerConfig;
-import com.tongbanjie.tevent.store.config.StoreConfig;
+import com.tongbanjie.tevent.store.StoreConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

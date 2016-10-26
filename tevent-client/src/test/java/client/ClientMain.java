@@ -42,10 +42,10 @@ public class ClientMain {
         }
 
         //1、事务消息
-        //transactionMessageTest(clientController);
+        transactionMessageTest(clientController);
 
         //2、集群测试
-        sendMessageTest(clientController);
+        //sendMessageTest(clientController);
     }
 
     public static ClientController startup(){
@@ -117,7 +117,7 @@ public class ClientMain {
     public static void sendMessageTest(final ClientController clientController){
         ExampleClient client = new ExampleClient(clientController, Constants.TEVENT_TEST_P_GROUP);
 
-        for(int i=0; i< 5; i++){
+        for(int i=0; i< 10; i++){
             Message message = new Message();
             message.setTopic(Constants.TEVENT_TEST_TOPIC);
             message.setKeys("cluster_msg_" + i);

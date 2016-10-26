@@ -3,6 +3,8 @@ package com.tongbanjie.tevent.store.service;
 import com.tongbanjie.tevent.common.message.MQMessage;
 import com.tongbanjie.tevent.store.Result;
 
+import java.util.List;
+
 /**
  * MQ 存储服务<p>
  * 〈功能详细描述〉
@@ -12,12 +14,15 @@ import com.tongbanjie.tevent.store.Result;
  */
 public interface StoreService<T extends MQMessage> {
 
-    Result put(T mqMessage);
+    String errorCode = "STORE_ERROR";
+    String errorMsg = "消息存储异常";
 
-    Result get(Long id);
+    Result<Long> put(T mqMessage);
 
-    Result update(Long id, T mqMessage);
+    Result<T> get(Long id);
 
-    Result selectTrans();
+    Result<T> update(Long id, T mqMessage);
+
+    Result<List<T>> getPreparedAndTimeOut(int timeOutSec);
 
 }

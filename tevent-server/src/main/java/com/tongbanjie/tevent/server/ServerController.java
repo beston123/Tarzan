@@ -31,14 +31,15 @@ import com.tongbanjie.tevent.server.client.ClientManager;
 import com.tongbanjie.tevent.server.processer.ClientManageProcessor;
 import com.tongbanjie.tevent.server.processer.SendMessageProcessor;
 import com.tongbanjie.tevent.server.transaction.TransactionCheckService;
-import com.tongbanjie.tevent.store.DefaultStoreManager;
 import com.tongbanjie.tevent.store.StoreManager;
-import com.tongbanjie.tevent.store.config.StoreConfig;
+import com.tongbanjie.tevent.store.StoreConfig;
 import com.tongbanjie.tevent.store.util.DistributedIdGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.io.IOException;
 import java.util.concurrent.*;
 
 /**
@@ -86,7 +87,7 @@ public class ServerController {
     // 处理管理Client线程池
     private ExecutorService clientManageExecutor;
 
-    //事务状态检查
+    //事务状态检查服务
     private TransactionCheckService transactionCheckService;
 
     // 对消息写入进行流控
@@ -116,50 +117,72 @@ public class ServerController {
     public boolean initialize() {
         boolean result = true;
 
+        /**
+         * 1、加载存储管理器
+         */
         try {
-            this.storeManager = new DefaultStoreManager(this.storeConfig);
+            ApplicationContext act = new ClassPathXmlApplicationContext("spring/spring-context.xml");
+            this.storeManager = act.getBean(StoreManager.class);
         }
-        catch (IOException e) {
+        catch (BeansException e) {
             result = false;
-            e.printStackTrace();
+            LOGGER.error("Load store manager failed.", e);
         }
-        result = result && this.storeManager.load();
 
         if (result) {
+            /**
+             * 2、初始化RpcServer
+             */
             this.rpcServer = new NettyRpcServer(this.nettyServerConfig, this.clientChannelManageService);
-
-            this.sendMessageExecutor = new ThreadPoolExecutor(//
-                this.serverConfig.getSendMessageThreadPoolNums(),//
-                this.serverConfig.getSendMessageThreadPoolNums(),//
-                1000 * 60,//
-                TimeUnit.MILLISECONDS,//
-                this.sendThreadPoolQueue,//
-                new NamedThreadFactory("SendMessageThread_"));
-
-            this.clientManageExecutor = Executors.newFixedThreadPool(
-                            this.serverConfig.getClientManageThreadPoolNums(),
-                            new NamedThreadFactory("ClientManageThread_"));
-
-
+            //注册请求处理器
             this.registerProcessor();
 
+            /**
+             * 3、初始化事务状态检查服务
+             */
             this.transactionCheckService = new TransactionCheckService(this);
 
-            //服务器地址 [ip]:[port]
-            String localIp = RemotingUtils.getLocalHostIp();
-            if(localIp == null){
-                throw new RuntimeException("Get localHost ip failed.");
+
+            /**
+             * 4、初始化注册中心，并注册地址到注册中心
+             */
+            try {
+                serverRegistry.start();
+            } catch (Exception e) {
+                throw new RuntimeException("The registry connect failed, address: " + serverConfig.getRegistryAddress(), e);
             }
-            serverAddress = new Address(localIp, nettyServerConfig.getListenPort(), serverConfig.getServerWeight());
+
+            if( registerServer(serverConfig.getServerId()) ){
+                //设置分布式Id生成器的WorkId
+                DistributedIdGenerator.setUniqueWorkId(serverConfig.getServerId());
+            }else{
+                throw new RuntimeException("Register failed, address: " + serverConfig.getRegistryAddress()
+                        +", server id: "+serverConfig.getServerId());
+            }
+
         }
 
         return result;
     }
 
-    private boolean register(int serverId, Address serverAddress) {
+    /**
+     * 注册ServerId和地址
+     * @param serverId
+     * @return
+     */
+    private boolean registerServer(int serverId) {
+        //1、获取服务器地址 [ip]:[port]
+        String localIp = RemotingUtils.getLocalHostIp();
+        if(localIp == null){
+            throw new RuntimeException("Get localHost ip failed.");
+        }
+        serverAddress = new Address(localIp, nettyServerConfig.getListenPort(), serverConfig.getServerWeight());
+
         if (serverRegistry.isConnected()) {
+            //2、注册serverId
             boolean flag = ((ServerZooKeeperRegistry) this.serverRegistry).registerId(serverId, serverAddress);
             if (flag) {
+                //3、注册服务器地址
                 serverRegistry.register(serverAddress);
                 return true;
             }else {
@@ -170,7 +193,22 @@ public class ServerController {
         return false;
     }
 
-    public void registerProcessor() {
+    /**
+     * 注册请求处理器
+     */
+    private void registerProcessor() {
+        this.sendMessageExecutor = new ThreadPoolExecutor(//
+                this.serverConfig.getSendMessageThreadPoolNums(),//
+                this.serverConfig.getSendMessageThreadPoolNums(),//
+                1000 * 60,//
+                TimeUnit.MILLISECONDS,//
+                this.sendThreadPoolQueue,//
+                new NamedThreadFactory("SendMessageThread_"));
+
+        this.clientManageExecutor = Executors.newFixedThreadPool(
+                this.serverConfig.getClientManageThreadPoolNums(),
+                new NamedThreadFactory("ClientManageThread_"));
+
         SendMessageProcessor sendProcessor = new SendMessageProcessor(this);
 
         this.rpcServer.registerProcessor(RequestCode.SEND_MESSAGE, sendProcessor, this.sendMessageExecutor);
@@ -183,6 +221,24 @@ public class ServerController {
 
     }
 
+    public void start() throws Exception {
+        if (this.storeManager != null) {
+            this.storeManager.start();
+        }
+
+        if (this.rpcServer != null) {
+            this.rpcServer.start();
+        }
+
+        if (this.clientChannelManageService != null) {
+            this.clientChannelManageService.start();
+        }
+
+        if(this.transactionCheckService != null){
+            this.transactionCheckService.start();
+        }
+
+    }
 
     public void shutdown() {
         if (this.rpcServer != null) {
@@ -212,40 +268,6 @@ public class ServerController {
         if (this.serverRegistry != null){
             this.serverRegistry.shutdown();
         }
-    }
-
-    public void start() throws Exception {
-        if (this.storeManager != null) {
-            this.storeManager.start();
-        }
-
-        if (this.rpcServer != null) {
-            this.rpcServer.start();
-        }
-
-        //注册地址
-        try {
-            serverRegistry.start();
-        } catch (Exception e) {
-            throw new RuntimeException("The registry connect failed, address: " + serverConfig.getRegistryAddress(), e);
-        }
-
-        if(register(serverConfig.getServerId(), serverAddress)){
-            //设置分布式Id生成器的WorkId
-            DistributedIdGenerator.setUniqueWorkId(serverConfig.getServerId());
-        }else{
-            throw new RuntimeException("Register failed, address: " + serverConfig.getRegistryAddress()
-                    +", server id: "+serverConfig.getServerId());
-        }
-
-        if (this.clientChannelManageService != null) {
-            this.clientChannelManageService.start();
-        }
-
-        if(this.transactionCheckService != null){
-            this.transactionCheckService.start();
-        }
-
     }
 
     public ServerConfig getServerConfig() {

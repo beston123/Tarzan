@@ -1,11 +1,11 @@
 package com.tongbanjie.tevent.store;
 
 import com.tongbanjie.tevent.common.message.MQType;
-import com.tongbanjie.tevent.store.config.StoreConfig;
-import com.tongbanjie.tevent.store.service.StoreService;
 import com.tongbanjie.tevent.store.service.RocketMQStoreService;
+import com.tongbanjie.tevent.store.service.StoreService;
+import org.springframework.stereotype.Component;
 
-import java.io.IOException;
+import javax.annotation.Resource;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,30 +16,22 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author zixiao
  * @date 16/10/10
  */
+@Component
 public class DefaultStoreManager implements StoreManager {
-
-    private StoreConfig storeConfig;
 
     private Map<MQType, StoreService> mqStoreServiceMap = new ConcurrentHashMap<MQType, StoreService>();
 
-    public DefaultStoreManager(StoreConfig storeConfig) throws IOException{
-        this.storeConfig = storeConfig;
-    }
-
-    @Override
-    public boolean load() {
-        mqStoreServiceMap.put(MQType.ROCKET_MQ, new RocketMQStoreService(this.storeConfig));
-        return true;
-    }
+    @Resource
+    private RocketMQStoreService rocketMQStoreService;
 
     @Override
     public void start() throws Exception {
-
+        mqStoreServiceMap.put(MQType.ROCKET_MQ, rocketMQStoreService);
     }
 
     @Override
     public void shutdown() {
-
+        mqStoreServiceMap.clear();
     }
 
     @Override

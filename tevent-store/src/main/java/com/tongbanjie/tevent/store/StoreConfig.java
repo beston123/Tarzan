@@ -1,4 +1,4 @@
-package com.tongbanjie.tevent.store.config;
+package com.tongbanjie.tevent.store;
 
 /**
  * 〈一句话功能简述〉<p>

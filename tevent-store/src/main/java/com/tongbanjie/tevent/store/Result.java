@@ -3,7 +3,7 @@ package com.tongbanjie.tevent.store;
 import java.io.Serializable;
 
 /**
- * 〈一句话功能简述〉<p>
+ * 返回对象 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao

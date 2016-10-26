@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="RocketMQMessageMapper" >
+  <resultMap id="BaseResultMap" type="RocketMQMessage" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="message_key" property="messageKey" jdbcType="VARCHAR" />
+    <result column="producer_group" property="producerGroup" jdbcType="VARCHAR" />
+    <result column="topic" property="topic" jdbcType="VARCHAR" />
+    <result column="tags" property="tags" jdbcType="VARCHAR" />
+    <result column="transaction_state" property="transactionState" jdbcType="TINYINT" />
+    <result column="send_status" property="sendStatus" jdbcType="TINYINT" />
+    <result column="retry_times" property="retryTimes" jdbcType="SMALLINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="producer_address" property="producerAddress" jdbcType="VARCHAR" />
+    <result column="message_id" property="messageId" jdbcType="VARCHAR" />
+    <result column="message_body" property="messageBody" jdbcType="VARBINARY" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    id, message_key, producer_group, topic, tags, message_body, transaction_state, send_status, retry_times, 
+    create_time, modify_time, producer_address, message_id
+  </sql>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from rocketmq_message
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  
+  <insert id="insert" parameterType="RocketMQMessage" >
+    insert into rocketmq_message (id, message_key, producer_group, 
+      topic, tags, transaction_state, 
+      send_status, retry_times,
+      create_time, modify_time,
+      producer_address, message_id,
+      message_body)
+    values (#{id,jdbcType=BIGINT}, #{messageKey,jdbcType=VARCHAR}, #{producerGroup,jdbcType=VARCHAR}, 
+      #{topic,jdbcType=VARCHAR}, #{tags,jdbcType=VARCHAR}, #{transactionState,jdbcType=TINYINT}, 
+      #{sendStatus,jdbcType=TINYINT}, #{retryTimes,jdbcType=SMALLINT},
+      now(), #{modifyTime,jdbcType=TIMESTAMP},
+      #{producerAddress,jdbcType=VARCHAR}, #{messageId,jdbcType=VARCHAR},
+      #{messageBody,jdbcType=VARBINARY})
+  </insert>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from rocketmq_message
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="RocketMQMessage" >
+    update rocketmq_message
+    <set >
+      <if test="messageKey != null" >
+        message_key = #{messageKey,jdbcType=VARCHAR},
+      </if>
+      <if test="producerGroup != null" >
+        producer_group = #{producerGroup,jdbcType=VARCHAR},
+      </if>
+      <if test="topic != null" >
+        topic = #{topic,jdbcType=VARCHAR},
+      </if>
+      <if test="tags != null" >
+        tags = #{tags,jdbcType=VARCHAR},
+      </if>
+      <if test="messageBody != null" >
+        message_body = #{messageBody,jdbcType=VARBINARY},
+      </if>
+      <if test="transactionState != null" >
+        transaction_state = #{transactionState,jdbcType=TINYINT},
+      </if>
+      <if test="sendStatus != null" >
+        send_status = #{sendStatus,jdbcType=TINYINT},
+      </if>
+      <if test="retryTimes != null" >
+        retry_times = #{retryTimes,jdbcType=SMALLINT},
+      </if>
+      <if test="messageId != null" >
+        message_id = #{messageId,jdbcType=VARCHAR},
+      </if>
+      modify_time = now()
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  
+  <select id="selectByCondition" resultMap="BaseResultMap" parameterType="hashmap" >
+    select 
+    <include refid="Base_Column_List" />
+    from rocketmq_message
+    <where >
+      <include refid="Where_Condition" />
+    </where>
+    <if test="pagingParam != null">
+      limit #{pagingParam.offset},#{pagingParam.limit}
+    </if>
+  </select>
+  
+  <sql id="Where_Condition">
+    <if test="messageKey != null" >
+      and message_key = #{messageKey,jdbcType=VARCHAR}
+    </if>
+    <if test="producerGroup != null" >
+      and producer_group = #{producerGroup,jdbcType=VARCHAR}
+    </if>
+    <if test="transactionState != null" >
+      and transaction_state = #{transactionState,jdbcType=TINYINT}
+    </if>
+    <if test="sendStatus != null" >
+      and send_status = #{sendStatus,jdbcType=TINYINT}
+    </if>
+    <if test="retryTimesFrom != null" >
+      <![CDATA[
+        and retry_times >= #{retryTimesFrom,jdbcType=SMALLINT}
+      ]]>
+    </if>
+    <if test="retryTimesTo != null" >
+      <![CDATA[
+        and retry_times <= #{retryTimesTo,jdbcType=SMALLINT}
+      ]]>
+    </if>
+    <if test="createTimeTo != null" >
+      <![CDATA[
+        and create_time <= #{createTimeTo,jdbcType=TIMESTAMP}
+      ]]>
+    </if>
+  </sql>
+  
+  <select id="countByCondition" resultType="int" parameterType="RocketMQMessageQuery" >
+    select count(1) from rocketmq_message
+    <where >
+      <include refid="Where_Condition" />
+    </where>
+  </select>
+  
+</mapper>

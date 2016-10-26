@@ -88,6 +88,8 @@ public class ClientController {
 
         if (result) {
             this.rpcClient = new NettyRpcClient(this.nettyClientConfig);
+            this.registerProcessor();
+
             this.clusterClient = new FailoverClusterClient(new ThreadLocal<LoadBalance<Address>>(){
                 @Override
                 protected LoadBalance<Address> initialValue() {
@@ -97,21 +99,26 @@ public class ClientController {
 
             this.serverManager = new ServerManager(this);
 
-            this.sendMessageExecutor = new ThreadPoolExecutor(//
-                    this.clientConfig.getSendMessageThreadPoolNums(),//
-                    this.clientConfig.getSendMessageThreadPoolNums(),//
-                    1000 * 60,//
-                    TimeUnit.MILLISECONDS,//
-                    this.sendThreadPoolQueue,//
-                    new NamedThreadFactory("SendMessageThread_"));
-
-            this.registerProcessor();
+            //start Registry
+            try {
+                clientRegistry.start();
+            } catch (Exception e) {
+                LOGGER.error("The registry connect failed, address: " + clientConfig.getRegistryAddress(), e);
+            }
         }
 
         return result;
     }
 
     public void registerProcessor() {
+        this.sendMessageExecutor = new ThreadPoolExecutor(//
+                this.clientConfig.getSendMessageThreadPoolNums(),//
+                this.clientConfig.getSendMessageThreadPoolNums(),//
+                1000 * 60,//
+                TimeUnit.MILLISECONDS,//
+                this.sendThreadPoolQueue,//
+                new NamedThreadFactory("SendMessageThread_"));
+
         ServerRequestProcessor serverRequestProcessor = new ServerRequestProcessor(this);
         this.rpcClient.registerProcessor(RequestCode.CHECK_TRANSACTION_STATE, serverRequestProcessor, this.sendMessageExecutor);
     }
@@ -136,12 +143,6 @@ public class ClientController {
             }
         }, 5 * 1000, clientConfig.getHeartbeatInterval(), TimeUnit.MILLISECONDS);
 
-        //start Registry
-        try {
-            clientRegistry.start();
-        } catch (Exception e) {
-            LOGGER.error("The registry connect failed, address: " + clientConfig.getRegistryAddress(), e);
-        }
     }
 
     public void shutdown() {
@@ -152,7 +153,16 @@ public class ClientController {
         if (this.sendMessageExecutor != null) {
             this.sendMessageExecutor.shutdown();
         }
+
+        if(this.clientRegistry != null){
+            this.clientRegistry.shutdown();
+        }
+
+        if(this.scheduledExecutorService != null){
+            this.scheduledExecutorService.shutdown();
+        }
     }
+
 
     public NettyClientConfig getNettyClientConfig() {
         return nettyClientConfig;

@@ -3,7 +3,7 @@ package com.tongbanjie.tevent.common.message;
 import java.io.Serializable;
 
 /**
- * 〈一句话功能简述〉<p>
+ * 消息存储Model <p>
  * 〈功能详细描述〉
  *
  * @author zixiao

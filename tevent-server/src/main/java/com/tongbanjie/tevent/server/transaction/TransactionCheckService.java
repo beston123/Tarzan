@@ -29,6 +29,11 @@ public class TransactionCheckService {
 
     private final TransactionCheckExecutor transactionCheckExecutor;
 
+    /**
+     * 事务超时时间
+     */
+    private final int txTimeOutSec = 30;
+
     private ScheduledExecutorService scheduledExecutorService = Executors
             .newSingleThreadScheduledExecutor(new NamedThreadFactory("TransactionStateCheckScheduledThread"));
 
@@ -56,7 +61,7 @@ public class TransactionCheckService {
     public void checkTransactionState(){
         StoreService storeService = this.serverController.getStoreManager().getStoreService();
         if(storeService instanceof RocketMQStoreService){
-            Result<List<RocketMQMessage>> listResult = storeService.selectTrans();
+            Result<List<RocketMQMessage>> listResult = storeService.getPreparedAndTimeOut(txTimeOutSec);
             List<RocketMQMessage> list = listResult.getData();
             for(RocketMQMessage mqMessage : list){
                 this.transactionCheckExecutor.gotoCheck(mqMessage.getProducerGroup(), mqMessage);
