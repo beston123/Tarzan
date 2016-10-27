@@ -46,23 +46,7 @@ public class ServerStartup {
 
     public static ServerController createServerController(String[] args) {
         //配置加载
-        String conf = System.getProperty(Constants.TEVENT_SERVER_CONF, "classpath:config.properties");
-        try {
-            Properties properties = new Properties();
-            if (conf.startsWith(Constants.CLASSPATH_PREFIX)) {
-                conf = StringUtils.substringAfter(conf, Constants.CLASSPATH_PREFIX);
-                properties.load(ServerStartup.class.getClassLoader().getResourceAsStream(conf));
-            } else {
-                properties.load(new FileInputStream(conf));
-            }
-            Set<String> propNames = properties.stringPropertyNames();
-            for(String propName : propNames){
-                System.setProperty(propName, properties.getProperty(propName));
-            }
-        } catch (IOException e) {
-            System.out.println("Configuration load failed, file:" + conf);
-            System.exit(-3);
-        }
+        loadConfig();
 
         final ServerConfig serverConfig = new ServerConfig();
         final NettyServerConfig nettyServerConfig = new NettyServerConfig();
@@ -129,5 +113,33 @@ public class ServerStartup {
         }
 
         return null;
+    }
+
+    private static void loadConfig(){
+        String conf = System.getProperty(Constants.TEVENT_SERVER_CONF, "classpath:config.properties");
+        try {
+            Properties properties = new Properties();
+            if (conf.startsWith(Constants.CLASSPATH_PREFIX)) {
+                conf = StringUtils.substringAfter(conf, Constants.CLASSPATH_PREFIX);
+                properties.load(ServerStartup.class.getClassLoader().getResourceAsStream(conf));
+            } else {
+                FileInputStream fis = null;
+                try {
+                    fis = new FileInputStream(conf);
+                }finally {
+                    if(fis != null){
+                        fis.close();
+                    }
+                }
+                properties.load(fis);
+            }
+            Set<String> propNames = properties.stringPropertyNames();
+            for(String propName : propNames){
+                System.setProperty(propName, properties.getProperty(propName));
+            }
+        } catch (IOException e) {
+            System.out.println("Configuration load failed, file:" + conf);
+            System.exit(-3);
+        }
     }
 }

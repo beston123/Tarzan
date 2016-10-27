@@ -27,7 +27,7 @@ public class OddValueModFunction extends ModFunction {
 	}
 
 	private String translate(String columnValue){
-		int oldInt = Integer.valueOf(columnValue);
+		int oldInt = Integer.parseInt(columnValue);
 		int newInt = (oldInt+1)/2;
 
 		return String.valueOf(newInt);

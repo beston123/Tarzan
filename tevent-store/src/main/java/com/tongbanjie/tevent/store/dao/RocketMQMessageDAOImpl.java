@@ -20,7 +20,7 @@ import java.util.Map;
 @Repository
 public class RocketMQMessageDAOImpl extends BaseDAO implements RocketMQMessageDAO {
 
-    private final String mapperNameSpace = "RocketMQMessageMapper.";
+    private final static String mapperNameSpace = "RocketMQMessageMapper.";
 
     private final PagingParam defaultPagingParam = new PagingParam(1, 10000);
 

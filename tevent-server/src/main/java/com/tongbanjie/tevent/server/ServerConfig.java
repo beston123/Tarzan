@@ -38,12 +38,12 @@ public class ServerConfig {
     /**
      * ServerId，每个server必须唯一， 取值范围 0-31
      */
-    private int serverId = Integer.valueOf(System.getProperty(Constants.TEVENT_SERVER_ID, "0"));
+    private int serverId = Integer.parseInt(System.getProperty(Constants.TEVENT_SERVER_ID, "0"));
 
     /**
      * Server权重，取值范围 1~32767
      */
-    private short serverWeight = Short.valueOf(System.getProperty(Constants.TEVENT_SERVER_WEIGHT, "1"));
+    private short serverWeight = Short.parseShort(System.getProperty(Constants.TEVENT_SERVER_WEIGHT, "1"));
 
     /**
      * 注册中心地址

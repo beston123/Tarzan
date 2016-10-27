@@ -21,7 +21,7 @@ import com.tongbanjie.tevent.common.Constants;
 
 public class NettyServerConfig implements Cloneable{
 
-    private int listenPort = Integer.valueOf(System.getProperty(Constants.TEVENT_SERVER_PORT, "7700"));
+    private int listenPort = Integer.parseInt(System.getProperty(Constants.TEVENT_SERVER_PORT, "7700"));
 
     private int serverWorkerThreads = 8;
     private int serverCallbackExecutorThreads = 0;
