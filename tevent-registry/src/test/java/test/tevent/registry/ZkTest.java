@@ -1,3 +1,5 @@
+package test.tevent.registry;
+
 import com.tongbanjie.tevent.registry.Address;
 import com.tongbanjie.tevent.registry.RecoverableRegistry;
 import com.tongbanjie.tevent.registry.zookeeper.ClientZooKeeperRegistry;

@@ -1,4 +1,4 @@
-package con.tongbanjie.tevent.mq.rocketmq.validator;
+package com.tongbanjie.tevent.rocketmq.validator;
 
 import com.alibaba.rocketmq.client.Validators;
 import com.alibaba.rocketmq.client.exception.MQClientException;

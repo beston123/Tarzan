@@ -1,4 +1,4 @@
-package con.tongbanjie.tevent.mq.rocketmq;
+package com.tongbanjie.tevent.rocketmq;
 
 import org.apache.commons.lang3.Validate;
 

@@ -1,12 +1,7 @@
-import com.tongbanjie.tevent.common.Constants;
+package test.tevent.registry;
+
 import com.tongbanjie.tevent.registry.zookeeper.ZkConstants;
 import org.I0Itec.zkclient.ZkClient;
-import org.apache.commons.lang3.StringUtils;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
-import java.util.Set;
 
 /**
  * 〈一句话功能简述〉<p>

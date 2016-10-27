@@ -1,10 +1,10 @@
-package mq.test;
+package test.tevent.rocketmq;
 
 import com.alibaba.rocketmq.common.message.Message;
 import com.tongbanjie.tevent.client.sender.TransactionCheckListener;
 import com.tongbanjie.tevent.common.Constants;
-import con.tongbanjie.tevent.mq.rocketmq.RocketMQNotifyManager;
-import con.tongbanjie.tevent.mq.rocketmq.RocketMQParam;
+import com.tongbanjie.tevent.rocketmq.RocketMQNotifyManager;
+import com.tongbanjie.tevent.rocketmq.RocketMQParam;
 
 /**
  * 〈一句话功能简述〉<p>

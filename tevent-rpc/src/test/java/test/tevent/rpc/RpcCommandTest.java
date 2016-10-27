@@ -1,4 +1,4 @@
-package test;
+package test.tevent.rpc;
 
 import com.tongbanjie.tevent.common.message.MQType;
 import com.tongbanjie.tevent.rpc.protocol.SerializeType;

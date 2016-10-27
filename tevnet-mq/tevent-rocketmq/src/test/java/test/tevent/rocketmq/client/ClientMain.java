@@ -1,4 +1,4 @@
-package mq.test.client;
+package test.tevent.rocketmq.client;
 
 import com.alibaba.rocketmq.common.message.Message;
 import com.tongbanjie.tevent.client.ClientConfig;

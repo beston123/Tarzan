@@ -1,7 +1,8 @@
+package test.tevent.store;
+
 import com.tongbanjie.tevent.common.Constants;
 import com.tongbanjie.tevent.common.message.RocketMQMessage;
 import com.tongbanjie.tevent.common.message.TransactionState;
-import com.tongbanjie.tevent.common.util.NamedThreadFactory;
 import com.tongbanjie.tevent.store.Result;
 import com.tongbanjie.tevent.store.dao.RocketMQMessageDAO;
 import com.tongbanjie.tevent.store.query.RocketMQMessageQuery;
@@ -9,7 +10,6 @@ import com.tongbanjie.tevent.store.service.RocketMQStoreService;
 import com.tongbanjie.tevent.store.util.DistributedIdGenerator;
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;

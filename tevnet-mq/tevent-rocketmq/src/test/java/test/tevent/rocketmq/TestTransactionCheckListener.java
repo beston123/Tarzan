@@ -1,4 +1,4 @@
-package mq.test;
+package test.tevent.rocketmq;
 
 import com.tongbanjie.tevent.client.sender.LocalTransactionState;
 import com.tongbanjie.tevent.client.sender.TransactionCheckListener;
