@@ -36,10 +36,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!--dependency>
-            <groupId>com.alibaba.rocketmq</groupId>
-            <artifactId>rocketmq-client</artifactId>
-        </dependency-->
     </dependencies>
 
 </project>

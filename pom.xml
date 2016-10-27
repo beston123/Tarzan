@@ -16,12 +16,15 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.version>1.0-SNAPSHOT</project.version>
+        <project.version>0.1.0-SNAPSHOT</project.version>
 
         <version.slf4j>1.7.10</version.slf4j>
         <version.junit>4.11</version.junit>
+
         <version.spring>3.2.8.RELEASE</version.spring>
+
         <version.netty>4.1.5.Final</version.netty>
+
         <version.protostuff>1.0.9</version.protostuff>
         <version.objenesis>2.1</version.objenesis>
         <version.cglib>3.1</version.cglib>
@@ -43,6 +46,12 @@
         <version.maven-javadoc-plugin>2.10.1</version.maven-javadoc-plugin>
 
         <version.rocketmq>3.4.6</version.rocketmq>
+
+        <version.mybatis>3.2.5</version.mybatis>
+        <version.mybatis-spring>1.2.2</version.mybatis-spring>
+        <version.mysql-connector-java>5.1.18</version.mysql-connector-java>
+        <version.druid>1.0.14</version.druid>
+        <version.baymax-spring>3.0.0</version.baymax-spring>
 
     </properties>
 
@@ -67,13 +76,21 @@
                 <artifactId>spring-context</artifactId>
                 <version>${version.spring}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-beans</artifactId>
+                <version>${version.spring}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${version.spring}</version>
+            </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-jdbc</artifactId>
                 <version>${version.spring}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-test</artifactId>
@@ -151,6 +168,36 @@
                 <artifactId>rocketmq-client</artifactId>
                 <version>${version.rocketmq}</version>
             </dependency>
+
+            <!-- mybatis -->
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>${version.mybatis}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis-spring</artifactId>
+                <version>${version.mybatis-spring}</version>
+            </dependency>
+            <!-- mysql -->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${version.mysql-connector-java}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${version.druid}</version>
+            </dependency>
+            <!-- https://github.com/tongbanjie/baymax -->
+            <dependency>
+                <groupId>com.tongbanjie.baymax</groupId>
+                <artifactId>baymax-spring</artifactId>
+                <version>${version.baymax-spring}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

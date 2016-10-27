@@ -16,14 +16,8 @@ import com.tongbanjie.tevent.rocketmq.RocketMQParam;
 public class RocketMQTest {
 
     public static void main(String[] args) {
-        RocketMQParam rocketMQParam = new RocketMQParam();
-        rocketMQParam.setGroupId(Constants.TEVENT_TEST_P_GROUP)
-                .setName("RocketMQTest")
-                .setTopic(Constants.TEVENT_TEST_TOPIC)
-                .setNamesrvAddr("192.168.1.42:9876");
-        TransactionCheckListener checkListener = new TestTransactionCheckListener();
-        RocketMQNotifyManager mqNotifyManager = new RocketMQNotifyManager(rocketMQParam, checkListener);
-        mqNotifyManager.init();
+
+        RocketMQNotifyManager mqNotifyManager = create();
 
         for(int i=0; i< 10; i++){
             Message message = new Message();
@@ -46,4 +40,24 @@ public class RocketMQTest {
         }
 
     }
+
+
+    private static RocketMQNotifyManager create(){
+        RocketMQParam rocketMQParam = new RocketMQParam();
+        rocketMQParam.setGroupId(Constants.TEVENT_TEST_P_GROUP)
+                .setName("RocketMQTest")
+                .setTopic(Constants.TEVENT_TEST_TOPIC)
+                .setNamesrvAddr("192.168.1.42:9876");
+        TransactionCheckListener checkListener = new TestTransactionCheckListener();
+        RocketMQNotifyManager mqNotifyManager = new RocketMQNotifyManager(rocketMQParam, checkListener);
+        mqNotifyManager.init();
+        return mqNotifyManager;
+    }
+
+//    private static RocketMQNotifyManager createBySpring(){
+//        ApplicationContext act = new ClassPathXmlApplicationContext("spring-context.xml");
+//        return act.getBean(RocketMQNotifyManager.class);
+//    }
+
+
 }

@@ -68,6 +68,21 @@ public class RocketMQMessageSender implements MQMessageSender<RocketMQBody> {
     }
 
     @Override
+    public void prepareMessage(RocketMQBody mqBody) throws RpcException {
+
+    }
+
+    @Override
+    public void commitMessage(Long transactionId, RocketMQBody mqBody) throws RpcException {
+
+    }
+
+    @Override
+    public void rollbackMessage(Long transactionId) throws RpcException {
+
+    }
+
+    @Override
     public TransactionCheckListener transactionCheckListener() {
         return this.transactionCheckListener;
     }

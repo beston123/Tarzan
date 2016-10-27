@@ -23,6 +23,12 @@ public interface MQMessageSender<T extends MQBody> {
 
     void sendMessage(final T mqBody) throws RpcException;
 
+    void prepareMessage(final T mqBody) throws RpcException;
+
+    void commitMessage(Long transactionId, final T mqBody) throws RpcException;
+
+    void rollbackMessage(Long transactionId) throws RpcException;
+
     TransactionCheckListener transactionCheckListener();
 
     void checkTransactionState(final String serverAddr, final T mqBody,

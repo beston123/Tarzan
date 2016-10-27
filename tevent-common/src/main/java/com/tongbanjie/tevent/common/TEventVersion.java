@@ -1,13 +1,11 @@
 package com.tongbanjie.tevent.common;
 
 /**
- * 〈一句话功能简述〉<p>
+ * 版本 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao
  * @date 16/9/29
- * @see [相关类/方法]（可选）
- * @since [产品/模块版本] （可选）
  */
 public abstract class TEventVersion {
 
@@ -15,13 +13,14 @@ public abstract class TEventVersion {
 
     public enum Version{
 
-        V0_1_0(1, "0.1.0");
+        V0_1_0(1, "0.1.0"),
+        V1_0_0(2, "1.0.0");
 
         private int value;
 
         private String name = null;
 
-        private Version(int value, String name) {
+        Version(int value, String name) {
             this.value = value;
             this.name = name;
         }

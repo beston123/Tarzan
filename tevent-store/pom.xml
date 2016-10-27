@@ -37,13 +37,11 @@
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
-            <version>3.2.5</version>
         </dependency>
 
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis-spring</artifactId>
-            <version>1.2.2</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>
@@ -59,19 +57,16 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
-            <version>1.0.14</version>
         </dependency>
 
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.18</version>
         </dependency>
 
         <dependency>
             <groupId>com.tongbanjie.baymax</groupId>
             <artifactId>baymax-spring</artifactId>
-            <version>3.0.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -83,7 +78,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
 
     </dependencies>
 
