@@ -1,4 +1,4 @@
-package client;
+package mq.test.client;
 
 import com.alibaba.rocketmq.common.message.Message;
 import com.tongbanjie.tevent.client.ClientConfig;
@@ -50,7 +50,6 @@ public class ClientMain {
 
     public static ClientController startup(){
         ClientController clientController = new ClientController(new ClientConfig(), new NettyClientConfig());
-        clientController.initialize();
         return clientController;
     }
 
@@ -76,7 +75,7 @@ public class ClientMain {
         Random random = new Random();
 
         for(int i=0; i< 5; i++){
-            Address serverAddr = clientController.getServerManager().discover();
+            Address serverAddr = clientController.getClusterClient().selectOne();
             if(serverAddr == null){
                 LOGGER.error(">>>Send message failed , can not find a server ");
                 continue;

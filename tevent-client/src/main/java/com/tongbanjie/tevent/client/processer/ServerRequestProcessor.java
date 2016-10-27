@@ -17,9 +17,7 @@
 package com.tongbanjie.tevent.client.processer;
 
 import com.tongbanjie.tevent.client.ClientController;
-import com.tongbanjie.tevent.client.example.TransactionCheckListenerExample;
 import com.tongbanjie.tevent.client.sender.MQMessageSender;
-import com.tongbanjie.tevent.client.sender.RocketMQMessageSender;
 import com.tongbanjie.tevent.common.body.RocketMQBody;
 import com.tongbanjie.tevent.rpc.RpcClient;
 import com.tongbanjie.tevent.rpc.exception.RpcCommandException;
@@ -45,12 +43,9 @@ public class ServerRequestProcessor implements NettyRequestProcessor {
 
     private final ConcurrentHashMap<String/* group */, MQMessageSender> messageSenderTable;
 
-    private final RpcClient rpcClient;
-    
     public ServerRequestProcessor(ClientController clientController) {
         this.clientController = clientController;
         this.messageSenderTable = this.clientController.getMessageSenderTable();
-        this.rpcClient = this.clientController.getRpcClient();
     }
 
 
@@ -106,8 +101,8 @@ public class ServerRequestProcessor implements NettyRequestProcessor {
             //按group查询生产者
             MQMessageSender mqMessageSender = this.messageSenderTable.get(group);
             if (mqMessageSender != null) {
-                final String addr = RpcHelper.parseChannelRemoteAddr(ctx.channel());
-                mqMessageSender.checkTransactionState(addr, requestBody, requestHeader, this.rpcClient);
+                final String serverAddr = RpcHelper.parseChannelRemoteAddr(ctx.channel());
+                mqMessageSender.checkTransactionState(serverAddr, requestBody, requestHeader);
             }
             else {
                 LOGGER.debug("checkTransactionState, pick producer by group[{}] failed", group);

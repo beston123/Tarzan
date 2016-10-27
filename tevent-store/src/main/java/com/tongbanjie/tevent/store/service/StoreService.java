@@ -1,6 +1,7 @@
 package com.tongbanjie.tevent.store.service;
 
 import com.tongbanjie.tevent.common.message.MQMessage;
+import com.tongbanjie.tevent.store.PagingParam;
 import com.tongbanjie.tevent.store.Result;
 
 import java.util.List;
@@ -23,6 +24,6 @@ public interface StoreService<T extends MQMessage> {
 
     Result<T> update(Long id, T mqMessage);
 
-    Result<List<T>> getPreparedAndTimeOut(int timeOutSec);
+    Result<List<T>> getPreparedAndTimeOut(int timeOutSec, PagingParam pagingParam);
 
 }

@@ -1,7 +1,7 @@
 package com.tongbanjie.tevent.client.sender;
 
 import com.tongbanjie.tevent.common.body.MQBody;
-import com.tongbanjie.tevent.rpc.RpcClient;
+import com.tongbanjie.tevent.rpc.exception.RpcException;
 import com.tongbanjie.tevent.rpc.protocol.header.CheckTransactionStateHeader;
 
 /**
@@ -19,11 +19,14 @@ public interface MQMessageSender<T extends MQBody> {
 
     int checkRequestHoldMax = 1000;
 
+    int sendMessageTimeOut = 3000;
+
+    void sendMessage(final T mqBody) throws RpcException;
+
     TransactionCheckListener transactionCheckListener();
 
-    void checkTransactionState(final String addr, final T mqBody,
-                               final CheckTransactionStateHeader requestHeader,
-                               final RpcClient rpcClient);
+    void checkTransactionState(final String serverAddr, final T mqBody,
+                               final CheckTransactionStateHeader requestHeader);
 
 
 }

@@ -19,24 +19,27 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class DefaultStoreManager implements StoreManager {
 
-    private Map<MQType, StoreService> mqStoreServiceMap = new ConcurrentHashMap<MQType, StoreService>();
+    /**
+     * MQ存储服务表
+     */
+    private Map<MQType, StoreService> mqStoreServiceTable = new ConcurrentHashMap<MQType, StoreService>();
 
     @Resource
     private RocketMQStoreService rocketMQStoreService;
 
     @Override
     public void start() throws Exception {
-        mqStoreServiceMap.put(MQType.ROCKET_MQ, rocketMQStoreService);
+        mqStoreServiceTable.put(MQType.ROCKET_MQ, rocketMQStoreService);
     }
 
     @Override
     public void shutdown() {
-        mqStoreServiceMap.clear();
+        mqStoreServiceTable.clear();
     }
 
     @Override
-    public StoreService getStoreService() {
-        return mqStoreServiceMap.get(MQType.ROCKET_MQ);
+    public StoreService getMQStoreService(MQType mqType) {
+        return mqStoreServiceTable.get(mqType);
     }
 
 }

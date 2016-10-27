@@ -218,6 +218,7 @@
         <module>tevent-rpc</module>
         <module>tevent-store</module>
         <module>tevent-cluster</module>
+        <module>tevnet-mq</module>
     </modules>
 
 </project>

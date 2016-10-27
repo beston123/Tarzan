@@ -15,4 +15,6 @@ public interface Cluster<R /* 返回值类型 */, T /* 调用的目标对象类�
 
     void invokeAsync(long timeoutMillis, int retryTimes, List<T> targetList, A arg, C callback) throws Exception;
 
+    T selectOne();
+
 }

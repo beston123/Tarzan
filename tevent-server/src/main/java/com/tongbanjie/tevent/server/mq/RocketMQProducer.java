@@ -7,6 +7,7 @@ import com.alibaba.rocketmq.client.producer.MQProducer;
 import com.alibaba.rocketmq.client.producer.SendResult;
 import com.alibaba.rocketmq.common.message.Message;
 import com.alibaba.rocketmq.remoting.exception.RemotingException;
+import com.tongbanjie.tevent.common.message.MQType;
 import com.tongbanjie.tevent.common.message.SendStatus;
 import com.tongbanjie.tevent.common.message.TransactionState;
 import com.tongbanjie.tevent.common.message.RocketMQMessage;
@@ -51,7 +52,7 @@ public class RocketMQProducer implements EventProducer {
 
     public RocketMQProducer(ServerController serverController) {
         this.serverController = serverController;
-        this.mQStoreService = (RocketMQStoreService)this.serverController.getStoreManager().getStoreService();
+        this.mQStoreService = (RocketMQStoreService)this.serverController.getStoreManager().getMQStoreService(MQType.ROCKET_MQ);
         this.namesrvAddr = this.serverController.getServerConfig().getRocketMQNamesrv();
     }
 

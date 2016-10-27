@@ -32,20 +32,38 @@ public class PagingParam implements Serializable {
     /**
      * 页码，从1开始
      */
-    private int               pageNo            = DEFAULT_PAGE_NO;
+    private int pageNo = DEFAULT_PAGE_NO;
 
     /**
      * 页面大小
      */
-    private int               pageSize          = DEFAULT_PAGE_SIZE;
+    private int pageSize = DEFAULT_PAGE_SIZE;
+
+    /**
+     * 总记录数
+     */
+    private int totalCount = 0;
+
+    /**
+     * 总页数
+     */
+    private int totalPage = 0;
 
     public PagingParam() {
     }
 
+    public PagingParam(int pageSize) {
+        setPageSize(pageSize);
+    }
+
     public PagingParam(int pageNo, int pageSize) {
-        super();
         setPageNo(pageNo);
         setPageSize(pageSize);
+    }
+
+    public PagingParam(int pageNo, int pageSize, int totalCount) {
+        this(pageNo, pageSize);
+        setTotalCount(totalCount);
     }
 
     public int getPageNo() {
@@ -70,8 +88,42 @@ public class PagingParam implements Serializable {
         this.pageSize = pageSize;
     }
 
+    public int getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(int totalCount) {
+        this.totalCount = totalCount;
+        this.totalPage = this.totalCount%pageSize == 0 ? this.totalCount/pageSize : this.totalCount/pageSize + 1;
+    }
+
+    public int getTotalPage() {
+        return totalPage;
+    }
+
+
+    /***********************************************************************************************************/
+    public boolean hasNextPage(){
+        if(this.pageNo >= 1 && this.pageNo < this.totalPage){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean nextPage(){
+        if(hasNextPage()){
+            this.pageNo++;
+            return true;
+        }
+        return false;
+    }
+
     public int getStartRow() {
         return (pageSize * (pageNo - 1)) + 1;
+    }
+
+    public int getEndRow() {
+        return pageSize * pageNo;
     }
 
     /**
@@ -79,12 +131,8 @@ public class PagingParam implements Serializable {
      * select * from table limit #{offset},#{pageSize}
      * @return
      */
-    public int getMysqlStartRow() {
+    private int getMysqlStartRow() {
         return (pageSize * (pageNo - 1));
-    }
-
-    public int getEndRow() {
-        return pageSize * pageNo;
     }
 
     public int getOffset(){

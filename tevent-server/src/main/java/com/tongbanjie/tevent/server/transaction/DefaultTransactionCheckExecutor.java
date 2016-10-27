@@ -46,13 +46,9 @@ public class DefaultTransactionCheckExecutor implements TransactionCheckExecutor
 
     private final ServerController serverController;
 
-    private final RpcServer rpcServer;
-
     public DefaultTransactionCheckExecutor(final ServerController serverController) {
         this.serverController = serverController;
-        this.rpcServer = serverController.getRpcServer();
     }
-
 
     @Override
     public void gotoCheck(String producerGroup, MQMessage mqMessage) {
@@ -64,17 +60,14 @@ public class DefaultTransactionCheckExecutor implements TransactionCheckExecutor
                     producerGroup);
             return;
         }
-
-        // 第二步、查询消息
-        Result<RocketMQMessage> result =
-                this.serverController.getStoreManager().getStoreService().get(mqMessage.getId());
-        if (null == result.getData()) {
-            LOGGER.warn("check a producer transaction state, but not find message by id: {}", mqMessage.getId());
-            return;
+        
+        // 第二步、检查消息类型，向Producer发起请求
+        if(mqMessage instanceof RocketMQMessage){
+            sendTransactionCheckRequest(clientChannelInfo.getChannel(), (RocketMQMessage) mqMessage);
+        }else{
+            LOGGER.warn("check a producer transaction state, unknown mq type message, id: {}", mqMessage.getId());
         }
-
-        // 第三步、向Producer发起请求
-        sendTransactionCheckRequest(clientChannelInfo.getChannel(), result.getData());
+        
     }
 
     private void sendTransactionCheckRequest(final Channel channel, final RocketMQMessage rocketMQMessage){
@@ -93,7 +86,7 @@ public class DefaultTransactionCheckExecutor implements TransactionCheckExecutor
         final RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.CHECK_TRANSACTION_STATE,
                 requestHeader, mqBody);
         try {
-            rpcServer.invokeAsync(channel, request, 10 * 1000, new InvokeCallback(){
+            this.serverController.getRpcServer().invokeAsync(channel, request, 10 * 1000, new InvokeCallback(){
                 @Override
                 public void operationComplete(ResponseFuture responseFuture) {
                     RpcCommand response = responseFuture.getResponseCommand();

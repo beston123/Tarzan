@@ -2,11 +2,9 @@ package com.tongbanjie.tevent.client;
 
 import com.tongbanjie.tevent.client.cluster.ClusterClient;
 import com.tongbanjie.tevent.client.cluster.FailoverClusterClient;
-import com.tongbanjie.tevent.client.example.TransactionCheckListenerExample;
 import com.tongbanjie.tevent.client.processer.ServerRequestProcessor;
 import com.tongbanjie.tevent.client.sender.MQMessageSender;
-import com.tongbanjie.tevent.client.sender.RocketMQMessageSender;
-import com.tongbanjie.tevent.common.Constants;
+import com.tongbanjie.tevent.common.ServiceState;
 import com.tongbanjie.tevent.common.util.NamedSingleThreadFactory;
 import com.tongbanjie.tevent.common.util.NamedThreadFactory;
 import com.tongbanjie.tevent.registry.Address;
@@ -43,15 +41,8 @@ public class ClientController {
 
     private final ConcurrentHashMap<String/* group */, MQMessageSender> messageSenderTable = new ConcurrentHashMap<String,MQMessageSender>();
 
-    private final ConcurrentHashMap<Integer/* serverId */, String/* address */> serverAddressTable = new ConcurrentHashMap<Integer, String>();
+    //private final ConcurrentHashMap<Integer/* serverId */, String/* address */> serverAddressTable = new ConcurrentHashMap<Integer, String>();
 
-
-    /********************** client manager ***********************/
-    // 服务端连接管理
-    private ServerManager serverManager;
-
-    //集群客户端，支持failover和loadBalance
-    private ClusterClient clusterClient;
 
     /********************** 服务 ***********************/
     //服务注册
@@ -59,6 +50,12 @@ public class ClientController {
 
     //远程通信层对象
     private RpcClient rpcClient;
+
+    // 服务端连接管理
+    private ServerManager serverManager;
+
+    //集群客户端，支持failover和loadBalance
+    private ClusterClient clusterClient;
 
     /********************** 线程池 ***********************/
     // 处理发送消息线程池
@@ -71,46 +68,34 @@ public class ClientController {
     private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(
             new NamedSingleThreadFactory("ClientScheduledThread"));
 
+    /**********************  ***********************/
+    private ServiceState serviceState = ServiceState.NOT_START;
+
     public ClientController(ClientConfig clientConfig, NettyClientConfig nettyClientConfig) {
         this.clientConfig = clientConfig;
         this.nettyClientConfig = nettyClientConfig;
 
         this.sendThreadPoolQueue = new LinkedBlockingQueue<Runnable>(this.clientConfig.getSendThreadPoolQueueCapacity());
         this.clientRegistry = new ClientZooKeeperRegistry(this.clientConfig.getRegistryAddress());
+
+        this.rpcClient = new NettyRpcClient(this.nettyClientConfig);
+
+        this.init();
     }
 
-    public boolean initialize() {
-        boolean result = true;
+    private void init() {
 
-        //TODO test code, should be deleted
-        MQMessageSender mqMessageSender = new RocketMQMessageSender(new TransactionCheckListenerExample());
-        this.messageSenderTable.put(Constants.TEVENT_TEST_P_GROUP, mqMessageSender);
-
-        if (result) {
-            this.rpcClient = new NettyRpcClient(this.nettyClientConfig);
-            this.registerProcessor();
-
-            this.clusterClient = new FailoverClusterClient(new ThreadLocal<LoadBalance<Address>>(){
-                @Override
-                protected LoadBalance<Address> initialValue() {
-                    return LoadBalanceFactory.getLoadBalance(LoadBalanceStrategy.WeightedRandom);
-                }
-            }, this.rpcClient, this.clientRegistry);
-
-            this.serverManager = new ServerManager(this);
-
-            //start Registry
-            try {
-                clientRegistry.start();
-            } catch (Exception e) {
-                LOGGER.error("The registry connect failed, address: " + clientConfig.getRegistryAddress(), e);
+        this.clusterClient = new FailoverClusterClient(new ThreadLocal<LoadBalance<Address>>(){
+            @Override
+            protected LoadBalance<Address> initialValue() {
+                return LoadBalanceFactory.getLoadBalance(LoadBalanceStrategy.WeightedRandom);
             }
-        }
+        }, this.rpcClient, this.clientRegistry);
 
-        return result;
+        this.serverManager = new ServerManager(this);
     }
 
-    public void registerProcessor() {
+    private void registerProcessor() {
         this.sendMessageExecutor = new ThreadPoolExecutor(//
                 this.clientConfig.getSendMessageThreadPoolNums(),//
                 this.clientConfig.getSendMessageThreadPoolNums(),//
@@ -123,11 +108,49 @@ public class ClientController {
         this.rpcClient.registerProcessor(RequestCode.CHECK_TRANSACTION_STATE, serverRequestProcessor, this.sendMessageExecutor);
     }
 
+    public void registerMQMessageSender(String group, MQMessageSender mqMessageSender){
+        this.messageSenderTable.put(group, mqMessageSender);
+    }
+
     public void start() throws Exception {
 
+        synchronized (this) {
+            switch (this.serviceState) {
+                case NOT_START:
+                    serviceState = ServiceState.IN_STARTING;
+                    try {
+                        doStart();
+                        serviceState = ServiceState.RUNNING;
+                        LOGGER.info("Client start successfully. ");
+                    } catch (Exception e) {
+                        serviceState = ServiceState.FAILED;
+                        throw e;
+                    }
+                    break;
+                case IN_STARTING:
+                case RUNNING:
+                case FAILED:
+                default:
+                    LOGGER.warn("Client start concurrently. Current service state: " + this.serviceState);
+                    break;
+            }
+        }
+
+    }
+
+    private void doStart() throws Exception{
         //rpcClient
         if (this.rpcClient != null) {
             this.rpcClient.start();
+        }
+
+        this.registerProcessor();
+
+        //start Registry
+        try {
+            clientRegistry.start();
+        } catch (Exception e) {
+            throw new RuntimeException("The registry connect failed, address: " + clientConfig.getRegistryAddress(), e);
         }
 
         //定时向所有服务端发送心跳
@@ -144,6 +167,7 @@ public class ClientController {
         }, 5 * 1000, clientConfig.getHeartbeatInterval(), TimeUnit.MILLISECONDS);
 
     }
+
 
     public void shutdown() {
         if (this.rpcClient != null) {
@@ -190,6 +214,10 @@ public class ClientController {
 
     public ServerManager getServerManager() {
         return serverManager;
+    }
+
+    public ServiceState getServiceState() {
+        return serviceState;
     }
 
 }

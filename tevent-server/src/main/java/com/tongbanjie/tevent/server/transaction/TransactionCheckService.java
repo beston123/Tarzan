@@ -1,11 +1,14 @@
 package com.tongbanjie.tevent.server.transaction;
 
+import com.tongbanjie.tevent.common.message.MQType;
 import com.tongbanjie.tevent.common.message.RocketMQMessage;
 import com.tongbanjie.tevent.common.util.NamedThreadFactory;
 import com.tongbanjie.tevent.server.ServerController;
+import com.tongbanjie.tevent.store.PagingParam;
 import com.tongbanjie.tevent.store.Result;
 import com.tongbanjie.tevent.store.service.RocketMQStoreService;
 import com.tongbanjie.tevent.store.service.StoreService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,13 +62,30 @@ public class TransactionCheckService {
     }
 
     public void checkTransactionState(){
-        StoreService storeService = this.serverController.getStoreManager().getStoreService();
-        if(storeService instanceof RocketMQStoreService){
-            Result<List<RocketMQMessage>> listResult = storeService.getPreparedAndTimeOut(txTimeOutSec);
-            List<RocketMQMessage> list = listResult.getData();
-            for(RocketMQMessage mqMessage : list){
-                this.transactionCheckExecutor.gotoCheck(mqMessage.getProducerGroup(), mqMessage);
+        StoreService storeService = this.serverController.getStoreManager().getMQStoreService(MQType.ROCKET_MQ);
+        if(storeService != null && storeService instanceof RocketMQStoreService){
+
+            PagingParam pagingParam = new PagingParam(2000);
+            Result<List<RocketMQMessage>> listResult = storeService.getPreparedAndTimeOut(txTimeOutSec, pagingParam);
+            /*************** 1、第一次检查，会获取总页数 ***************/
+            doCheckTransactionState(listResult.getData());
+
+            /*************** 2、循环分页 ***************/
+            while(pagingParam.hasNextPage()){
+                pagingParam.nextPage();
+                listResult = storeService.getPreparedAndTimeOut(txTimeOutSec, pagingParam);
+                if( CollectionUtils.isEmpty(listResult.getData()) ){
+                    break;
+                }
+                doCheckTransactionState(listResult.getData());
             }
+
+        }
+    }
+
+    private void doCheckTransactionState(List<RocketMQMessage> list){
+        for(RocketMQMessage mqMessage : list){
+            this.transactionCheckExecutor.gotoCheck(mqMessage.getProducerGroup(), mqMessage);
         }
     }
 

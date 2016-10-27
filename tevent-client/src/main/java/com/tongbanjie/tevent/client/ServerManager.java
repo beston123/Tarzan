@@ -18,10 +18,6 @@ package com.tongbanjie.tevent.client;
 
 import com.tongbanjie.tevent.client.sender.MQMessageSender;
 import com.tongbanjie.tevent.registry.Address;
-import com.tongbanjie.tevent.registry.RecoverableRegistry;
-import com.tongbanjie.tevent.cluster.loadbalance.LoadBalance;
-import com.tongbanjie.tevent.cluster.loadbalance.RandomLoadBalance;
-import com.tongbanjie.tevent.rpc.RpcClient;
 import com.tongbanjie.tevent.rpc.exception.*;
 import com.tongbanjie.tevent.rpc.protocol.RequestCode;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommand;
@@ -44,27 +40,17 @@ public class ServerManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerManager.class);
 
-    private final RecoverableRegistry clientRegistry;
-
-    private final RpcClient rpcClient;
-
     private final ConcurrentHashMap<String/* group */, MQMessageSender> messageSenderTable;
 
-    private ThreadLocal<LoadBalance<Address>> loadBalanceThreadLocal = new ThreadLocal<LoadBalance<Address>>(){
-        @Override
-        protected LoadBalance<Address> initialValue() {
-            return new RandomLoadBalance();
-        }
-    };
+    private final ClientController clientController;
 
     public ServerManager(ClientController clientController) {
-        this.clientRegistry = clientController.getClientRegistry();
-        this.rpcClient = clientController.getRpcClient();
+        this.clientController = clientController;
         this.messageSenderTable = clientController.getMessageSenderTable();
     }
 
     public void sendHeartbeatToAllServer(){
-        List<Address> copy = clientRegistry.getDiscovered();
+        List<Address> copy = clientController.getClientRegistry().getDiscovered();
         if(LOGGER.isDebugEnabled()){
             LOGGER.debug("Start to send heartbeat to {} servers.",  copy.size());
         }
@@ -93,7 +79,7 @@ public class ServerManager {
 
         try {
             //用oneWay方式即可
-            this.rpcClient.invokeOneway(serverAddr.getAddress(), request, timeoutMillis);
+            this.clientController.getRpcClient().invokeOneway(serverAddr.getAddress(), request, timeoutMillis);
         } catch (RpcConnectException e) {
             LOGGER.warn("Send heartbeat to server " + serverAddr +
                     " exception, maybe lose connection with the sever.", e);
@@ -105,20 +91,20 @@ public class ServerManager {
 
     }
 
-    public Address discover() {
-        List<Address> copy = clientRegistry.getDiscovered();
-
-        Address address = loadBalanceThreadLocal.get().select(copy);
-
-        if(address == null){
-            LOGGER.warn("Can not find a server.");
-            return null;
-        }
-        if(LOGGER.isDebugEnabled()){
-            LOGGER.debug("Find a server {}", address);
-        }
-        return address;
-    }
+//    public Address discover() {
+//        List<Address> copy = clientController.getClientRegistry().getDiscovered();
+//
+//        Address address = loadBalanceThreadLocal.get().select(copy);
+//
+//        if(address == null){
+//            LOGGER.warn("Can not find a server.");
+//            return null;
+//        }
+//        if(LOGGER.isDebugEnabled()){
+//            LOGGER.debug("Find a server {}", address);
+//        }
+//        return address;
+//    }
 
 
 }

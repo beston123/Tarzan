@@ -230,5 +230,10 @@ public abstract class ClusterClient implements Cluster<RpcCommand, Address, RpcC
         }
     }
 
+    @Override
+    public Address selectOne(){
+        List<Address> addressList = this.registry.getDiscovered();
+        return select(addressList);
+    }
 
 }

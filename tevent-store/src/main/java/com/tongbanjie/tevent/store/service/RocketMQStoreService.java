@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -79,26 +80,39 @@ public class RocketMQStoreService implements StoreService<RocketMQMessage> {
     }
 
     @Override
-    public Result<List<RocketMQMessage>> getPreparedAndTimeOut(int timeOutSec) {
+    public Result<List<RocketMQMessage>> getPreparedAndTimeOut(int timeOutSec, PagingParam pagingParam) {
         Result<List<RocketMQMessage>> result;
-        try {
-            RocketMQMessageQuery query = new RocketMQMessageQuery();
-            query.setTransactionState(TransactionState.PREPARE.getCode());
-            //消息没有超时
-            if(timeOutSec > 0){
-                query.setCreateTimeTo(getTimeLine(timeOutSec));
-            }
-            //没有超过最大重试次数
-            query.setRetryTimesTo(maxRetryTimes-1);
+        /******1、构造参选参数******/
+        RocketMQMessageQuery query = new RocketMQMessageQuery();
+        query.setTransactionState(TransactionState.PREPARE.getCode());
+        //消息没有超时
+        if(timeOutSec > 0){
+            query.setCreateTimeTo(getTimeLine(timeOutSec));
+        }
+        //没有超过最大重试次数
+        query.setRetryTimesTo(maxRetryTimes - 1);
 
-            List<RocketMQMessage> mqMessages = rocketMQMessageDAO.selectByCondition(query, new PagingParam(1, 2000));
-            result = Result.buildSucc(mqMessages);
+        try {
+
+            /******2、首次查询获取总记录数******/
+            if(pagingParam.getTotalCount() == 0){
+                int total = rocketMQMessageDAO.countByCondition(query);
+                pagingParam.setTotalCount(total);
+            }
+            List<RocketMQMessage> messageList = null;
+            if(pagingParam.getTotalCount() == 0){
+                messageList =  new ArrayList<RocketMQMessage>(0);
+            }else{
+                messageList = rocketMQMessageDAO.selectByCondition(query, pagingParam);
+            }
+            result = Result.buildSucc(messageList);
         } catch (Exception e) {
             LOGGER.error(StoreService.errorMsg + ": getPreparedAndTimeOut error", e);
             result = Result.buildFail(StoreService.errorCode, StoreService.errorMsg, e.getMessage());
         }
         return result;
     }
+
 
     private Date getTimeLine(int timeOutSec){
         return DateUtils.addSeconds(new Date(), timeOutSec);

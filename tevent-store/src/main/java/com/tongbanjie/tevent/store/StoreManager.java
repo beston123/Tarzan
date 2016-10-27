@@ -1,5 +1,6 @@
 package com.tongbanjie.tevent.store;
 
+import com.tongbanjie.tevent.common.message.MQType;
 import com.tongbanjie.tevent.store.service.StoreService;
 
 /**
@@ -15,6 +16,6 @@ public interface StoreManager {
 
     void shutdown();
 
-    StoreService getStoreService();
+    StoreService getMQStoreService(MQType mqType);
 
 }
