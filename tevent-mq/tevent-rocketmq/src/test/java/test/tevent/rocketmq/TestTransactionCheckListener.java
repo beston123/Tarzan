@@ -24,7 +24,7 @@ public class TestTransactionCheckListener implements TransactionCheckListener<Ro
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        int state = random.nextInt(4);
+        int state = random.nextInt(3);
         switch (state){
             case 0:
                 return LocalTransactionState.UNKNOWN;

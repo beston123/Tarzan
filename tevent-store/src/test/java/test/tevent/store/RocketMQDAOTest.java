@@ -50,7 +50,7 @@ public class RocketMQDAOTest {
 
     @Test
     public void insert() throws InterruptedException {
-        for(int i=10000; i<100000; i++){
+        for(int i=100000; i<120000; i++){
             final RocketMQMessage mqMessage = new RocketMQMessage();
             mqMessage.setMessageKey("TEST_KEY_" + i);
             mqMessage.setProducerGroup(Constants.TEVENT_TEST_P_GROUP);
@@ -67,9 +67,10 @@ public class RocketMQDAOTest {
                 }
             });
         }
-        Thread.currentThread().join();
         executorService.shutdown();
-
+        while(!executorService.isTerminated()){
+            Thread.sleep(500);
+        }
     }
 
     @Test
