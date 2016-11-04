@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * 〈一句话功能简述〉<p>
+ * Client控制器工厂 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao
@@ -30,7 +30,7 @@ public class ClientControllerFactory {
         return instance;
     }
 
-    public ClientController getAndCreate(){
+    public ClientController getAndCreate(ClientConfig clientConfig){
         ClientController instance = this.clientTable.get(DEFAULT_CLIENT);
         if (null != instance) {
             return instance;
@@ -43,7 +43,7 @@ public class ClientControllerFactory {
                 return instance;
             }
 
-            instance = new ClientController(new ClientConfig(), new NettyClientConfig());
+            instance = new ClientController(clientConfig, new NettyClientConfig());
             this.clientTable.put(DEFAULT_CLIENT, instance);
 
             return instance;

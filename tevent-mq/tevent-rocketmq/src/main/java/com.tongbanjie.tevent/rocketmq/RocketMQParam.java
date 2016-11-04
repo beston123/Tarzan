@@ -3,7 +3,7 @@ package com.tongbanjie.tevent.rocketmq;
 import org.apache.commons.lang3.Validate;
 
 /**
- * 〈一句话功能简述〉<p>
+ * RocketMQ参数对象 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao

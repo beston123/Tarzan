@@ -20,11 +20,13 @@ import com.tongbanjie.tevent.common.Constants;
 import com.tongbanjie.tevent.rpc.netty.NettyServerConfig;
 import com.tongbanjie.tevent.store.StoreConfig;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,12 +43,32 @@ public class ServerStartup {
     private static final Logger LOGGER= LoggerFactory.getLogger(ServerStartup.class);
 
     public static void main(String[] args) {
-        start(createServerController(args));
+        start(args);
     }
 
-    public static ServerController createServerController(String[] args) {
+    public static ServerController start(String[] args) {
+        ServerController controller = createServerController(args);
+        try {
+            controller.start();
+            String tip = "The tevent server[" + controller.getServerAddress() + "] boot success.";
+            LOGGER.info(tip);
+            return controller;
+        }
+        catch (Throwable e) {
+            LOGGER.error("The tevent server[" + controller.getServerAddress() + "] boot failed.", e);
+            System.exit(-1);
+        }
+        return null;
+    }
+
+    private static ServerController createServerController(String[] args) {
         //配置加载
-        loadConfig();
+        try {
+            loadConfig(args);
+        } catch (IOException e) {
+            LOGGER.error("Configuration load failed.", e);
+            System.exit(-3);
+        }
 
         final ServerConfig serverConfig = new ServerConfig();
         final NettyServerConfig nettyServerConfig = new NettyServerConfig();
@@ -54,7 +76,7 @@ public class ServerStartup {
 
         try {
             if (serverConfig.getServerId() < 0 || serverConfig.getServerId() > 31) {
-                System.out.println("ServerId must between 0 and 31");
+                LOGGER.error("ServerId must between 0 and 31 !");
                 System.exit(-3);
             }
 
@@ -93,53 +115,59 @@ public class ServerStartup {
             return controller;
         }
         catch (Throwable e) {
-            e.printStackTrace();
+            LOGGER.error("The tevent server boot failed.", e);
             System.exit(-1);
         }
 
         return null;
     }
 
-    public static ServerController start(ServerController controller) {
+    /**
+     * 加载配置
+     * @throws IOException
+     */
+    private static void loadConfig(String[] args) throws IOException {
+        /*************** 检查配置文件是否存在 ***************/
         try {
-            controller.start();
-            String tip = "The tevent server[" + controller.getServerAddress() + "] boot success.";
-            LOGGER.info(tip);
-            return controller;
-        }
-        catch (Throwable e) {
-            LOGGER.error("The tevent server[" + controller.getServerAddress() + "] boot failed.", e);
-            System.exit(-1);
-        }
-
-        return null;
-    }
-
-    private static void loadConfig(){
-        String conf = System.getProperty(Constants.TEVENT_SERVER_CONF, "classpath:config.properties");
-        try {
-            Properties properties = new Properties();
-            if (conf.startsWith(Constants.CLASSPATH_PREFIX)) {
-                conf = StringUtils.substringAfter(conf, Constants.CLASSPATH_PREFIX);
-                properties.load(ServerStartup.class.getClassLoader().getResourceAsStream(conf));
-            } else {
-                FileInputStream fis = null;
-                try {
-                    fis = new FileInputStream(conf);
-                }finally {
-                    if(fis != null){
-                        fis.close();
-                    }
-                }
-                properties.load(fis);
-            }
-            Set<String> propNames = properties.stringPropertyNames();
-            for(String propName : propNames){
-                System.setProperty(propName, properties.getProperty(propName));
-            }
+            ConfigManager.checkConfigFiles();
         } catch (IOException e) {
-            System.out.println("Configuration load failed, file:" + conf);
-            System.exit(-3);
+            System.err.println("Check configuration file failed:");
+            e.printStackTrace();
+            throw e;
         }
+
+        /*************** 加载日志配置 ***************/
+        if( args.length > 0 && Constants.RUN_IN_IDE.equals(args[0]) ){
+            //ide中运行模式, 加载默认日志配置
+        }else{
+            String logFilePath = ConfigManager.logFilePath;
+            if(!ConfigManager.logFilePath.startsWith(Constants.CLASSPATH_PREFIX)) {
+                PropertyConfigurator.configure(logFilePath);
+            }
+        }
+
+        /*************** 加载业务配置 ***************/
+        String configFilePath = ConfigManager.configFilePath;
+        Properties properties = new Properties();
+        InputStream is = null;
+        try {
+            if (configFilePath.startsWith(Constants.CLASSPATH_PREFIX)) {
+                configFilePath = StringUtils.substringAfter(configFilePath, Constants.CLASSPATH_PREFIX);
+                is = ServerStartup.class.getClassLoader().getResourceAsStream(configFilePath);
+            } else {
+                is = new FileInputStream(configFilePath);
+            }
+            properties.load(is);
+        }finally {
+            if(is != null){
+                is.close();
+            }
+        }
+
+        Set<String> propNames = properties.stringPropertyNames();
+        for(String propName : propNames){
+            System.setProperty(propName, properties.getProperty(propName));
+        }
+
     }
 }

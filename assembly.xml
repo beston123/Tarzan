@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+    <baseDirectory>tevent</baseDirectory>
+    <formats>
+        <format>dir</format>
+        <format>tar.gz</format>
+    </formats>
+    <fileSets>
+        <fileSet>
+            <includes>
+                <include>bin/*</include>
+                <include>conf/*</include>
+                <include>conf/*/*</include>
+                <include>README.md</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+
+
+    <moduleSets>
+        <moduleSet>
+            <includes>
+                <include>com.tongbanjie.tevent:tevent-server</include>
+                <include>com.tongbanjie.tevent:tevent-client</include>
+                <include>com.tongbanjie.tevent:tevent-common</include>
+                <include>com.tongbanjie.tevent:tevent-registry</include>
+                <include>com.tongbanjie.tevent:tevent-rpc</include>
+                <include>com.tongbanjie.tevent:tevent-store</include>
+                <include>com.tongbanjie.tevent:tevent-cluster</include>
+                <include>com.tongbanjie.tevent:tevent-mq</include>
+            </includes>
+            <binaries>
+                <outputDirectory>lib/</outputDirectory>
+                <unpack>false</unpack>
+                <dependencySets>
+                    <dependencySet>
+                        <outputDirectory>lib/</outputDirectory>
+                    </dependencySet>
+                </dependencySets>
+            </binaries>
+        </moduleSet>
+    </moduleSets>
+</assembly>

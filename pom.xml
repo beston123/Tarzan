@@ -25,12 +25,6 @@
 
         <version.netty>4.1.5.Final</version.netty>
 
-        <version.protostuff>1.0.9</version.protostuff>
-        <version.objenesis>2.1</version.objenesis>
-        <version.cglib>3.1</version.cglib>
-
-        <version.fastjson>1.2.17</version.fastjson>
-
         <version.zookeeper>3.4.8</version.zookeeper>
         <version.zkclient>0.8</version.zkclient>
 
@@ -38,12 +32,15 @@
         <version.commons-collections>4.0</version.commons-collections>
         <version.commons-cli>1.3.1</version.commons-cli>
 
+        <version.fluent-validator>1.0.5</version.fluent-validator>
+
         <version.javatuples>1.2</version.javatuples>
 
-        <version.maven-compiler-plugin>3.2</version.maven-compiler-plugin>
-        <version.maven-surefire-plugin>2.18.1</version.maven-surefire-plugin>
-        <version.maven-source-plugin>2.1.2</version.maven-source-plugin>
-        <version.maven-javadoc-plugin>2.10.1</version.maven-javadoc-plugin>
+        <version.protostuff>1.0.9</version.protostuff>
+        <version.objenesis>2.1</version.objenesis>
+        <version.cglib>3.1</version.cglib>
+
+        <version.fastjson>1.2.17</version.fastjson>
 
         <version.rocketmq>3.4.6</version.rocketmq>
 
@@ -52,6 +49,11 @@
         <version.mysql-connector-java>5.1.18</version.mysql-connector-java>
         <version.druid>1.0.14</version.druid>
         <version.baymax-spring>3.0.0</version.baymax-spring>
+
+        <version.maven-compiler-plugin>3.2</version.maven-compiler-plugin>
+        <version.maven-surefire-plugin>2.18.1</version.maven-surefire-plugin>
+        <version.maven-source-plugin>2.1.2</version.maven-source-plugin>
+        <version.maven-javadoc-plugin>2.10.1</version.maven-javadoc-plugin>
 
     </properties>
 
@@ -127,6 +129,27 @@
                 <artifactId>commons-collections4</artifactId>
                 <version>${version.commons-collections}</version>
             </dependency>
+            <!-- Apache Commons cli -->
+            <dependency>
+                <groupId>commons-cli</groupId>
+                <artifactId>commons-cli</artifactId>
+                <version>${version.commons-cli}</version>
+            </dependency>
+
+            <!-- baidu validator -->
+            <dependency>
+                <groupId>com.baidu.unbiz</groupId>
+                <artifactId>fluent-validator</artifactId>
+                <version>${version.fluent-validator}</version>
+            </dependency>
+
+            <!-- javatuples -->
+            <dependency>
+                <groupId>org.javatuples</groupId>
+                <artifactId>javatuples</artifactId>
+                <version>${version.javatuples}</version>
+            </dependency>
+
             <!-- Protostuff -->
             <dependency>
                 <groupId>com.dyuproject.protostuff</groupId>
@@ -144,6 +167,7 @@
                 <artifactId>objenesis</artifactId>
                 <version>${version.objenesis}</version>
             </dependency>
+
             <!-- fastjson -->
             <dependency>
                 <groupId>com.alibaba</groupId>
@@ -151,17 +175,6 @@
                 <version>${version.fastjson}</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.javatuples</groupId>
-                <artifactId>javatuples</artifactId>
-                <version>${version.javatuples}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>commons-cli</groupId>
-                <artifactId>commons-cli</artifactId>
-                <version>${version.commons-cli}</version>
-            </dependency>
             <!-- RocketMQ -->
             <dependency>
                 <groupId>com.alibaba.rocketmq</groupId>
@@ -223,6 +236,17 @@
                     <skipTests>true</skipTests>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <finalName>tevent-${project.version}</finalName>
+                    <descriptors>
+                        <descriptor>assembly.xml</descriptor>
+                    </descriptors>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 

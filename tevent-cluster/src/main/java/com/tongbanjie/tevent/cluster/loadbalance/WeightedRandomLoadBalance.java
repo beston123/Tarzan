@@ -1,7 +1,6 @@
 package com.tongbanjie.tevent.cluster.loadbalance;
 
 import com.tongbanjie.tevent.common.Weighable;
-import com.tongbanjie.tevent.registry.Address;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
@@ -52,23 +51,4 @@ public class WeightedRandomLoadBalance<T extends Weighable> extends RandomLoadBa
         return sameWeight;
     }
 
-
-    public static void main(String[] args) {
-        List<Address> list = new ArrayList<Address>();
-
-        init(list);
-        LoadBalance<Address> loadBalance = new WeightedRandomLoadBalance<Address>();
-
-        for(int j=0; j< 100; j++){
-            System.out.println(">>>>"+j+":"+loadBalance.select(list));
-        }
-    }
-
-    private static void init(List<Address> list){
-        for(int i=0; i<5; i++){
-            short weight = Short.parseShort((i+1)+"");
-            Address address1 = new Address("192.168.1.1", i , weight);
-            list.add(address1);
-        }
-    }
 }

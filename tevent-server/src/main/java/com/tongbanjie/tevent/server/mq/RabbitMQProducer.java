@@ -1,13 +1,11 @@
 package com.tongbanjie.tevent.server.mq;
 
-import com.alibaba.rocketmq.client.exception.MQClientException;
-import com.tongbanjie.tevent.rpc.exception.RpcCommandException;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommand;
 import com.tongbanjie.tevent.server.ServerController;
 import io.netty.channel.ChannelHandlerContext;
 
 /**
- * 〈一句话功能简述〉<p>
+ * RabbitMQ发送者 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao
@@ -22,7 +20,7 @@ public class RabbitMQProducer implements EventProducer {
     }
 
     @Override
-    public RpcCommand sendMessage(ChannelHandlerContext ctx, RpcCommand request) throws RpcCommandException, MQClientException {
+    public RpcCommand sendMessage(ChannelHandlerContext ctx, RpcCommand request){
         return null;
     }
 

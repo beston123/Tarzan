@@ -23,13 +23,20 @@ import com.tongbanjie.tevent.rpc.protocol.header.RegisterRequestHeader;
 import com.tongbanjie.tevent.rpc.netty.NettyRequestProcessor;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommand;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommandBuilder;
-import com.tongbanjie.tevent.rpc.protocol.body.HeartbeatData;
+import com.tongbanjie.tevent.common.body.HeartbeatData;
 import com.tongbanjie.tevent.server.ServerController;
 import com.tongbanjie.tevent.server.client.ClientChannelInfo;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 客户端连接请求处理者<p>
+ * 〈功能详细描述〉
+ *
+ * @author zixiao
+ * @date 16/9/30
+ */
 public class ClientManageProcessor implements NettyRequestProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientManageProcessor.class);

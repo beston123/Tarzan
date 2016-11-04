@@ -1,22 +1,19 @@
 package com.tongbanjie.tevent.server.mq;
 
-import com.alibaba.rocketmq.client.exception.MQBrokerException;
 import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.client.producer.DefaultMQProducer;
 import com.alibaba.rocketmq.client.producer.MQProducer;
 import com.alibaba.rocketmq.client.producer.SendResult;
 import com.alibaba.rocketmq.common.message.Message;
-import com.alibaba.rocketmq.remoting.exception.RemotingException;
 import com.tongbanjie.tevent.common.message.MQType;
 import com.tongbanjie.tevent.common.message.SendStatus;
 import com.tongbanjie.tevent.common.message.TransactionState;
 import com.tongbanjie.tevent.common.message.RocketMQMessage;
-import com.tongbanjie.tevent.rpc.exception.RpcCommandException;
 import com.tongbanjie.tevent.rpc.protocol.ResponseCode;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommand;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommandBuilder;
 import com.tongbanjie.tevent.common.body.RocketMQBody;
-import com.tongbanjie.tevent.rpc.protocol.header.TransactionMessageHeader;
+import com.tongbanjie.tevent.rpc.protocol.header.MessageResultHeader;
 import com.tongbanjie.tevent.server.ServerController;
 import com.tongbanjie.tevent.store.Result;
 import com.tongbanjie.tevent.store.service.RocketMQStoreService;
@@ -30,7 +27,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * 〈一句话功能简述〉<p>
+ * RocketMQ发送者<p>
  * 〈功能详细描述〉
  *
  * @author zixiao
@@ -44,11 +41,11 @@ public class RocketMQProducer implements EventProducer {
 
     private final Lock lock = new ReentrantLock();
 
-    private RocketMQStoreService mQStoreService;
+    private final RocketMQStoreService mQStoreService;
 
-    private ServerController serverController;
+    private final ServerController serverController;
 
-    private String namesrvAddr;
+    private final String namesrvAddr;
 
     public RocketMQProducer(ServerController serverController) {
         this.serverController = serverController;
@@ -57,9 +54,8 @@ public class RocketMQProducer implements EventProducer {
     }
 
     @Override
-    public RpcCommand sendMessage(ChannelHandlerContext ctx, RpcCommand request)
-            throws RpcCommandException {
-        RpcCommand response = null;
+    public RpcCommand sendMessage(ChannelHandlerContext ctx, RpcCommand request) {
+        RpcCommand response;
         final RocketMQBody mqBody = request.getBody(RocketMQBody.class);
 
         String producerAddress = null;
@@ -69,9 +65,11 @@ public class RocketMQProducer implements EventProducer {
 
         RocketMQMessage mqMessage = RocketMQMessage.build(mqBody, TransactionState.PREPARE, producerAddress);
 
-        SendResult sendResult = sendMessage(mqMessage);
+        SendResult sendResult = doSend(mqMessage);
         if(sendResult != null){
-            response = RpcCommandBuilder.buildSuccess();
+            MessageResultHeader responseHeader = new MessageResultHeader();
+            responseHeader.setMsgId(sendResult.getMsgId());
+            response = RpcCommandBuilder.buildSuccess(responseHeader);
             LOGGER.info("发送消息 messageKey:" + mqBody.getMessageKey()
                     + ", result:" + sendResult.getSendStatus()
                     + ", msgId:"+sendResult.getMsgId());
@@ -81,38 +79,33 @@ public class RocketMQProducer implements EventProducer {
         return response;
     }
 
-    private SendResult sendMessage(RocketMQMessage mqMessage){
+    /**
+     * 发送消息方法
+     * @param mqMessage
+     * @return
+     */
+    private SendResult doSend(RocketMQMessage mqMessage){
         MQProducer producer = null;
         try {
             producer = getMQProducer(mqMessage.getProducerGroup());
         } catch (MQClientException e) {
-            e.printStackTrace();
+            LOGGER.error("Find mq producer failed, group {}" + mqMessage.getProducerGroup(), e);
+            return null;
         }
 
-        if(producer == null){
-            throw new RuntimeException();
-        }
-
-        Message msg = new Message(mqMessage.getTopic(),// topic
-                mqMessage.getTags(),       // tag
-                mqMessage.getMessageBody() // body
+        Message msg = new Message(  mqMessage.getTopic(),       // topic
+                                    mqMessage.getTags(),        // tag
+                                    mqMessage.getMessageBody()  // body
         );
         msg.setKeys(mqMessage.getMessageKey());
         try {
             SendResult sendResult = producer.send(msg);
             LOGGER.info("Send status {}, msgId {}", sendResult.getSendStatus(), sendResult.getMsgId());
             return sendResult;
-        } catch (MQClientException e) {
-            e.printStackTrace();
-        } catch (RemotingException e) {
-            e.printStackTrace();
-        } catch (MQBrokerException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            LOGGER.error("Send to rocketMQ failed.", e);
+            return null;
         }
-
-        return null;
     }
 
     @Override
@@ -136,7 +129,7 @@ public class RocketMQProducer implements EventProducer {
             LOGGER.debug("准备事务消息 topic:{}, messageKey:{}, transactionId:{}" ,
                     mqMessage.getTopic(), mqMessage.getMessageKey(), transactionId);
 
-            TransactionMessageHeader responseHeader = new TransactionMessageHeader();
+            MessageResultHeader responseHeader = new MessageResultHeader();
             responseHeader.setTransactionId(transactionId);
 
             response = RpcCommandBuilder.buildSuccess(responseHeader);
@@ -177,23 +170,15 @@ public class RocketMQProducer implements EventProducer {
                 Result<RocketMQMessage> commitResult = mQStoreService.update(transactionId, forUpdate);
 
                 if(commitResult.isSuccess()){
-                    LOGGER.debug("提交事务消息 topic:{}, messageKey:{}, transactionId:{}" ,
+                    LOGGER.debug("提交事务消息 topic:{}, messageKey:{}, transactionId:{}",
                             mqMessage.getTopic(), mqMessage.getMessageKey(), transactionId);
                     response = RpcCommandBuilder.buildSuccess();  
                 }else{
                     LOGGER.error("提交事务消息失败, transactionId: " + transactionId+", error: "+ commitResult.getErrorString());
                     response = RpcCommandBuilder.buildFail("提交事务消息失败," + commitResult.getErrorString());
                 }
-
-                //发送消息 //TODO 异步处理
-                SendResult sendResult = sendMessage(mqMessage);
-                if(sendResult != null){
-                    forUpdate.setSendStatus(SendStatus.SUCCESS.ordinal());
-                    forUpdate.setMessageId(sendResult.getMsgId());
-                }else{
-                    forUpdate.setSendStatus(SendStatus.FAILD.ordinal());
-                }
-                mQStoreService.update(transactionId, forUpdate);
+                //异步发送消息
+                sendMessageAsync(mqMessage, transactionId);
             }
         }else{
             LOGGER.error("提交事务消息失败, transactionId: " + transactionId+", error: "+ getResult.getErrorString());
@@ -201,6 +186,31 @@ public class RocketMQProducer implements EventProducer {
         }
         return response;
     }
+
+    /**
+     *  异步发送消息，并记录发送状态
+     * @param mqMessage
+     * @param transactionId
+     */
+    private void sendMessageAsync(final RocketMQMessage mqMessage, final Long transactionId){
+        Runnable sendTask = new Runnable() {
+            @Override
+            public void run() {
+                SendResult sendResult = doSend(mqMessage);
+                RocketMQMessage forUpdate = new RocketMQMessage();
+                forUpdate.setId(transactionId);
+                if(sendResult != null){
+                    forUpdate.setSendStatus(SendStatus.SUCCESS.ordinal());
+                    forUpdate.setMessageId(sendResult.getMsgId());
+                }else{
+                    forUpdate.setSendStatus(SendStatus.FAILED.ordinal());
+                }
+                mQStoreService.update(transactionId, forUpdate);
+            }
+        };
+        this.serverController.getSendMessageExecutor().submit(sendTask);
+    }
+
 
     @Override
     public RpcCommand rollbackMessage(ChannelHandlerContext ctx, RpcCommand request, Long transactionId) {

@@ -17,10 +17,12 @@
 package com.tongbanjie.tevent.server;
 
 
+import com.tongbanjie.tevent.common.Constants;
 import com.tongbanjie.tevent.common.util.NamedThreadFactory;
 import com.tongbanjie.tevent.common.util.RemotingUtils;
 import com.tongbanjie.tevent.registry.Address;
 import com.tongbanjie.tevent.registry.RecoverableRegistry;
+import com.tongbanjie.tevent.registry.ServerAddress;
 import com.tongbanjie.tevent.registry.zookeeper.ServerZooKeeperRegistry;
 import com.tongbanjie.tevent.rpc.RpcServer;
 import com.tongbanjie.tevent.rpc.netty.NettyRpcServer;
@@ -121,7 +123,7 @@ public class ServerController {
          * 1、加载存储管理器
          */
         try {
-            ApplicationContext act = new ClassPathXmlApplicationContext("spring/spring-context.xml");
+            ApplicationContext act = new ClassPathXmlApplicationContext(Constants.TEVENT_STORE_CONTEXT);
             this.storeManager = act.getBean(StoreManager.class);
         }
         catch (BeansException e) {
@@ -148,17 +150,15 @@ public class ServerController {
              */
             try {
                 serverRegistry.start();
-            } catch (Exception e) {
-                throw new RuntimeException("The registry connect failed, address: " + serverConfig.getRegistryAddress(), e);
+                registerServer(serverConfig.getServerId());
+            } catch (ServerException e) {
+                throw e;
+            }catch (Exception e) {
+                throw new ServerException("The registry connect failed, address: " + serverConfig.getRegistryAddress(), e);
             }
 
-            if( registerServer(serverConfig.getServerId()) ){
-                //设置分布式Id生成器的WorkId
-                DistributedIdGenerator.setUniqueWorkId(serverConfig.getServerId());
-            }else{
-                throw new RuntimeException("Register failed, address: " + serverConfig.getRegistryAddress()
-                        +", server id: "+serverConfig.getServerId());
-            }
+            //设置分布式Id生成器的WorkId
+            DistributedIdGenerator.setUniqueWorkId(serverConfig.getServerId());
 
         }
 
@@ -174,23 +174,23 @@ public class ServerController {
         //1、获取服务器地址 [ip]:[port]
         String localIp = RemotingUtils.getLocalHostIp();
         if(localIp == null){
-            throw new RuntimeException("Get localHost ip failed.");
+            throw new ServerException("Get localHost ip failed.");
         }
-        serverAddress = new Address(localIp, nettyServerConfig.getListenPort(), serverConfig.getServerWeight());
+        serverAddress = new ServerAddress(localIp, nettyServerConfig.getListenPort(), serverConfig.getServerWeight());
 
         if (serverRegistry.isConnected()) {
             //2、注册serverId
-            boolean flag = ((ServerZooKeeperRegistry) this.serverRegistry).registerId(serverId, serverAddress);
-            if (flag) {
-                //3、注册服务器地址
-                serverRegistry.register(serverAddress);
-                return true;
-            }else {
-                throw new IllegalArgumentException("The server id '" +serverConfig.getServerId()+
-                        "' already in use, it must be unique.");
+            boolean registerFlag = ((ServerZooKeeperRegistry) this.serverRegistry).registerId(serverId, serverAddress);
+            if (!registerFlag) {
+                throw new ServerException("The server id '" + serverConfig.getServerId() +
+                        "' already in use, it must be unique in cluster.");
             }
+            //3、注册服务器地址
+            serverRegistry.register(serverAddress);
+            return true;
         }
-        return false;
+        throw new ServerException("Register failed, address: " + serverConfig.getRegistryAddress()
+                +", server id: "+serverConfig.getServerId());
     }
 
     /**
@@ -300,5 +300,13 @@ public class ServerController {
 
     public Address getServerAddress() {
         return serverAddress;
+    }
+
+    public ExecutorService getSendMessageExecutor() {
+        return sendMessageExecutor;
+    }
+
+    public void setSendMessageExecutor(ExecutorService sendMessageExecutor) {
+        this.sendMessageExecutor = sendMessageExecutor;
     }
 }

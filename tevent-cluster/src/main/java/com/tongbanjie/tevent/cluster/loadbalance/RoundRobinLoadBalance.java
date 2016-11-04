@@ -1,15 +1,12 @@
 package com.tongbanjie.tevent.cluster.loadbalance;
 
 import com.tongbanjie.tevent.common.Weighable;
-import com.tongbanjie.tevent.registry.Address;
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
- * 〈一句话功能简述〉<p>
+ * 轮询算法 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao
@@ -59,30 +56,6 @@ public class RoundRobinLoadBalance<T extends Weighable> extends AbstractLoadBala
 
         return list.get(lastIndex);
 
-    }
-
-    public static void main(String[] args) {
-        List<Address> list = new ArrayList<Address>();
-
-        init(list);
-        LoadBalance<Address> loadBalance = new RoundRobinLoadBalance<Address>();
-
-        for(int j=0; j< 12; j++){
-            System.out.println(">>>>"+j+":"+loadBalance.select(list));
-        }
-        System.out.println("************************ list changed ************************");
-
-        Collections.reverse(list);
-        for(int j=12; j< 24; j++){
-            System.out.println(">>>>"+j+":"+loadBalance.select(list));
-        }
-    }
-
-    private static void init(List<Address> list){
-        for(int i=0; i<5; i++){
-            Address address1 = new Address("192.168.1.1", i);
-            list.add(address1);
-        }
     }
 
 }

@@ -3,7 +3,7 @@ package com.tongbanjie.tevent.client.sender;
 import com.tongbanjie.tevent.common.body.MQBody;
 
 /**
- * 〈一句话功能简述〉<p>
+ * 事务检查监听器 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao

@@ -3,7 +3,7 @@ package com.tongbanjie.tevent.common.body;
 import java.io.Serializable;
 
 /**
- * 自定义协议body<p>
+ * 自定义 协议body<p>
  * 〈功能详细描述〉
  *
  * @author zixiao

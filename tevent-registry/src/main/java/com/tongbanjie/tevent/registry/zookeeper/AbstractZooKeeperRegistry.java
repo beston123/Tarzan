@@ -137,7 +137,6 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry, 
                 } else if (keeperState == Watcher.Event.KeeperState.SyncConnected) {
                     onSessionSyncConnected();
                 }
-                //onStateChanged();
             }
 
             /**

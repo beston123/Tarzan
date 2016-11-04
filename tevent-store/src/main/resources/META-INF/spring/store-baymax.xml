@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:baymax="http://baymax.tongbanjie.com/schema/baymax-3.0"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	                       http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+	                       http://baymax.tongbanjie.com/schema/baymax-3.0
+	                       http://baymax.tongbanjie.com/schema/baymax-3.0.xsd">
+    <!-- 开启baymax -->
+    <baymax:context />
+
+    <!--  分表配置 -->
+    <baymax:table tableName="rocketmq_message" namePatten="rocketmq_message_{000}">
+        <baymax:columns>
+            <!-- 根据哪个字段分表 -->
+            <baymax:column name="id"/>
+        </baymax:columns>
+
+        <!-- 取最后一位％分表数 作为表后缀 -->
+        <baymax:function class="com.tongbanjie.tevent.store.baymax.VirtualModFunction128_4"/>
+
+        <!-- 指定 每个数据库上分别有哪些表后缀 -->
+        <baymax:nodeMapping class="com.tongbanjie.baymax.router.strategy.SimpleTableNodeMapping">
+            <!-- p0 代表是一个数据源，与 multipleDataSource 定义的 identity 对应 -->
+            <!-- 这个配置代表的是 p0 数据库存储的表 -->
+            <baymax:node>p0:000,032,064,096</baymax:node>
+
+            <!-- 这个配置代表的是 p1 数据库存储的表 -->
+            <!--baymax:node>p1:000</baymax:node-->
+        </baymax:nodeMapping>
+    </baymax:table>
+
+    <!-- 最大支持128张分表，真实提供 000,032,064,096 4张 -->
+    <bean id="virtualModFunction128_4" class="com.tongbanjie.baymax.router.strategy.function.VirtualModFunction">
+        <constructor-arg name="max" value="128" />
+        <constructor-arg name="current" value="4" />
+    </bean>
+
+</beans>

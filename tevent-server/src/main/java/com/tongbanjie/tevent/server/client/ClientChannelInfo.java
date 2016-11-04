@@ -32,11 +32,6 @@ public class ClientChannelInfo implements Weighable{
 
     private volatile long lastUpdateTimestamp = System.currentTimeMillis();
 
-
-    public ClientChannelInfo(Channel channel) {
-        this(channel, null, 0);
-    }
-
     public ClientChannelInfo(Channel channel, String clientId, int version) {
         this(channel, clientId, version, Weighable.DEFAULT_WEIGHT);
     }
@@ -64,6 +59,11 @@ public class ClientChannelInfo implements Weighable{
     @Override
     public short getWeight() {
         return this.weight;
+    }
+
+    @Override
+    public void setWeight(short weight) {
+        this.weight = weight;
     }
 
     public long getLastUpdateTimestamp() {

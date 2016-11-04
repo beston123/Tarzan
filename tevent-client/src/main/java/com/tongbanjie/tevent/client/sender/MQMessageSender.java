@@ -1,11 +1,12 @@
 package com.tongbanjie.tevent.client.sender;
 
+import com.tongbanjie.tevent.client.MessageResult;
 import com.tongbanjie.tevent.common.body.MQBody;
 import com.tongbanjie.tevent.rpc.exception.RpcException;
 import com.tongbanjie.tevent.rpc.protocol.header.CheckTransactionStateHeader;
 
 /**
- * 〈一句话功能简述〉<p>
+ * MQ消息发送者 接口<p>
  * 〈功能详细描述〉
  *
  * @author zixiao
@@ -13,23 +14,17 @@ import com.tongbanjie.tevent.rpc.protocol.header.CheckTransactionStateHeader;
  */
 public interface MQMessageSender<T extends MQBody> {
 
-    int checkThreadPoolCoreSize = 1;
+    MessageResult sendMessage(final T mqBody);
 
-    int checkThreadPoolMaxSize = 1;
+    MessageResult prepareMessage(final T mqBody);
 
-    int checkRequestHoldMax = 1000;
+    MessageResult commitMessage(Long transactionId, final T mqBody);
 
-    int sendMessageTimeOut = 3000;
-
-    void sendMessage(final T mqBody) throws RpcException;
-
-    void prepareMessage(final T mqBody) throws RpcException;
-
-    void commitMessage(Long transactionId, final T mqBody) throws RpcException;
-
-    void rollbackMessage(Long transactionId) throws RpcException;
+    MessageResult rollbackMessage(Long transactionId);
 
     TransactionCheckListener transactionCheckListener();
+
+    void setTransactionCheckListener(TransactionCheckListener transactionCheckListener);
 
     void checkTransactionState(final String serverAddr, final T mqBody,
                                final CheckTransactionStateHeader requestHeader);

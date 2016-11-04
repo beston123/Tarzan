@@ -45,10 +45,12 @@ public class RocketMQBody implements MQBody {
         this.producerGroup = producerGroup;
     }
 
+    @Override
     public String getMessageKey() {
         return messageKey;
     }
 
+    @Override
     public void setMessageKey(String messageKey) {
         this.messageKey = messageKey;
     }

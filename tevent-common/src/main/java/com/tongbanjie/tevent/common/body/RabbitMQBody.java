@@ -7,6 +7,17 @@ package com.tongbanjie.tevent.common.body;
  * @author zixiao
  * @date 16/10/9
  */
-public class RabbitMQBody implements CustomBody {
+public class RabbitMQBody implements MQBody {
 
+    private String messageKey;
+
+    @Override
+    public String getMessageKey() {
+        return messageKey;
+    }
+
+    @Override
+    public void setMessageKey(String messageKey) {
+        this.messageKey = messageKey;
+    }
 }

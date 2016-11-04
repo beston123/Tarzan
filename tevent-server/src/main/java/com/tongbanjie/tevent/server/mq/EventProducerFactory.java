@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * 〈一句话功能简述〉<p>
+ * 发送者工厂<p>
  * 〈功能详细描述〉
  *
  * @author zixiao
@@ -23,8 +23,6 @@ public class EventProducerFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(EventProducerFactory.class);
 
     private static final EventProducerFactory eventProducerFactory = new EventProducerFactory();
-
-    private final AtomicInteger indexGenerator = new AtomicInteger(0);
 
     private final ReentrantLock createLock = new ReentrantLock();
 
@@ -64,13 +62,13 @@ public class EventProducerFactory {
     }
 
     private EventProducer createProducer(MQType mqType, ServerController serverController){
-        LOGGER.debug("Create {} Producer, count: {}", mqType, indexGenerator.addAndGet(1));
         switch (mqType){
             case ROCKET_MQ:
                 return new RocketMQProducer(serverController);
             case RABBIT_MQ:
                 return new RabbitMQProducer(serverController);
             default:
+                LOGGER.warn("Unsupported mqType '{}'", mqType);
                 break;
         }
         return null;

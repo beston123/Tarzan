@@ -1,6 +1,5 @@
 package com.tongbanjie.tevent.server.processer;
 
-import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.tongbanjie.tevent.common.message.MQType;
 import com.tongbanjie.tevent.common.message.TransactionState;
 import com.tongbanjie.tevent.rpc.exception.RpcCommandException;
@@ -19,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 〈一句话功能简述〉<p>
+ * 消息发送请求处理者<p>
  * 〈功能详细描述〉
  *
  * @author zixiao
@@ -55,10 +54,9 @@ public class SendMessageProcessor implements NettyRequestProcessor {
      * @param ctx
      * @param request
      * @return
-     * @throws MQClientException
      * @throws RpcCommandException
      */
-    private RpcCommand sendMessage(ChannelHandlerContext ctx, RpcCommand request) throws MQClientException, RpcCommandException {
+    private RpcCommand sendMessage(ChannelHandlerContext ctx, RpcCommand request) throws RpcCommandException {
         //1、解析并校验 消息头
         SendMessageHeader header = (SendMessageHeader)request.decodeCustomHeader(SendMessageHeader.class);
 

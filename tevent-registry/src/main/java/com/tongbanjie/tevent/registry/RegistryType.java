@@ -1,7 +1,7 @@
 package com.tongbanjie.tevent.registry;
 
 /**
- * 〈一句话功能简述〉<p>
+ * 注册类型 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao
@@ -10,6 +10,6 @@ package com.tongbanjie.tevent.registry;
 public enum RegistryType {
 
     SERVER,
-    CLIENT;
+    CLIENT
 
 }

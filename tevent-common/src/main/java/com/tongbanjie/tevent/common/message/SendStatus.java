@@ -11,5 +11,5 @@ public enum SendStatus {
 
     INITIAL,
     SUCCESS,
-    FAILD;
+    FAILED
 }

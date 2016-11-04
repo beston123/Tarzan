@@ -1,7 +1,7 @@
 package com.tongbanjie.tevent.cluster.loadbalance;
 
 /**
- * 〈一句话功能简述〉<p>
+ * 负载均衡 策略<p>
  * 〈功能详细描述〉
  *
  * @author zixiao

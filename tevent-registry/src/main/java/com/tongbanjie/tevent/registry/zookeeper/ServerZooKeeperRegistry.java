@@ -42,9 +42,10 @@ public class ServerZooKeeperRegistry extends AbstractZooKeeperRegistry{
 
     private List<Address> toAddressList(List<String> childrenPathList){
         List<Address> addressOnZk = new ArrayList<Address>();
+
         for(String childPath : childrenPathList){
             Address address = zkClient.readData(this.getDiscoverPath() + ZkConstants.PATH_SEPARATOR + childPath, true);
-            if(address != null){
+            if(address != null && address.isEnable()){
                 addressOnZk.add(address);
             }
         }

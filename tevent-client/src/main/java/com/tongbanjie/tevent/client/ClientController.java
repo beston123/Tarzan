@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.*;
 
 /**
- * 〈一句话功能简述〉<p>
+ * Client控制器 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao
@@ -39,10 +39,7 @@ public class ClientController {
 
     private final NettyClientConfig nettyClientConfig;
 
-    private final ConcurrentHashMap<String/* group */, MQMessageSender> messageSenderTable = new ConcurrentHashMap<String,MQMessageSender>();
-
-    //private final ConcurrentHashMap<Integer/* serverId */, String/* address */> serverAddressTable = new ConcurrentHashMap<Integer, String>();
-
+    private final ConcurrentHashMap<String/* producer group */, MQMessageSender> messageSenderTable = new ConcurrentHashMap<String,MQMessageSender>();
 
     /********************** 服务 ***********************/
     //服务注册
@@ -68,7 +65,7 @@ public class ClientController {
     private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(
             new NamedSingleThreadFactory("ClientScheduledThread"));
 
-    /**********************  ***********************/
+    /********************** 服务状态 ***********************/
     private ServiceState serviceState = ServiceState.NOT_START;
 
     public ClientController(ClientConfig clientConfig, NettyClientConfig nettyClientConfig) {
@@ -112,7 +109,7 @@ public class ClientController {
         this.messageSenderTable.put(group, mqMessageSender);
     }
 
-    public void start() throws Exception {
+    public void start() throws ClientException {
 
         synchronized (this) {
             switch (this.serviceState) {
@@ -124,7 +121,11 @@ public class ClientController {
                         LOGGER.info("Client start successfully. ");
                     } catch (Exception e) {
                         serviceState = ServiceState.FAILED;
-                        throw e;
+                        if(e instanceof ClientException){
+                            throw (ClientException)e;
+                        }else{
+                            throw new ClientException("Client start exception,", e);
+                        }
                     }
                     break;
                 case IN_STARTING:
@@ -138,7 +139,7 @@ public class ClientController {
 
     }
 
-    private void doStart() throws Exception{
+    private void doStart() throws ClientException{
         //rpcClient
         if (this.rpcClient != null) {
             this.rpcClient.start();
@@ -150,7 +151,7 @@ public class ClientController {
         try {
             clientRegistry.start();
         } catch (Exception e) {
-            throw new RuntimeException("The registry connect failed, address: " + clientConfig.getRegistryAddress(), e);
+            throw new ClientException("The registry connect failed, address: " + clientConfig.getRegistryAddress(), e);
         }
 
         //定时向所有服务端发送心跳
@@ -186,7 +187,6 @@ public class ClientController {
             this.scheduledExecutorService.shutdown();
         }
     }
-
 
     public NettyClientConfig getNettyClientConfig() {
         return nettyClientConfig;

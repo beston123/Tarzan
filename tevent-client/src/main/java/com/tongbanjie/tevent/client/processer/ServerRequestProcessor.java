@@ -34,7 +34,12 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-
+/**
+ * 来自服务端的请求处理者
+ *
+ * @author zixiao
+ * @date 16/9/30
+ */
 public class ServerRequestProcessor implements NettyRequestProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerRequestProcessor.class);

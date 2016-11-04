@@ -1,0 +1,114 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+   	   http://www.springframework.org/schema/tx
+   	   http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+
+    <bean id="dataSource_p0" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="url">
+            <value>
+                ${jdbc.druid.url}
+            </value>
+        </property>
+        <property name="username">
+            <value>${jdbc.druid.user}</value>
+        </property>
+        <property name="password">
+            <value>${jdbc.druid.password}</value>
+        </property>
+        <property name="filters">
+            <value>${jdbc.druid.filters}</value>
+        </property>
+        <property name="maxActive">
+            <value>${jdbc.druid.maxActive}</value>
+        </property>
+        <property name="initialSize">
+            <value>${jdbc.druid.initialSize}</value>
+        </property>
+        <property name="maxWait">
+            <value>${jdbc.druid.maxWait}</value>
+        </property>
+        <property name="minIdle">
+            <value>${jdbc.druid.minIdle}</value>
+        </property>
+        <property name="timeBetweenEvictionRunsMillis">
+            <value>${jdbc.druid.timeBetweenEvictionRunsMillis}</value>
+        </property>
+        <property name="minEvictableIdleTimeMillis">
+            <value>${jdbc.druid.minEvictableIdleTimeMillis}</value>
+        </property>
+        <property name="validationQuery">
+            <value>${jdbc.druid.validationQuery}</value>
+        </property>
+        <property name="testWhileIdle">
+            <value>${jdbc.druid.testWhileIdle}</value>
+        </property>
+        <property name="testOnBorrow">
+            <value>${jdbc.druid.testOnBorrow}</value>
+        </property>
+        <property name="testOnReturn">
+            <value>${jdbc.druid.testOnReturn}</value>
+        </property>
+        <property name="poolPreparedStatements">
+            <value>${jdbc.druid.poolPreparedStatements}</value>
+        </property>
+        <property name="maxOpenPreparedStatements">
+            <value>${jdbc.druid.maxOpenPreparedStatements}</value>
+        </property>
+    </bean>
+
+    <!--bean id="dataSource_p1" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="url">
+            <value>
+                ${jdbc.druid.p2.url}
+            </value>
+        </property>
+        <property name="username">
+            <value>${jdbc.druid.p2.user}</value>
+        </property>
+        <property name="password">
+            <value>${jdbc.druid.p2.password}</value>
+        </property>
+        <property name="filters" value="stat,wall"/>
+    </bean-->
+
+    <!-- 数据源分发器 -->
+    <bean id="multipleDataSource" class="com.tongbanjie.baymax.datasource.BaymaxDataSource" init-method="init">
+        <property name="dataSourceGroupSet">
+            <set>
+                <bean class="com.tongbanjie.baymax.datasource.DataSourceGroup">
+                    <property name="identity" value="p0"/>
+                    <property name="targetDataSource" ref="dataSource_p0"/>
+                </bean>
+                <!--bean class="com.tongbanjie.baymax.datasource.DataSourceGroup">
+                    <property name="identity" value="p1"/>
+                    <property name="targetDataSource" ref="dataSource_p1"/>
+                </bean-->
+            </set>
+        </property>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="multipleDataSource" />
+    </bean>
+
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!-- myBatis文件 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="configLocation" value="classpath:META-INF/mybatis/mybatis-configuration.xml" />
+        <property name="mapperLocations" value="classpath*:META-INF/mybatis/mapper/rocketmq_message_mapper.xml" />
+        <property name="dataSource" ref="multipleDataSource" />
+    </bean>
+
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSessionFactory" />
+    </bean>
+
+    <!-- 路由配置文件 -->
+    <import resource="classpath:META-INF/spring/store-baymax.xml" />
+
+</beans>

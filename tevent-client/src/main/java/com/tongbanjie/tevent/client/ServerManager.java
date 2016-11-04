@@ -22,7 +22,7 @@ import com.tongbanjie.tevent.rpc.exception.*;
 import com.tongbanjie.tevent.rpc.protocol.RequestCode;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommand;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommandBuilder;
-import com.tongbanjie.tevent.rpc.protocol.body.HeartbeatData;
+import com.tongbanjie.tevent.common.body.HeartbeatData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,13 +40,10 @@ public class ServerManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerManager.class);
 
-    private final ConcurrentHashMap<String/* group */, MQMessageSender> messageSenderTable;
-
     private final ClientController clientController;
 
     public ServerManager(ClientController clientController) {
         this.clientController = clientController;
-        this.messageSenderTable = clientController.getMessageSenderTable();
     }
 
     public void sendHeartbeatToAllServer(){
@@ -60,7 +57,7 @@ public class ServerManager {
     }
 
     private void sendHeartbeatToServer(final Address serverAddr){
-        for(String producerGroup : this.messageSenderTable.keySet()){
+        for(String producerGroup : this.clientController.getMessageSenderTable().keySet()){
             HeartbeatData heartbeatData = new HeartbeatData();
             heartbeatData.setClientId("");//TODO clientId
             heartbeatData.setGroup(producerGroup);
@@ -90,21 +87,5 @@ public class ServerManager {
         }
 
     }
-
-//    public Address discover() {
-//        List<Address> copy = clientController.getClientRegistry().getDiscovered();
-//
-//        Address address = loadBalanceThreadLocal.get().select(copy);
-//
-//        if(address == null){
-//            LOGGER.warn("Can not find a server.");
-//            return null;
-//        }
-//        if(LOGGER.isDebugEnabled()){
-//            LOGGER.debug("Find a server {}", address);
-//        }
-//        return address;
-//    }
-
 
 }

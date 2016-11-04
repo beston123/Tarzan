@@ -18,6 +18,12 @@ package com.tongbanjie.tevent.server;
 
 import com.tongbanjie.tevent.common.Constants;
 
+/**
+ * Server配置
+ *
+ * @author zixiao
+ * @date 16/10/12
+ */
 public class ServerConfig {
 
     /**

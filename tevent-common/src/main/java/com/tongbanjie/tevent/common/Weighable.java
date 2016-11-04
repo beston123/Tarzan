@@ -15,10 +15,8 @@ public interface Weighable {
      */
     short DEFAULT_WEIGHT = 1;
 
-    /**
-     * 权重
-     * 取值范围 1 ~ Short.MAX_VALUE
-     */
     short getWeight();
+
+    void setWeight(short weight);
 
 }
