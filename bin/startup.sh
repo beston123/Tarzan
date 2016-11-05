@@ -51,16 +51,16 @@ startup(){
     if [ $serverPid -ne 0 ]; then
         echo "The server(pid=$serverPid) has already been started!"
     else
-        echo "Starting the server ..."
+        printf "Starting the server "
         if [ ! -d "${TEVENT_HOME}/log" ]; then
           mkdir "${TEVENT_HOME}/log"
         fi
 
-		nohup $JAVA_HOME/bin/java ${JAVA_OPT} -cp ${CLASSPATH} ${APP_MAIN} 2 > ${TEVENT_HOME}/log/startup.log &
+	nohup $JAVA_HOME/bin/java ${JAVA_OPT} -cp ${CLASSPATH} ${APP_MAIN} 2 > ${TEVENT_HOME}/log/startup.log &
 
-		for i in {1..20} #循环检测10秒
+	for i in {1..20} #循环检测10秒
             do
-                echo "."
+                printf "."
                 sleep 0.5
 
                 getPid
@@ -68,7 +68,8 @@ startup(){
                     break;
                 fi
             done
-
+	printf "\n"
+	
         if [ $serverPid -ne 0 ]; then
             echo "Start server(pid=$serverPid) successfully!"
         else
