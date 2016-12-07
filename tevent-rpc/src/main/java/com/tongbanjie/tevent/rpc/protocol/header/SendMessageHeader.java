@@ -12,6 +12,8 @@ import com.tongbanjie.tevent.rpc.exception.RpcCommandException;
  */
 public class SendMessageHeader implements CustomHeader {
 
+    private static final long serialVersionUID = -1378348758378944301L;
+
     protected MQType mqType;
 
     @Override

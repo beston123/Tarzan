@@ -5,7 +5,7 @@
     <parent>
         <artifactId>tevent</artifactId>
         <groupId>com.tongbanjie.tevent</groupId>
-        <version>${project.version}</version>
+        <version>0.3.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,15 +13,15 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.tongbanjie.tevent</groupId>
+            <groupId>${project.parent.groupId}</groupId>
             <artifactId>tevent-common</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.tongbanjie.tevent</groupId>
+            <groupId>${project.parent.groupId}</groupId>
             <artifactId>tevent-registry</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
     </dependencies>

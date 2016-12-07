@@ -11,6 +11,8 @@ import com.tongbanjie.tevent.rpc.exception.RpcCommandException;
  */
 public class MessageResultHeader implements CustomHeader {
 
+    private static final long serialVersionUID = -2825045873230336070L;
+
     private String msgId;
 
     private Long transactionId;

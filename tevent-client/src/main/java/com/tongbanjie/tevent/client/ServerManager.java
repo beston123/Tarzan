@@ -16,7 +16,7 @@
  */
 package com.tongbanjie.tevent.client;
 
-import com.tongbanjie.tevent.client.sender.MQMessageSender;
+import com.tongbanjie.tevent.common.exception.RpcException;
 import com.tongbanjie.tevent.registry.Address;
 import com.tongbanjie.tevent.rpc.exception.*;
 import com.tongbanjie.tevent.rpc.protocol.RequestCode;
@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 服务端 管理者<p>
@@ -76,7 +75,7 @@ public class ServerManager {
 
         try {
             //用oneWay方式即可
-            this.clientController.getRpcClient().invokeOneway(serverAddr.getAddress(), request, timeoutMillis);
+            this.clientController.getRpcClient().invokeOneWay(serverAddr.getAddress(), request, timeoutMillis);
         } catch (RpcConnectException e) {
             LOGGER.warn("Send heartbeat to server " + serverAddr +
                     " exception, maybe lose connection with the sever.", e);

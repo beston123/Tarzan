@@ -1,16 +1,17 @@
 package com.tongbanjie.tevent.store;
 
 import com.tongbanjie.tevent.common.message.MQType;
-import com.tongbanjie.tevent.store.service.RocketMQStoreService;
-import com.tongbanjie.tevent.store.service.StoreService;
+import com.tongbanjie.tevent.common.redis.RedisComponent;
+import com.tongbanjie.tevent.store.service.*;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 〈一句话功能简述〉<p>
+ * 默认存储管理器 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao
@@ -27,9 +28,27 @@ public class DefaultStoreManager implements StoreManager {
     @Resource
     private RocketMQStoreService rocketMQStoreService;
 
+    @Resource
+    private ToCheckMessageService toCheckMessageService;
+
+    @Resource
+    private ToSendMessageService toSendMessageService;
+
+    @Resource
+    private MessageToCheckJob messageToCheckJob;
+
+    @Resource
+    private MessageToSendJob messageToSendJob;
+
+    @Resource
+    private RedisComponent redisComponent;
+
     @Override
     public void start() throws Exception {
         mqStoreServiceTable.put(MQType.ROCKET_MQ, rocketMQStoreService);
+        
+        messageToCheckJob.start();
+        messageToSendJob.start();
     }
 
     @Override
@@ -41,5 +60,26 @@ public class DefaultStoreManager implements StoreManager {
     public StoreService getMQStoreService(MQType mqType) {
         return mqStoreServiceTable.get(mqType);
     }
+
+    @Override
+    public Set<Map.Entry<MQType, StoreService>> mqStoreServiceSet(){
+        return this.mqStoreServiceTable.entrySet();
+    }
+
+    @Override
+    public ToCheckMessageService getToCheckMessageService() {
+        return this.toCheckMessageService;
+    }
+
+    @Override
+    public ToSendMessageService getToSendMessageService() {
+        return this.toSendMessageService;
+    }
+
+    @Override
+    public RedisComponent getRedisComponent() {
+        return this.redisComponent;
+    }
+
 
 }

@@ -6,12 +6,9 @@
    	   http://www.springframework.org/schema/tx
    	   http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
 
-
-    <bean id="dataSource_p0" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
         <property name="url">
-            <value>
-                ${jdbc.druid.url}
-            </value>
+            <value>${jdbc.druid.url}</value>
         </property>
         <property name="username">
             <value>${jdbc.druid.user}</value>
@@ -60,28 +57,13 @@
         </property>
     </bean>
 
-    <!--bean id="dataSource_p1" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
-        <property name="url">
-            <value>
-                ${jdbc.druid.p2.url}
-            </value>
-        </property>
-        <property name="username">
-            <value>${jdbc.druid.p2.user}</value>
-        </property>
-        <property name="password">
-            <value>${jdbc.druid.p2.password}</value>
-        </property>
-        <property name="filters" value="stat,wall"/>
-    </bean-->
-
-    <!-- 数据源分发器 -->
-    <bean id="multipleDataSource" class="com.tongbanjie.baymax.datasource.BaymaxDataSource" init-method="init">
+    <!-- 分表分库数据源 -->
+    <bean id="shardingDataSource" class="com.tongbanjie.baymax.datasource.BaymaxDataSource" init-method="init">
         <property name="dataSourceGroupSet">
             <set>
                 <bean class="com.tongbanjie.baymax.datasource.DataSourceGroup">
                     <property name="identity" value="p0"/>
-                    <property name="targetDataSource" ref="dataSource_p0"/>
+                    <property name="targetDataSource" ref="dataSource"/>
                 </bean>
                 <!--bean class="com.tongbanjie.baymax.datasource.DataSourceGroup">
                     <property name="identity" value="p1"/>
@@ -91,24 +73,34 @@
         </property>
     </bean>
 
+    <!-- 事务管理器 -->
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="multipleDataSource" />
+        <property name="dataSource" ref="dataSource" />
     </bean>
 
     <tx:annotation-driven transaction-manager="transactionManager"/>
 
-    <!-- myBatis文件 -->
-    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <!-- 分表分库SqlSessionFactory，mybatis文件配置，扫描所有mapper文件，同时指定数据源 -->
+    <bean id="shardingSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="configLocation" value="classpath:META-INF/mybatis/mybatis-configuration.xml" />
-        <property name="mapperLocations" value="classpath*:META-INF/mybatis/mapper/rocketmq_message_mapper.xml" />
-        <property name="dataSource" ref="multipleDataSource" />
+        <property name="mapperLocations" value="classpath*:META-INF/mybatis/mapper/sharding/*.xml" />
+        <property name="dataSource" ref="shardingDataSource" />
     </bean>
 
-    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
-        <constructor-arg index="0" ref="sqlSessionFactory" />
+    <!-- SqlSessionFactory，mybatis文件配置，扫描所有mapper文件，同时指定数据源 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="configLocation" value="classpath:META-INF/mybatis/mybatis-configuration.xml" />
+        <property name="mapperLocations" value="classpath*:META-INF/mybatis/mapper/*.xml" />
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <!-- 自动扫描Dao -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.tongbanjie.tevent.store.mapper" />
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
     </bean>
 
     <!-- 路由配置文件 -->
-    <import resource="classpath:META-INF/spring/store-baymax.xml" />
+    <import resource="classpath:META-INF/spring/store-sharding.xml" />
 
 </beans>

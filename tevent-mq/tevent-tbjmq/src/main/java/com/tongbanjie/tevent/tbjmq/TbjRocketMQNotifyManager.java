@@ -7,7 +7,7 @@ import com.tongbanjie.mq.message.StringMessage;
 import com.tongbanjie.mq.util.ObjectUtil;
 import com.tongbanjie.tevent.client.ClientConfig;
 import com.tongbanjie.tevent.client.MessageResult;
-import com.tongbanjie.tevent.client.sender.TransactionCheckListener;
+import com.tongbanjie.tevent.client.transaction.TransactionCheckListener;
 import com.tongbanjie.tevent.rocketmq.RocketMQNotifyManager;
 import com.tongbanjie.tevent.rocketmq.RocketMQParam;
 

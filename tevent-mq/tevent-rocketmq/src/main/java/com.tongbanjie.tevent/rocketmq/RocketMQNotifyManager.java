@@ -5,15 +5,12 @@ import com.alibaba.rocketmq.common.message.Message;
 import com.tongbanjie.tevent.client.ClientConfig;
 import com.tongbanjie.tevent.client.MessageResult;
 import com.tongbanjie.tevent.client.mq.AbstractMQNotifyManager;
-import com.tongbanjie.tevent.client.mq.MQNotifyManager;
-import com.tongbanjie.tevent.client.sender.TransactionCheckListener;
+import com.tongbanjie.tevent.client.transaction.TransactionCheckListener;
 import com.tongbanjie.tevent.common.body.RocketMQBody;
 import com.tongbanjie.tevent.common.message.MQType;
 import com.tongbanjie.tevent.rocketmq.validator.RocketMQValidators;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * RocketMQ 通知管理者<p>
@@ -58,7 +55,7 @@ public class RocketMQNotifyManager extends AbstractMQNotifyManager<Message> {
     public MessageResult sendMessage(Message message) {
         /*************** 消息校验 ***************/
         try {
-            RocketMQValidators.checkMessage(message);
+            checkMessage(message);
         } catch (MQClientException e) {
             LOGGER.error("消息格式错误", e);
             return MessageResult.buildFail("消息格式错误,"+ e.getErrorMessage());
@@ -74,7 +71,7 @@ public class RocketMQNotifyManager extends AbstractMQNotifyManager<Message> {
     public MessageResult prepareMessage(Message message) {
         /*************** 消息校验 ***************/
         try {
-            RocketMQValidators.checkMessage(message);
+            checkMessage(message);
         } catch (MQClientException e) {
             LOGGER.error("消息格式错误", e);
             return MessageResult.buildFail("消息格式错误,"+ e.getErrorMessage());
@@ -91,7 +88,7 @@ public class RocketMQNotifyManager extends AbstractMQNotifyManager<Message> {
     public MessageResult commitMessage(Long transactionId, Message message) {
         /*************** 消息校验 ***************/
         try {
-            RocketMQValidators.checkMessage(message);
+            checkMessage(message);
         } catch (MQClientException e) {
             LOGGER.error("消息格式错误", e);
             return MessageResult.buildFail("消息格式错误,"+ e.getErrorMessage());
@@ -103,10 +100,17 @@ public class RocketMQNotifyManager extends AbstractMQNotifyManager<Message> {
         return mqMessageSender.commitMessage(transactionId, mqBody);
     }
 
+    private void checkMessage(Message message) throws MQClientException {
+        if(message.getTopic() == null){
+            message.setTopic(getTopic());
+        }
+        RocketMQValidators.checkMessage(message);
+    }
+
     private RocketMQBody buildMQBody(Message message){
         RocketMQBody mqBody = new RocketMQBody();
-        mqBody.setProducerGroup(rocketMQParam.getGroupId());
-        mqBody.setTopic(rocketMQParam.getTopic());
+        mqBody.setProducerGroup(getGroupId());
+        mqBody.setTopic(getTopic());
         mqBody.setTags(rocketMQParam.getTag());
 
         mqBody.setMessageKey(message.getKeys());

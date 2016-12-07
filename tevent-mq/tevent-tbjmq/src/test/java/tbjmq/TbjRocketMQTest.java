@@ -11,7 +11,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
- * 〈一句话功能简述〉<p>
+ * TBJ RocketMQ 客户端测试<p>
  * 〈功能详细描述〉
  *
  * @author zixiao

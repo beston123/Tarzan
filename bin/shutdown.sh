@@ -20,13 +20,13 @@ shutdown(){
     getPid
 
     if [ $serverPid -ne 0 ]; then
-        echo "Stopping the server(pid=$serverPid)..."
+        printf "Stopping the server(pid=$serverPid) "
 
         kill -15 $serverPid
 
         for i in {1..20} #循环检测10秒
             do
-                echo "."
+                printf "."
                 sleep 0.5
                 if [ $? -eq 0 ]; then
                     getPid
@@ -35,6 +35,7 @@ shutdown(){
                     fi
                 fi
             done
+        printf "\n"
 
         if [ $serverPid -ne 0 ]; then
             echo "Stop server failed!"

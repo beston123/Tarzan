@@ -2,10 +2,11 @@ package com.tongbanjie.tevent.client.sender;
 
 import com.tongbanjie.tevent.client.ClientController;
 import com.tongbanjie.tevent.client.MessageResult;
+import com.tongbanjie.tevent.client.transaction.TransactionCheckListener;
 import com.tongbanjie.tevent.common.body.MQBody;
 import com.tongbanjie.tevent.common.message.MQType;
 import com.tongbanjie.tevent.common.message.TransactionState;
-import com.tongbanjie.tevent.rpc.exception.RpcException;
+import com.tongbanjie.tevent.common.exception.RpcException;
 import com.tongbanjie.tevent.rpc.protocol.RequestCode;
 import com.tongbanjie.tevent.rpc.protocol.ResponseCode;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommand;
@@ -73,7 +74,8 @@ public abstract class AbstractMQMessageSender<T extends MQBody> implements MQMes
                         +", error:"+ response.getRemark());
             }
         } catch (InterruptedException e) {
-            result = MessageResult.buildFail("远程调用失败", e);
+            Thread.currentThread().interrupt();
+            result = MessageResult.buildFail("应用被中断", e);
         } catch (RpcException e) {
             result = MessageResult.buildFail("远程调用失败", e);
         }
@@ -99,7 +101,8 @@ public abstract class AbstractMQMessageSender<T extends MQBody> implements MQMes
                         +", error:"+ response.getRemark());
             }
         } catch (InterruptedException e) {
-            result = MessageResult.buildFail("远程调用失败", e);
+            Thread.currentThread().interrupt();
+            result = MessageResult.buildFail("应用被中断", e);
         } catch (RpcException e) {
             result = MessageResult.buildFail("远程调用失败", e);
         }
@@ -125,7 +128,8 @@ public abstract class AbstractMQMessageSender<T extends MQBody> implements MQMes
                         +", error:"+ response.getRemark());
             }
         } catch (InterruptedException e) {
-            result = MessageResult.buildFail("远程调用失败", e);
+            Thread.currentThread().interrupt();
+            result = MessageResult.buildFail("应用被中断", e);
         } catch (RpcException e) {
             result = MessageResult.buildFail("远程调用失败", e);
         }
@@ -151,7 +155,8 @@ public abstract class AbstractMQMessageSender<T extends MQBody> implements MQMes
                         +", error:"+ response.getRemark());
             }
         } catch (InterruptedException e) {
-            result = MessageResult.buildFail("远程调用失败", e);
+            Thread.currentThread().interrupt();
+            result = MessageResult.buildFail("应用被中断", e);
         } catch (RpcException e) {
             result = MessageResult.buildFail("远程调用失败", e);
         }

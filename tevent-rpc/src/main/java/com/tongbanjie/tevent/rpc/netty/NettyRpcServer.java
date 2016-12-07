@@ -78,17 +78,17 @@ public class NettyRpcServer extends NettyRpcAbstract implements RpcServer {
     }
 
     public NettyRpcServer(final NettyServerConfig nettyServerConfig, final ChannelEventListener channelEventListener) {
-        super(nettyServerConfig.getServerOnewaySemaphoreValue(), nettyServerConfig.getServerAsyncSemaphoreValue());
+        super(nettyServerConfig.getServerOneWaySemaphoreValue(), nettyServerConfig.getServerAsyncSemaphoreValue());
         this.serverBootstrap = new ServerBootstrap();
         this.nettyServerConfig = nettyServerConfig;
         this.channelEventListener = channelEventListener;
 
-        int publicThreadNums = nettyServerConfig.getServerCallbackExecutorThreads();
-        if (publicThreadNums <= 0) {
-            publicThreadNums = 4;
+        int publicThreadNum = nettyServerConfig.getServerCallbackExecutorThreads();
+        if (publicThreadNum <= 0) {
+            publicThreadNum = 4;
         }
 
-        this.publicExecutor = Executors.newFixedThreadPool(publicThreadNums, new ThreadFactory() {
+        this.publicExecutor = Executors.newFixedThreadPool(publicThreadNum, new ThreadFactory() {
             private AtomicInteger threadIndex = new AtomicInteger(0);
 
 
@@ -248,9 +248,9 @@ public class NettyRpcServer extends NettyRpcAbstract implements RpcServer {
 
 
     @Override
-    public void invokeOneway(Channel channel, RpcCommand request, long timeoutMillis) throws InterruptedException,
+    public void invokeOneWay(Channel channel, RpcCommand request, long timeoutMillis) throws InterruptedException,
             RpcTooMuchRequestException, RpcTimeoutException, RpcSendRequestException {
-        this.invokeOnewayImpl(channel, request, timeoutMillis);
+        this.invokeOneWayImpl(channel, request, timeoutMillis);
     }
 
 

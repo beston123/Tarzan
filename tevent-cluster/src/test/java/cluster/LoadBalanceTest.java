@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * 〈一句话功能简述〉<p>
+ * 负载均衡测试 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao

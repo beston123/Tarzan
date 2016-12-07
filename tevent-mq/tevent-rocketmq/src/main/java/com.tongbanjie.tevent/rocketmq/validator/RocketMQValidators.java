@@ -7,7 +7,7 @@ import com.alibaba.rocketmq.common.message.Message;
 import com.alibaba.rocketmq.common.protocol.ResponseCode;
 
 /**
- * 〈一句话功能简述〉<p>
+ * RocketMQ 校验器 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao

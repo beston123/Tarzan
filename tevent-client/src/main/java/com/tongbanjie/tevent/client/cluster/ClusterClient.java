@@ -85,10 +85,10 @@ public abstract class ClusterClient implements Cluster<RpcCommand, Address, RpcC
      * @throws RpcTimeoutException
      * @throws RpcSendRequestException
      */
-    public void invokeOneway(long timeoutMillis, RpcCommand arg)
+    public void invokeOneWay(long timeoutMillis, RpcCommand arg)
             throws InterruptedException, RpcConnectException, RpcTooMuchRequestException,
             RpcTimeoutException, RpcSendRequestException  {
-        invokeOneway(timeoutMillis, defaultRetryTimes, arg);
+        invokeOneWay(timeoutMillis, defaultRetryTimes, arg);
     }
 
     /**
@@ -140,11 +140,11 @@ public abstract class ClusterClient implements Cluster<RpcCommand, Address, RpcC
      * @throws RpcTimeoutException
      * @throws RpcSendRequestException
      */
-    public void invokeOneway(long timeoutMillis, int retryTimes, RpcCommand arg)
+    public void invokeOneWay(long timeoutMillis, int retryTimes, RpcCommand arg)
             throws InterruptedException, RpcConnectException, RpcTooMuchRequestException,
             RpcTimeoutException, RpcSendRequestException  {
         List<Address> addressList = this.registry.getDiscovered();
-        invokeOneway(timeoutMillis, retryTimes, addressList, arg);
+        invokeOneWay(timeoutMillis, retryTimes, addressList, arg);
     }
 
 
@@ -199,7 +199,7 @@ public abstract class ClusterClient implements Cluster<RpcCommand, Address, RpcC
      * @throws RpcTimeoutException
      * @throws RpcSendRequestException
      */
-    public void invokeOneway(long timeoutMillis, int retryTimes, List<Address> targetList, RpcCommand arg)
+    public void invokeOneWay(long timeoutMillis, int retryTimes, List<Address> targetList, RpcCommand arg)
             throws InterruptedException, RpcConnectException, RpcTooMuchRequestException,
             RpcTimeoutException, RpcSendRequestException  {
         invokeAsync(timeoutMillis, retryTimes, targetList, arg, null);
@@ -226,7 +226,7 @@ public abstract class ClusterClient implements Cluster<RpcCommand, Address, RpcC
         if(invokeCallback != null){
             this.rpcClient.invokeAsync(address.getAddress(), request, timeoutMillis, invokeCallback);
         }else {
-            this.rpcClient.invokeOneway(address.getAddress(), request, timeoutMillis);
+            this.rpcClient.invokeOneWay(address.getAddress(), request, timeoutMillis);
         }
     }
 

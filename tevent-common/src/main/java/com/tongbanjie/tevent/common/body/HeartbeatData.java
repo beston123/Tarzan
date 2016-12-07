@@ -9,6 +9,8 @@ package com.tongbanjie.tevent.common.body;
  */
 public class HeartbeatData implements CustomBody {
 
+    private static final long serialVersionUID = 2612739800029760734L;
+
     private String clientId;
 
     private String group;

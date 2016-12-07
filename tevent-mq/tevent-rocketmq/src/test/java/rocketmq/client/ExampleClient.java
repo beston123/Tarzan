@@ -4,9 +4,10 @@ import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.common.message.Message;
 import com.tongbanjie.tevent.client.ClientController;
 import com.tongbanjie.tevent.client.cluster.ClusterClient;
-import com.tongbanjie.tevent.client.sender.LocalTransactionState;
+import com.tongbanjie.tevent.client.transaction.LocalTransactionState;
 import com.tongbanjie.tevent.common.body.HeartbeatData;
 import com.tongbanjie.tevent.common.body.RocketMQBody;
+import com.tongbanjie.tevent.common.exception.RpcException;
 import com.tongbanjie.tevent.common.message.MQType;
 import com.tongbanjie.tevent.common.message.TransactionState;
 import com.tongbanjie.tevent.registry.Address;
@@ -27,7 +28,7 @@ import java.io.IOException;
 
 
 /**
- * 〈一句话功能简述〉<p>
+ * Client样例 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao

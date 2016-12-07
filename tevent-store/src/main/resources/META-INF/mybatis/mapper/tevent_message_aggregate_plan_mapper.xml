@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tongbanjie.tevent.store.mapper.MessageAggregatePlanMapper" >
+
+  <resultMap id="BaseResultMap" type="MessageAggregatePlan" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="time_start" property="timeStart" jdbcType="TIMESTAMP" />
+    <result column="time_end" property="timeEnd" jdbcType="TIMESTAMP" />
+    <result column="mq_type" property="mqType" jdbcType="TINYINT" />
+    <result column="aggregate_type" property="aggregateType" jdbcType="TINYINT" />
+    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="record_count" property="recordCount" jdbcType="INTEGER" />
+    <result column="elapsed_time" property="elapsedTime" jdbcType="BIGINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, time_start, time_end, mq_type, aggregate_type, status, record_count, elapsed_time, 
+    create_time, modify_time, remark
+  </sql>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from tevent_message_aggregate_plan
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <insert id="insert" parameterType="MessageAggregatePlan" useGeneratedKeys="true" keyProperty="id" >
+    insert into tevent_message_aggregate_plan (time_start, time_end, mq_type,
+      aggregate_type, status, record_count,
+      elapsed_time, create_time, modify_time,
+      remark)
+    values (#{timeStart,jdbcType=TIMESTAMP}, #{timeEnd,jdbcType=TIMESTAMP}, #{mqType,jdbcType=TINYINT},
+      #{aggregateType,jdbcType=TINYINT}, #{status,jdbcType=TINYINT}, #{recordCount,jdbcType=INTEGER},
+      #{elapsedTime,jdbcType=BIGINT}, now(), #{modifyTime,jdbcType=TIMESTAMP},
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from tevent_message_aggregate_plan
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <update id="updateByPrimaryKeySelective" parameterType="MessageAggregatePlan" >
+    update tevent_message_aggregate_plan
+    <set >
+      <if test="status != null" >
+        status = #{status,jdbcType=TINYINT},
+      </if>
+      <if test="recordCount != null" >
+        record_count = #{recordCount,jdbcType=INTEGER},
+      </if>
+      <if test="elapsedTime != null" >
+        elapsed_time = #{elapsedTime,jdbcType=BIGINT},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      modify_time = now()
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectByCondition" resultMap="BaseResultMap" parameterType="MessageAggregatePlanQuery" >
+    select 
+    <include refid="Base_Column_List" />
+    from tevent_message_aggregate_plan
+    <where >
+      <include refid="where_sql" />
+    </where>
+  </select>
+
+  <sql id="where_sql">
+    <if test="mqType != null" >
+      and mq_type = #{mqType,jdbcType=TINYINT}
+    </if>
+    <if test="aggregateType != null" >
+      and aggregate_type = #{aggregateType,jdbcType=TINYINT}
+    </if>
+    <if test="statusList != null" >
+      and status in
+      <foreach collection="statusList" item="status" open="(" close=")"  separator=",">
+        #{status, jdbcType=TINYINT}
+      </foreach>
+    </if>
+  </sql>
+
+  <select id="selectCountByCondition" resultType="int" parameterType="MessageAggregatePlanQuery" >
+    select count(1) from tevent_message_aggregate_plan
+    <where >
+      <include refid="where_sql" />
+    </where>
+  </select>
+
+  <select id="getLatest" resultMap="BaseResultMap" parameterType="MessageAggregatePlanQuery" >
+    select * from tevent_message_aggregate_plan
+    where mq_type = #{mqType,jdbcType=TINYINT}
+    and aggregate_type = #{aggregateType,jdbcType=TINYINT}
+    order by time_start desc limit 1
+  </select>
+
+  <select id="getNow" resultType="java.util.Date" >
+    select now()
+  </select>
+
+</mapper>

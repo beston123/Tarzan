@@ -21,9 +21,9 @@ export CLASSPATH=.:${TEVENT_HOME}/conf:${CLASSPATH}
 #===========================================================================================
 # JVM Configuration
 #===========================================================================================
-JAVA_OPT="${JAVA_OPT} -server -Xms1g -Xmx1g -Xmn512m -XX:PermSize=128m -XX:MaxPermSize=320m"
+JAVA_OPT="${JAVA_OPT} -server -Xms2g -Xmx2g -Xmn768m -XX:PermSize=128m -XX:MaxPermSize=256m"
 JAVA_OPT="${JAVA_OPT} -XX:+UseConcMarkSweepGC -XX:+UseCMSCompactAtFullCollection -XX:CMSInitiatingOccupancyFraction=70 -XX:+CMSParallelRemarkEnabled -XX:SoftRefLRUPolicyMSPerMB=0 -XX:+CMSClassUnloadingEnabled -XX:SurvivorRatio=8 -XX:+DisableExplicitGC"
-JAVA_OPT="${JAVA_OPT} -verbose:gc -Xloggc:${HOME}/tevent_gc.log -XX:+PrintGCDetails"
+JAVA_OPT="${JAVA_OPT} -verbose:gc -Xloggc:${TEVENT_HOME}/log/tevent_gc.log -XX:+PrintGCDetails"
 JAVA_OPT="${JAVA_OPT} -XX:-OmitStackTraceInFastThrow"
 JAVA_OPT="${JAVA_OPT} -Djava.ext.dirs=${LIB_PATH}"
 #JAVA_OPT="${JAVA_OPT} -Xdebug -Xrunjdwp:transport=dt_socket,address=9555,server=y,suspend=n"
@@ -56,9 +56,9 @@ startup(){
           mkdir "${TEVENT_HOME}/log"
         fi
 
-	nohup $JAVA_HOME/bin/java ${JAVA_OPT} -cp ${CLASSPATH} ${APP_MAIN} 2 > ${TEVENT_HOME}/log/startup.log &
+        nohup $JAVA_HOME/bin/java ${JAVA_OPT} -cp ${CLASSPATH} ${APP_MAIN} 2 > ${TEVENT_HOME}/log/startup.log &
 
-	for i in {1..20} #循环检测10秒
+        for i in {1..10} #循环检测5秒
             do
                 printf "."
                 sleep 0.5
@@ -68,8 +68,14 @@ startup(){
                     break;
                 fi
             done
-	printf "\n"
-	
+        for i in {1..5} #等待2.5秒,确认是否启动成功
+            do
+                printf "."
+                sleep 0.5
+            done
+        printf ".\n"
+
+        getPid
         if [ $serverPid -ne 0 ]; then
             echo "Start server(pid=$serverPid) successfully!"
         else

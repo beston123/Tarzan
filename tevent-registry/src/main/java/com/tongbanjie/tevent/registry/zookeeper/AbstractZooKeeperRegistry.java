@@ -10,10 +10,7 @@ import org.apache.zookeeper.Watcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -173,7 +170,7 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry, 
         } else {
             LOGGER.info("Children changed in path {}, children count: {}", parentPath, currentChildren.size());
         }
-        //
+        //节点列表变化时触发
         onDiscoverChanged(currentChildren);
     }
 
@@ -253,6 +250,26 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry, 
         registerAll();
     }
 
+    @Override
+    public List<Address> getDiscovered(String discoverPath){
+        return getDiscovered();
+    }
+
+    @Override
+    public List<Address> discover(String path){
+        if (!zkClient.exists(path)) {
+            return Collections.emptyList();
+        }
+        List<Address> addressList = new ArrayList<Address>();
+        List<String> childrenPathList = zkClient.getChildren(path);
+        for(String childPath : childrenPathList){
+            Address address = zkClient.readData(path + ZkConstants.PATH_SEPARATOR + childPath, true);
+            if(address != null){
+                addressList.add(address);
+            }
+        }
+        return addressList;
+    }
 
     protected void discoverAll() {
         String discoverPath = getDiscoverPath();

@@ -13,6 +13,8 @@ import com.tongbanjie.tevent.rpc.exception.RpcCommandException;
  */
 public class RegisterRequestHeader implements CustomHeader {
 
+    private static final long serialVersionUID = -4192931458381984926L;
+
     private String clientId;
 
     private String group;

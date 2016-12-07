@@ -1,6 +1,7 @@
 package com.tongbanjie.tevent.client.sender;
 
 import com.tongbanjie.tevent.client.ClientController;
+import com.tongbanjie.tevent.client.transaction.TransactionCheckListener;
 import com.tongbanjie.tevent.common.message.MQType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +44,7 @@ public class MQMessageSenderFactory {
             case ROCKET_MQ:
                 return new RocketMQMessageSender(clientController, transactionCheckListener);
             case RABBIT_MQ:
-                return new RabbitMQMessaageSender(clientController, transactionCheckListener);
+                return new RabbitMQMessageSender(clientController, transactionCheckListener);
             default:
                 LOGGER.warn("Unsupported mqType '{}'", mqType);
                 break;

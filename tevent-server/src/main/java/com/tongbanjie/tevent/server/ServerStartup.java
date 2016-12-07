@@ -18,7 +18,6 @@ package com.tongbanjie.tevent.server;
 
 import com.tongbanjie.tevent.common.Constants;
 import com.tongbanjie.tevent.rpc.netty.NettyServerConfig;
-import com.tongbanjie.tevent.store.StoreConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
@@ -72,7 +71,6 @@ public class ServerStartup {
 
         final ServerConfig serverConfig = new ServerConfig();
         final NettyServerConfig nettyServerConfig = new NettyServerConfig();
-        final StoreConfig storeConfig = new StoreConfig();
 
         try {
             if (serverConfig.getServerId() < 0 || serverConfig.getServerId() > 31) {
@@ -82,8 +80,7 @@ public class ServerStartup {
 
             final ServerController controller = new ServerController(//
                 serverConfig, //
-                nettyServerConfig, //
-                storeConfig
+                nettyServerConfig//
                 );
 
             boolean initResult = controller.initialize();

@@ -9,12 +9,13 @@ package com.tongbanjie.tevent.common;
  */
 public abstract class TEventVersion {
 
-    public static final Version CURRENT = Version.V0_1_0;
+    public static final Version CURRENT = Version.V0_3_0;
 
     public enum Version{
 
         V0_1_0(1, "0.1.0"),
-        V1_0_0(2, "1.0.0");
+        V0_2_0(2, "0.2.0"),
+        V0_3_0(3, "0.3.0");
 
         private int value;
 

@@ -66,6 +66,9 @@ public class IdWorker {
     //随机数
     private Random sequenceRandom = new Random();
 
+    //sequence随机值范围 0-SEQ_ROUND
+    private final int SEQ_ROUND = 128;
+
     public IdWorker(long workerId) {
         this(workerId, 0L);
     }
@@ -100,7 +103,7 @@ public class IdWorker {
             }
         } else {
             //计数重置为随机数
-            sequence = sequenceRandom.nextInt(128);
+            sequence = sequenceRandom.nextInt(SEQ_ROUND);
         }
 
         lastTimestamp = timestamp;

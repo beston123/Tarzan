@@ -1,0 +1,89 @@
+## 面包屑
+#breadcrumbs(["/server/list",""],["服务端","在线列表"])
+
+## 一级二级菜单
+#set($leftLevel1 = 'server')
+#set($leftLevel2 = 1)
+
+## 主面板
+<!--div class="page-header">
+    <h1>
+        服务端
+        <small>
+            <i class="ace-icon fa fa-angle-double-right"></i>
+            overview &amp; stats
+        </small>
+    </h1>
+</div><!-- /.page-header -->
+
+<div class="row">
+    <div class="col-xs-12">
+
+        <!--h3 class="header smaller lighter blue">jQuery dataTables</h3-->
+
+        <div class="clearfix">
+            <div class="pull-right tableTools-container"></div>
+        </div>
+        <div class="table-header">
+            服务端在线列表
+        </div>
+
+        <!-- div.table-responsive -->
+
+        <!-- div.dataTables_borderWrap -->
+        <div>
+            <table id="dynamic-table" class="table table-striped table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th class="center">
+                        <label class="pos-rel">
+                            <input type="checkbox" class="ace" />
+                            <span class="lbl"></span>
+                        </label>
+                    </th>
+                    <th>IP:端口</th>
+                    <th>ServerId</th>
+                    <th>权重</th>
+                    <th class="hidden-480">状态</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                #foreach($!{item} in $!{data})
+                <tr>
+                    <td class="center">
+                        <label class="pos-rel">
+                            <input type="checkbox" class="ace" />
+                            <span class="lbl"></span>
+                        </label>
+                    </td>
+                    <td>$!{item.address}</td>
+                    <td>$!{item.serverId}</td>
+                    <td>$!{item.weight}</td>
+
+                    <td class="hidden-480">
+                        #if($!{item.enable})
+                            <span class="label label-sm label-success">已起用</span>
+                        #else
+                            <span class="label label-sm label-grey">已禁用</span>
+                        #end
+                    </td>
+
+                    <td>
+                        <div class="hidden-sm hidden-xs action-buttons">
+                            <a class="red" href="#" title="删除">
+                                <i class="ace-icon fa fa-trash-o bigger-130"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                #end
+
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PAGE CONTENT ENDS -->
+    </div><!-- /.col -->
+</div><!-- /.row -->

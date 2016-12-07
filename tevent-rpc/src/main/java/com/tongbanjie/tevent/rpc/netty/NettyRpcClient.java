@@ -81,16 +81,16 @@ public class NettyRpcClient extends NettyRpcAbstract implements RpcClient {
 
     public NettyRpcClient(final NettyClientConfig nettyClientConfig, //
                           final ChannelEventListener channelEventListener) {
-        super(nettyClientConfig.getClientOnewaySemaphoreValue(), nettyClientConfig.getClientAsyncSemaphoreValue());
+        super(nettyClientConfig.getClientOneWaySemaphoreValue(), nettyClientConfig.getClientAsyncSemaphoreValue());
         this.nettyClientConfig = nettyClientConfig;
         this.channelEventListener = channelEventListener;
 
-        int publicThreadNums = nettyClientConfig.getClientCallbackExecutorThreads();
-        if (publicThreadNums <= 0) {
-            publicThreadNums = 4;
+        int publicThreadNum = nettyClientConfig.getClientCallbackExecutorThreads();
+        if (publicThreadNum <= 0) {
+            publicThreadNum = 4;
         }
 
-        this.publicExecutor = Executors.newFixedThreadPool(publicThreadNums, new ThreadFactory() {
+        this.publicExecutor = Executors.newFixedThreadPool(publicThreadNum, new ThreadFactory() {
             private AtomicInteger threadIndex = new AtomicInteger(0);
 
 
@@ -420,7 +420,7 @@ public class NettyRpcClient extends NettyRpcAbstract implements RpcClient {
     }
 
     @Override
-    public void invokeOneway(String addr, RpcCommand request, long timeoutMillis)
+    public void invokeOneWay(String addr, RpcCommand request, long timeoutMillis)
             throws InterruptedException, RpcConnectException, RpcTooMuchRequestException,
             RpcTimeoutException, RpcSendRequestException {
         final Channel channel = this.getAndCreateChannel(addr);
@@ -429,9 +429,9 @@ public class NettyRpcClient extends NettyRpcAbstract implements RpcClient {
                 if (this.rpcHook != null) {
                     this.rpcHook.doBeforeRequest(addr, request);
                 }
-                this.invokeOnewayImpl(channel, request, timeoutMillis);
+                this.invokeOneWayImpl(channel, request, timeoutMillis);
             } catch (RpcSendRequestException e) {
-                LOGGER.warn("invokeOneway: send request exception, so close the channel[{}]", addr);
+                LOGGER.warn("invokeOneWay: send request exception, so close the channel[{}]", addr);
                 this.closeChannel(addr, channel);
                 throw e;
             }

@@ -1,7 +1,9 @@
 package com.tongbanjie.tevent.rpc.exception;
 
+import com.tongbanjie.tevent.common.exception.RpcException;
+
 /**
- * 〈一句话功能简述〉<p>
+ * RPC 命令异常 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao
@@ -10,6 +12,8 @@ package com.tongbanjie.tevent.rpc.exception;
  * @since [产品/模块版本] （可选）
  */
 public class RpcCommandException extends RpcException {
+
+    private static final long serialVersionUID = 6043282122067443721L;
 
     public RpcCommandException(String message){
         super(message);

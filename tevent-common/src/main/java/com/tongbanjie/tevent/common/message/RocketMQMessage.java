@@ -1,9 +1,9 @@
 package com.tongbanjie.tevent.common.message;
 
+import com.sun.istack.internal.NotNull;
 import com.tongbanjie.tevent.common.body.RocketMQBody;
 
 import java.util.Arrays;
-import java.util.Date;
 
 /**
  * RocketMQ 消息存储Model <p>
@@ -12,43 +12,26 @@ import java.util.Date;
  * @author zixiao
  * @date 16/10/9
  */
-public class RocketMQMessage implements MQMessage{
+public class RocketMQMessage extends MQMessage{
 
-    private Long id;
+    private static final long serialVersionUID = -5887448864636050120L;
 
-    private String messageKey;
-
-    private String producerGroup;
-
+    /**
+     * 消息topic
+     */
+    @NotNull
     private String topic;
 
+    /**
+     * 消息tags
+     */
     private String tags;
-
-    private byte[] messageBody;
-
-    private Byte transactionState;
-
-    private Integer sendStatus;
-
-    private Integer retryTimes;
-
-    private Date createTime;
-
-    private String producerAddress;
-
-    private Date modifyTime;
-
-    private String messageId;
 
     public static RocketMQMessage build(RocketMQBody mqBody){
         return build(mqBody, null);
     }
 
     public static RocketMQMessage build(RocketMQBody mqBody, TransactionState transactionState){
-        return build(mqBody, transactionState, null);
-    }
-
-    public static RocketMQMessage build(RocketMQBody mqBody, TransactionState transactionState, String producerAddress){
         RocketMQMessage mqMessage = new RocketMQMessage();
         mqMessage.setMessageBody(mqBody.getMessageBody());
         mqMessage.setMessageKey(mqBody.getMessageKey());
@@ -57,35 +40,7 @@ public class RocketMQMessage implements MQMessage{
         if(transactionState != null){
             mqMessage.setTransactionState(transactionState.getCode());
         }
-        mqMessage.setProducerAddress(producerAddress);
         return mqMessage;
-    }
-
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-
-    public String getMessageKey() {
-        return messageKey;
-    }
-
-    public void setMessageKey(String messageKey) {
-        this.messageKey = messageKey;
-    }
-
-    public String getProducerGroup() {
-        return producerGroup;
-    }
-
-    public void setProducerGroup(String producerGroup) {
-        this.producerGroup = producerGroup;
     }
 
     public String getTopic() {
@@ -104,67 +59,14 @@ public class RocketMQMessage implements MQMessage{
         this.tags = tags;
     }
 
-    public byte[] getMessageBody() {
-        return messageBody;
+
+    @Override
+    public String toString() {
+        return "RocketMQMessage{" +
+                super.toString() + ',' +
+                ", topic='" + topic + '\'' +
+                ", tags='" + tags + '\'' +
+                '}';
     }
 
-    public void setMessageBody(byte[] messageBody) {
-        this.messageBody = messageBody;
-    }
-
-    public Byte getTransactionState() {
-        return transactionState;
-    }
-
-    public void setTransactionState(Byte transactionState) {
-        this.transactionState = transactionState;
-    }
-
-    public Integer getSendStatus() {
-        return sendStatus;
-    }
-
-    public void setSendStatus(Integer sendStatus) {
-        this.sendStatus = sendStatus;
-    }
-
-    public Integer getRetryTimes() {
-        return retryTimes;
-    }
-
-    public void setRetryTimes(Integer retryTimes) {
-        this.retryTimes = retryTimes;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public String getProducerAddress() {
-        return producerAddress;
-    }
-
-    public void setProducerAddress(String producerAddress) {
-        this.producerAddress = producerAddress;
-    }
-
-    public Date getModifyTime() {
-        return modifyTime;
-    }
-
-    public void setModifyTime(Date modifyTime) {
-        this.modifyTime = modifyTime;
-    }
-
-    public String getMessageId() {
-        return messageId;
-    }
-
-    public void setMessageId(String messageId) {
-        this.messageId = messageId;
-    }
 }

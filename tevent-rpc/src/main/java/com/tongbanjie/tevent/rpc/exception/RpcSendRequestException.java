@@ -1,17 +1,14 @@
 package com.tongbanjie.tevent.rpc.exception;
 
-/**
- * Created by swy on 2016/9/28.
- */
+import com.tongbanjie.tevent.common.exception.RpcException;
+
 public class RpcSendRequestException extends RpcException {
-
-    private static final long serialVersionUID = 5391285827332471674L;
-
+    
+    private static final long serialVersionUID = 6424234526891851248L;
 
     public RpcSendRequestException(String addr) {
         this(addr, null);
     }
-
 
     public RpcSendRequestException(String addr, Throwable cause) {
         super("send request to <" + addr + "> failed", cause);

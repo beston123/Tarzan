@@ -13,12 +13,12 @@
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
-                <!--value>classpath:store.properties</value-->
                 <value>file:${TEVENT_HOME}/conf/store.properties</value>
             </list>
         </property>
     </bean>
 
+    <import resource="classpath:META-INF/spring/store-redis.xml"/>
     <import resource="classpath:META-INF/spring/store-db.xml"/>
 
 </beans>

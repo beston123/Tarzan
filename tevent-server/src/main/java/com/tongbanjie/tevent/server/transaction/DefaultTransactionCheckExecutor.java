@@ -1,18 +1,3 @@
-/**
- * Copyright (C) 2010-2013 Alibaba Group Holding Limited
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.tongbanjie.tevent.server.transaction;
 
 import com.tongbanjie.tevent.common.body.RocketMQBody;
@@ -21,8 +6,7 @@ import com.tongbanjie.tevent.common.message.MQType;
 import com.tongbanjie.tevent.common.message.RocketMQMessage;
 import com.tongbanjie.tevent.rpc.InvokeCallback;
 import com.tongbanjie.tevent.rpc.ResponseFuture;
-import com.tongbanjie.tevent.rpc.RpcServer;
-import com.tongbanjie.tevent.rpc.exception.RpcException;
+import com.tongbanjie.tevent.common.exception.RpcException;
 import com.tongbanjie.tevent.rpc.protocol.RequestCode;
 import com.tongbanjie.tevent.rpc.protocol.ResponseCode;
 import com.tongbanjie.tevent.rpc.protocol.RpcCommand;
@@ -30,15 +14,16 @@ import com.tongbanjie.tevent.rpc.protocol.RpcCommandBuilder;
 import com.tongbanjie.tevent.rpc.protocol.header.CheckTransactionStateHeader;
 import com.tongbanjie.tevent.server.ServerController;
 import com.tongbanjie.tevent.server.client.ClientChannelInfo;
-import com.tongbanjie.tevent.store.Result;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
- * 主动回查Producer的事务状态
+ * 向消息生产者回查事务状态 <p>
+ * 〈功能详细描述〉
  *
+ * @author zixiao
+ * @date 16/10/9
  */
 public class DefaultTransactionCheckExecutor implements TransactionCheckExecutor {
 
@@ -65,9 +50,8 @@ public class DefaultTransactionCheckExecutor implements TransactionCheckExecutor
         if(mqMessage instanceof RocketMQMessage){
             sendTransactionCheckRequest(clientChannelInfo.getChannel(), (RocketMQMessage) mqMessage);
         }else{
-            LOGGER.warn("check a producer transaction state, unknown mq type message, id: {}", mqMessage.getId());
+            LOGGER.warn("check a producer transaction state, unsupported mq type message, id: {}", mqMessage.getId());
         }
-        
     }
 
     private void sendTransactionCheckRequest(final Channel channel, final RocketMQMessage rocketMQMessage){
@@ -107,6 +91,7 @@ public class DefaultTransactionCheckExecutor implements TransactionCheckExecutor
                 }
             });
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             LOGGER.error("InterruptedException", e);
         } catch (RpcException e) {
             LOGGER.error("RpcException", e);

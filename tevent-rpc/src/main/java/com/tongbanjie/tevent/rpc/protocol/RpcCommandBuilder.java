@@ -65,6 +65,15 @@ public class RpcCommandBuilder {
         return buildResponse(cmdCode, remark, null/* customHeader */);
     }
 
+    public static RpcCommand buildSuccess(Object body) {
+        RpcCommand cmd = buildResponse();
+        cmd.setCmdCode(ResponseCode.SUCCESS);
+        if(body != null){
+            cmd.setBody(body);
+        }
+        return cmd;
+    }
+
     public static RpcCommand buildSuccess() {
         return buildSuccess(null/* customHeader */);
     }

@@ -14,7 +14,9 @@ import com.tongbanjie.tevent.rpc.exception.RpcCommandException;
  * @see [相关类/方法]（可选）
  * @since [产品/模块版本] （可选）
  */
-public class TransactionMessageHeader extends SendMessageHeader implements CustomHeader {
+public class TransactionMessageHeader implements CustomHeader {
+
+    private static final long serialVersionUID = 3269691943634333493L;
 
     private Long transactionId;
 
@@ -23,10 +25,13 @@ public class TransactionMessageHeader extends SendMessageHeader implements Custo
     protected MQType mqType;
 
     @Override
-    public void checkFields() throws RpcCommandException{
-        if(transactionState == TransactionState.COMMIT || transactionState == TransactionState.ROLLBACK){
+    public void checkFields() throws RpcCommandException {
+        if(mqType == null){
+            throw new RpcCommandException("mqType can not be null!");
+        }
+        if(TransactionState.PREPARE != transactionState){
             if(transactionId == null){
-                throw new RpcCommandException("TransactionId can not be null, when transactionType is " + transactionState);
+                throw new RpcCommandException("transactionId can not be null, when transactionType is not " + TransactionState.PREPARE);
             }
         }
     }
@@ -47,12 +52,10 @@ public class TransactionMessageHeader extends SendMessageHeader implements Custo
         this.transactionState = transactionState;
     }
 
-    @Override
     public MQType getMqType() {
         return mqType;
     }
 
-    @Override
     public void setMqType(MQType mqType) {
         this.mqType = mqType;
     }

@@ -1,5 +1,7 @@
 package com.tongbanjie.tevent.registry;
 
+import com.tongbanjie.tevent.common.Service;
+
 import java.util.List;
 
 /**
@@ -9,18 +11,7 @@ import java.util.List;
  * @author zixiao
  * @date 16/10/12
  */
-public interface Registry {
-
-    /**
-     * 启动
-     * @throws Exception
-     */
-    void start() throws Exception;
-
-    /**
-     * 停止
-     */
-    void shutdown();
+public interface Registry extends Service {
 
     /**
      * 注册到指定路径

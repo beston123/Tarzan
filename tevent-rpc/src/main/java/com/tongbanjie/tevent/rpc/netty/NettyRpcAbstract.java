@@ -16,7 +16,6 @@
  */
 package com.tongbanjie.tevent.rpc.netty;
 
-
 import com.tongbanjie.tevent.rpc.InvokeCallback;
 import com.tongbanjie.tevent.rpc.ResponseFuture;
 import com.tongbanjie.tevent.rpc.RpcHook;
@@ -50,7 +49,7 @@ public abstract class NettyRpcAbstract {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NettyRpcAbstract.class);
 
-    protected final Semaphore semaphoreOneway;
+    protected final Semaphore semaphoreOneWay;
 
     protected final Semaphore semaphoreAsync;
 
@@ -65,8 +64,8 @@ public abstract class NettyRpcAbstract {
     protected Pair<NettyRequestProcessor, ExecutorService> defaultRequestProcessor;
 
 
-    public NettyRpcAbstract(final int permitsOneway, final int permitsAsync) {
-        this.semaphoreOneway = new Semaphore(permitsOneway, true);
+    public NettyRpcAbstract(final int permitsOneWay, final int permitsAsync) {
+        this.semaphoreOneWay = new Semaphore(permitsOneWay, true);
         this.semaphoreAsync = new Semaphore(permitsAsync, true);
     }
 
@@ -356,7 +355,7 @@ public abstract class NettyRpcAbstract {
         }
     }
 
-    public void invokeOnewayImpl(final Channel channel, final RpcCommand request, final long timeoutMillis)
+    public void invokeOneWayImpl(final Channel channel, final RpcCommand request, final long timeoutMillis)
             throws InterruptedException, RpcTooMuchRequestException, RpcTimeoutException, RpcSendRequestException {
         //check channel writable
         if(!channel.isWritable()){
@@ -366,9 +365,9 @@ public abstract class NettyRpcAbstract {
         }
 
         request.setOneWayRpc(true);
-        boolean acquired = this.semaphoreOneway.tryAcquire(timeoutMillis, TimeUnit.MILLISECONDS);
+        boolean acquired = this.semaphoreOneWay.tryAcquire(timeoutMillis, TimeUnit.MILLISECONDS);
         if (acquired) {
-            final OnceSemaphore once = new OnceSemaphore(this.semaphoreOneway);
+            final OnceSemaphore once = new OnceSemaphore(this.semaphoreOneWay);
             try {
                 channel.writeAndFlush(request).addListener(new ChannelFutureListener() {
                     @Override
@@ -386,10 +385,10 @@ public abstract class NettyRpcAbstract {
             }
         } else {
             if (timeoutMillis <= 0) {
-                throw new RpcTooMuchRequestException("invokeOnewayImpl invoke too fast");
+                throw new RpcTooMuchRequestException("invokeOneWayImpl invoke too fast");
             } else {
                 String info = String.format(
-                        "invokeOnewayImpl tryAcquire semaphore timeout, %dms, waiting thread nums: %d semaphoreAsyncValue: %d", //
+                        "invokeOneWayImpl tryAcquire semaphore timeout, %dms, waiting thread nums: %d semaphoreAsyncValue: %d", //
                         timeoutMillis, //
                         this.semaphoreAsync.getQueueLength(), //
                         this.semaphoreAsync.availablePermits()//

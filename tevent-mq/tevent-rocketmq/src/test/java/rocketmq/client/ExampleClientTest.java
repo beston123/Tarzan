@@ -5,7 +5,7 @@ import com.tongbanjie.tevent.client.ClientConfig;
 import com.tongbanjie.tevent.client.ClientController;
 import com.tongbanjie.tevent.common.Constants;
 import com.tongbanjie.tevent.registry.Address;
-import com.tongbanjie.tevent.rpc.exception.RpcException;
+import com.tongbanjie.tevent.common.exception.RpcException;
 import com.tongbanjie.tevent.rpc.netty.NettyClientConfig;
 import org.junit.After;
 import org.junit.Before;
@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 〈一句话功能简述〉<p>
+ * Client样例测试 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao

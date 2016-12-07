@@ -11,7 +11,7 @@ import java.io.Serializable;
  */
 public class MessageResult implements Serializable {
 
-    private static final long serialVersionUID = 6781030660269943247L;
+    private static final long serialVersionUID = -4604216924886472481L;
 
     private boolean success = false;
 

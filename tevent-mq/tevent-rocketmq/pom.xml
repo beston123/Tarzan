@@ -5,18 +5,17 @@
     <parent>
         <artifactId>tevent-mq</artifactId>
         <groupId>com.tongbanjie.tevent</groupId>
-        <version>${project.version}</version>
+        <version>0.3.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>tevent-rocketmq</artifactId>
-    <packaging>pom</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>com.tongbanjie.tevent</groupId>
+            <groupId>${project.parent.groupId}</groupId>
             <artifactId>tevent-client</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>

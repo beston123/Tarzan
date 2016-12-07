@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 〈一句话功能简述〉<p>
+ * bean工具类 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao

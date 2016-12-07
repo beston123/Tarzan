@@ -27,7 +27,6 @@
                 <include>com.tongbanjie.tevent:tevent-rpc</include>
                 <include>com.tongbanjie.tevent:tevent-store</include>
                 <include>com.tongbanjie.tevent:tevent-cluster</include>
-                <include>com.tongbanjie.tevent:tevent-mq</include>
             </includes>
             <binaries>
                 <outputDirectory>lib/</outputDirectory>

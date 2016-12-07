@@ -16,10 +16,10 @@
  */
 package com.tongbanjie.tevent.server;
 
-
 import com.tongbanjie.tevent.common.Constants;
+import com.tongbanjie.tevent.common.Service;
 import com.tongbanjie.tevent.common.util.NamedThreadFactory;
-import com.tongbanjie.tevent.common.util.RemotingUtils;
+import com.tongbanjie.tevent.common.util.NetworkUtils;
 import com.tongbanjie.tevent.registry.Address;
 import com.tongbanjie.tevent.registry.RecoverableRegistry;
 import com.tongbanjie.tevent.registry.ServerAddress;
@@ -31,11 +31,11 @@ import com.tongbanjie.tevent.rpc.protocol.RequestCode;
 import com.tongbanjie.tevent.server.client.ClientChannelManageService;
 import com.tongbanjie.tevent.server.client.ClientManager;
 import com.tongbanjie.tevent.server.processer.ClientManageProcessor;
+import com.tongbanjie.tevent.server.processer.QueryMessageProcessor;
 import com.tongbanjie.tevent.server.processer.SendMessageProcessor;
 import com.tongbanjie.tevent.server.transaction.TransactionCheckService;
 import com.tongbanjie.tevent.store.StoreManager;
-import com.tongbanjie.tevent.store.StoreConfig;
-import com.tongbanjie.tevent.store.util.DistributedIdGenerator;
+import com.tongbanjie.tevent.common.util.DistributedIdGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -51,7 +51,7 @@ import java.util.concurrent.*;
  * @author zixiao
  * @date 16/9/29
  */
-public class ServerController {
+public class ServerController implements Service {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerController.class);
 
@@ -62,10 +62,7 @@ public class ServerController {
     // 通信层配置
     private final NettyServerConfig nettyServerConfig;
 
-    //数据存储层配置
-    private final StoreConfig storeConfig;
-
-    /********************** client manager ***********************/
+    /********************** 客户端管理 ***********************/
     // 客户端连接管理
     private final ClientManager clientManager;
 
@@ -86,25 +83,24 @@ public class ServerController {
     // 处理发送消息线程池
     private ExecutorService sendMessageExecutor;
 
-    // 处理管理Client线程池
-    private ExecutorService clientManageExecutor;
-
-    //事务状态检查服务
-    private TransactionCheckService transactionCheckService;
-
     // 对消息写入进行流控
     private final BlockingQueue<Runnable> sendThreadPoolQueue;
 
+    // 处理管理Client线程池
+    private ExecutorService clientManageExecutor;
+
+    /********************** 其他 ***********************/
+    //定时任务管理器
+    private ScheduledServiceManager scheduledServiceManager;
+
     //服务器地址
-    private Address serverAddress;
+    private ServerAddress serverAddress;
 
     public ServerController(final ServerConfig serverConfig, //
-                            final NettyServerConfig nettyServerConfig, //
-                            final StoreConfig storeConfig //
+                            final NettyServerConfig nettyServerConfig//
     ) {
         this.serverConfig = serverConfig;
         this.nettyServerConfig = nettyServerConfig;
-        this.storeConfig = storeConfig;
 
         this.clientManager = new ClientManager(this.serverConfig);
         this.clientChannelManageService = new ClientChannelManageService(this);
@@ -125,8 +121,7 @@ public class ServerController {
         try {
             ApplicationContext act = new ClassPathXmlApplicationContext(Constants.TEVENT_STORE_CONTEXT);
             this.storeManager = act.getBean(StoreManager.class);
-        }
-        catch (BeansException e) {
+        } catch (BeansException e) {
             result = false;
             LOGGER.error("Load store manager failed.", e);
         }
@@ -140,17 +135,20 @@ public class ServerController {
             this.registerProcessor();
 
             /**
-             * 3、初始化事务状态检查服务
+             * 3、初始化定时任务
              */
-            this.transactionCheckService = new TransactionCheckService(this);
-
+            this.scheduledServiceManager = new ScheduledServiceManager();
+            this.scheduledServiceManager
+                    .add(new TransactionCheckService(this))     //事务状态检查服务
+                    .add(new MessageResendService(this))        //消息重发Job
+                    .add(this.clientChannelManageService);      //检测所有客户端连接
 
             /**
              * 4、初始化注册中心，并注册地址到注册中心
              */
             try {
                 serverRegistry.start();
-                registerServer(serverConfig.getServerId());
+                registerServer();
             } catch (ServerException e) {
                 throw e;
             }catch (Exception e) {
@@ -167,22 +165,24 @@ public class ServerController {
 
     /**
      * 注册ServerId和地址
-     * @param serverId
      * @return
      */
-    private boolean registerServer(int serverId) {
+    private boolean registerServer() {
         //1、获取服务器地址 [ip]:[port]
-        String localIp = RemotingUtils.getLocalHostIp();
-        if(localIp == null){
+        String localIp = NetworkUtils.getLocalHostIp();
+        if (localIp == null) {
             throw new ServerException("Get localHost ip failed.");
         }
-        serverAddress = new ServerAddress(localIp, nettyServerConfig.getListenPort(), serverConfig.getServerWeight());
+        serverAddress = new ServerAddress(localIp, nettyServerConfig.getListenPort());
+        serverAddress.setWeight(serverConfig.getServerWeight());
+        serverAddress.setServerId(serverConfig.getServerId());
 
         if (serverRegistry.isConnected()) {
             //2、注册serverId
-            boolean registerFlag = ((ServerZooKeeperRegistry) this.serverRegistry).registerId(serverId, serverAddress);
+            boolean registerFlag = ((ServerZooKeeperRegistry) this.serverRegistry)
+                    .registerId(serverAddress.getServerId(), serverAddress);
             if (!registerFlag) {
-                throw new ServerException("The server id '" + serverConfig.getServerId() +
+                throw new ServerException("The server id '" + serverAddress.getServerId() +
                         "' already in use, it must be unique in cluster.");
             }
             //3、注册服务器地址
@@ -190,7 +190,7 @@ public class ServerController {
             return true;
         }
         throw new ServerException("Register failed, address: " + serverConfig.getRegistryAddress()
-                +", server id: "+serverConfig.getServerId());
+                + ", server id: " + serverAddress.getServerId());
     }
 
     /**
@@ -198,24 +198,25 @@ public class ServerController {
      */
     private void registerProcessor() {
         this.sendMessageExecutor = new ThreadPoolExecutor(//
-                this.serverConfig.getSendMessageThreadPoolNums(),//
-                this.serverConfig.getSendMessageThreadPoolNums(),//
+                this.serverConfig.getSendMessageThreadPoolNum(),//
+                this.serverConfig.getSendMessageThreadPoolNum(),//
                 1000 * 60,//
                 TimeUnit.MILLISECONDS,//
                 this.sendThreadPoolQueue,//
                 new NamedThreadFactory("SendMessageThread_"));
 
         this.clientManageExecutor = Executors.newFixedThreadPool(
-                this.serverConfig.getClientManageThreadPoolNums(),
+                this.serverConfig.getClientManageThreadPoolNum(),
                 new NamedThreadFactory("ClientManageThread_"));
 
         SendMessageProcessor sendProcessor = new SendMessageProcessor(this);
-
         this.rpcServer.registerProcessor(RequestCode.SEND_MESSAGE, sendProcessor, this.sendMessageExecutor);
         this.rpcServer.registerProcessor(RequestCode.TRANSACTION_MESSAGE, sendProcessor, this.sendMessageExecutor);
 
-        ClientManageProcessor clientProcessor = new ClientManageProcessor(this);
+        QueryMessageProcessor queryProcessor = new QueryMessageProcessor(this);
+        this.rpcServer.registerProcessor(RequestCode.QUERY_MESSAGE, queryProcessor, this.sendMessageExecutor);
 
+        ClientManageProcessor clientProcessor = new ClientManageProcessor(this);
         this.rpcServer.registerProcessor(RequestCode.HEART_BEAT, clientProcessor, this.clientManageExecutor);
         this.rpcServer.registerProcessor(RequestCode.UNREGISTER_CLIENT, clientProcessor, this.clientManageExecutor);
 
@@ -230,12 +231,8 @@ public class ServerController {
             this.rpcServer.start();
         }
 
-        if (this.clientChannelManageService != null) {
-            this.clientChannelManageService.start();
-        }
-
-        if(this.transactionCheckService != null){
-            this.transactionCheckService.start();
+        if(this.scheduledServiceManager != null){
+            this.scheduledServiceManager.start();
         }
 
     }
@@ -253,16 +250,8 @@ public class ServerController {
             this.sendMessageExecutor.shutdown();
         }
 
-        if (this.clientManageExecutor != null){
-            this.clientManageExecutor.shutdown();
-        }
-
-        if (this.clientChannelManageService != null) {
-            this.clientChannelManageService.shutdown();
-        }
-
-        if (this.transactionCheckService != null) {
-            this.transactionCheckService.shutdown();
+        if (this.scheduledServiceManager != null) {
+            this.scheduledServiceManager.shutdown();
         }
 
         if (this.serverRegistry != null){
@@ -276,10 +265,6 @@ public class ServerController {
 
     public NettyServerConfig getNettyServerConfig() {
         return nettyServerConfig;
-    }
-
-    public StoreConfig getStoreConfig() {
-        return storeConfig;
     }
 
     public ClientManager getClientManager() {
@@ -306,7 +291,4 @@ public class ServerController {
         return sendMessageExecutor;
     }
 
-    public void setSendMessageExecutor(ExecutorService sendMessageExecutor) {
-        this.sendMessageExecutor = sendMessageExecutor;
-    }
 }

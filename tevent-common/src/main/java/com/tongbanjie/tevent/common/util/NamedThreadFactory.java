@@ -4,7 +4,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 〈一句话功能简述〉<p>
+ * 可命名的线程工厂<p>
  * 〈功能详细描述〉
  *
  * @author zixiao

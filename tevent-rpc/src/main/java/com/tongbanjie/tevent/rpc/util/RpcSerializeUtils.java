@@ -6,7 +6,7 @@ import com.tongbanjie.tevent.rpc.protocol.ProtostuffSerializer;
 import com.tongbanjie.tevent.rpc.protocol.SerializeType;
 
 /**
- * 〈一句话功能简述〉<p>
+ * RPC 序列化工具 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao

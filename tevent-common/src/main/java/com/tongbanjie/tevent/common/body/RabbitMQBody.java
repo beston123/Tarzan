@@ -9,6 +9,8 @@ package com.tongbanjie.tevent.common.body;
  */
 public class RabbitMQBody implements MQBody {
 
+    private static final long serialVersionUID = -434925588851925781L;
+
     private String messageKey;
 
     @Override

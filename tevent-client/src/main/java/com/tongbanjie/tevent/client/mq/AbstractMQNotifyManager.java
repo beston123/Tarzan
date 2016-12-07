@@ -6,7 +6,7 @@ import com.tongbanjie.tevent.client.ClientControllerFactory;
 import com.tongbanjie.tevent.client.ClientException;
 import com.tongbanjie.tevent.client.sender.MQMessageSender;
 import com.tongbanjie.tevent.client.sender.MQMessageSenderFactory;
-import com.tongbanjie.tevent.client.sender.TransactionCheckListener;
+import com.tongbanjie.tevent.client.transaction.TransactionCheckListener;
 import com.tongbanjie.tevent.common.message.MQType;
 
 import java.util.concurrent.atomic.AtomicBoolean;

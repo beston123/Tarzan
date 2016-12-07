@@ -11,6 +11,8 @@ import java.util.Arrays;
  */
 public class RocketMQBody implements MQBody {
 
+    private static final long serialVersionUID = -8300918145242520246L;
+
     private String topic;
 
     private String tags;

@@ -1,0 +1,45 @@
+#set($ctx = $ac.contextPath)
+## 设置开发者环境
+#set($develop = $ctx)
+## 切换环境
+#set($env = $develop)
+
+<!DOCTYPE html>
+<html>
+## header
+    #parse("include/header.vm")
+
+## 全局框架
+<body class="no-skin">
+<!-- navbar -->
+    #parse("include/navbar.vm")
+
+<div class="main-container ace-save-state" id="main-container">
+    <script type="text/javascript">
+        try{ace.settings.loadState('main-container')}catch(e){}
+    </script>
+
+    <!-- sidebar -->
+    #parse("include/sidebar.vm")
+
+    <div class="main-content">
+        <div class="main-content-inner">
+            <!-- breadcrumbs -->
+            #parse("include/breadcrumbs.vm")
+
+            <div class="page-content">
+                <!-- content -->
+                $screen_content
+            </div><!-- /.page-content -->
+        </div>
+    </div><!-- /.main-content -->
+
+    <!-- footer -->
+    #parse("include/footer.vm")
+
+</div><!-- /.main-container -->
+
+    #parse("include/footerJs.vm")
+
+</body>
+</html>

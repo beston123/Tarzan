@@ -4,7 +4,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * 〈一句话功能简述〉<p>
+ * ID生成器工厂<p>
  * 〈功能详细描述〉
  *
  * @author zixiao

@@ -27,8 +27,8 @@ public class NettyServerConfig implements Cloneable{
     private int serverCallbackExecutorThreads = 0;
     private int serverSelectorThreads = 3;
 
-    private int serverOnewaySemaphoreValue = 256;
-    private int serverAsyncSemaphoreValue = 64;
+    private int serverOneWaySemaphoreValue = 512;
+    private int serverAsyncSemaphoreValue = 128;
 
     private int serverChannelMaxIdleTimeSeconds = 120;
 
@@ -66,8 +66,8 @@ public class NettyServerConfig implements Cloneable{
         return serverSelectorThreads;
     }
 
-    public int getServerOnewaySemaphoreValue() {
-        return serverOnewaySemaphoreValue;
+    public int getServerOneWaySemaphoreValue() {
+        return serverOneWaySemaphoreValue;
     }
 
     public int getServerAsyncSemaphoreValue() {

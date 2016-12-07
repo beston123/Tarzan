@@ -29,17 +29,17 @@ public class ServerConfig {
     /**
      * 消息发送线程池大小
      */
-    private int sendMessageThreadPoolNums = 16 + Runtime.getRuntime().availableProcessors() * 4;
+    private int sendMessageThreadPoolNum = 32 + Runtime.getRuntime().availableProcessors() * 3;
 
     /**
      * 客户端管理线程池大小
      */
-    private int clientManageThreadPoolNums = 8+ Runtime.getRuntime().availableProcessors();
+    private int clientManageThreadPoolNum = 8 + Runtime.getRuntime().availableProcessors();
 
     /**
      * 消息发送线程池队列容量
      */
-    private int sendThreadPoolQueueCapacity = 50000;
+    private int sendThreadPoolQueueCapacity = 100000;
 
     /**
      * ServerId，每个server必须唯一， 取值范围 0-31
@@ -62,20 +62,20 @@ public class ServerConfig {
     private String rocketMQNamesrv =  System.getProperty(Constants.TEVENT_ROCKETMQ_NAMESRV);
 
 
-    public int getSendMessageThreadPoolNums() {
-        return sendMessageThreadPoolNums;
+    public int getSendMessageThreadPoolNum() {
+        return sendMessageThreadPoolNum;
     }
 
-    public void setSendMessageThreadPoolNums(int sendMessageThreadPoolNums) {
-        this.sendMessageThreadPoolNums = sendMessageThreadPoolNums;
+    public void setSendMessageThreadPoolNum(int sendMessageThreadPoolNum) {
+        this.sendMessageThreadPoolNum = sendMessageThreadPoolNum;
     }
 
-    public int getClientManageThreadPoolNums() {
-        return clientManageThreadPoolNums;
+    public int getClientManageThreadPoolNum() {
+        return clientManageThreadPoolNum;
     }
 
-    public void setClientManageThreadPoolNums(int clientManageThreadPoolNums) {
-        this.clientManageThreadPoolNums = clientManageThreadPoolNums;
+    public void setClientManageThreadPoolNum(int clientManageThreadPoolNum) {
+        this.clientManageThreadPoolNum = clientManageThreadPoolNum;
     }
 
     public int getSendThreadPoolQueueCapacity() {
@@ -121,8 +121,8 @@ public class ServerConfig {
     @Override
     public String toString() {
         return "ServerConfig{" +
-                "sendMessageThreadPoolNums=" + sendMessageThreadPoolNums +
-                ", clientManageThreadPoolNums=" + clientManageThreadPoolNums +
+                "sendMessageThreadPoolNum=" + sendMessageThreadPoolNum +
+                ", clientManageThreadPoolNum=" + clientManageThreadPoolNum +
                 ", sendThreadPoolQueueCapacity=" + sendThreadPoolQueueCapacity +
                 ", serverId=" + serverId +
                 ", serverWeight=" + serverWeight +

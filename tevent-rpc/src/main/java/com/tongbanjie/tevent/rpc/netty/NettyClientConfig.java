@@ -24,7 +24,7 @@ public class NettyClientConfig  implements Cloneable{
     private int clientWorkerThreads = 4;
     private int clientCallbackExecutorThreads = Runtime.getRuntime().availableProcessors();
 
-    private int clientOnewaySemaphoreValue = 2048;
+    private int clientOneWaySemaphoreValue = 2048;
     private int clientAsyncSemaphoreValue = 2048;
 
     private int connectTimeoutMillis = 3000;
@@ -51,8 +51,8 @@ public class NettyClientConfig  implements Cloneable{
         return clientCallbackExecutorThreads;
     }
 
-    public int getClientOnewaySemaphoreValue() {
-        return clientOnewaySemaphoreValue;
+    public int getClientOneWaySemaphoreValue() {
+        return clientOneWaySemaphoreValue;
     }
 
     public int getClientAsyncSemaphoreValue() {

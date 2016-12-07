@@ -4,6 +4,7 @@ import com.tongbanjie.tevent.client.cluster.ClusterClient;
 import com.tongbanjie.tevent.client.cluster.FailoverClusterClient;
 import com.tongbanjie.tevent.client.processer.ServerRequestProcessor;
 import com.tongbanjie.tevent.client.sender.MQMessageSender;
+import com.tongbanjie.tevent.common.Service;
 import com.tongbanjie.tevent.common.ServiceState;
 import com.tongbanjie.tevent.common.util.NamedSingleThreadFactory;
 import com.tongbanjie.tevent.common.util.NamedThreadFactory;
@@ -29,7 +30,7 @@ import java.util.concurrent.*;
  * @author zixiao
  * @date 16/10/13
  */
-public class ClientController {
+public class ClientController implements Service {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientController.class);
 
@@ -94,8 +95,8 @@ public class ClientController {
 
     private void registerProcessor() {
         this.sendMessageExecutor = new ThreadPoolExecutor(//
-                this.clientConfig.getSendMessageThreadPoolNums(),//
-                this.clientConfig.getSendMessageThreadPoolNums(),//
+                this.clientConfig.getSendMessageThreadPoolNum(),//
+                this.clientConfig.getSendMessageThreadPoolNum(),//
                 1000 * 60,//
                 TimeUnit.MILLISECONDS,//
                 this.sendThreadPoolQueue,//

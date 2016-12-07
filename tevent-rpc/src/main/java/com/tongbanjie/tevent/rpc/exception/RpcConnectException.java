@@ -1,9 +1,10 @@
 package com.tongbanjie.tevent.rpc.exception;
 
-/**
- * Created by swy on 2016/9/28.
- */
-public class RpcConnectException extends RpcException{
+import com.tongbanjie.tevent.common.exception.RpcException;
+
+public class RpcConnectException extends RpcException {
+
+    private static final long serialVersionUID = -6353151567489596604L;
 
     public RpcConnectException(String message) {
         super(message);

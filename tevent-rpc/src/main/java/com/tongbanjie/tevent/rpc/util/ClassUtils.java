@@ -2,13 +2,14 @@ package com.tongbanjie.tevent.rpc.util;
 
 import com.tongbanjie.tevent.common.util.DateUtils;
 
+import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 〈一句话功能简述〉<p>
+ * Class工具类 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao
@@ -45,6 +46,8 @@ public class ClassUtils {
 
     private static final String utilDateClass = java.util.Date.class.getCanonicalName();
 
+    private static final String BigDecimalClass = BigDecimal.class.getCanonicalName();
+
     private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     //简单数据类型set
@@ -67,6 +70,15 @@ public class ClassUtils {
         simpleTypeSet.add(BooleanClass);
         simpleTypeSet.add(booleanClass);
         simpleTypeSet.add(utilDateClass);
+        simpleTypeSet.add(BigDecimalClass);
+    }
+
+    public static boolean isSimpleValueType(Class clazz){
+        return simpleTypeSet.contains(getCanonicalName(clazz));
+    }
+
+    private static String getCanonicalName(Class clazz) {
+        return clazz.getCanonicalName();
     }
 
     /**
@@ -75,7 +87,7 @@ public class ClassUtils {
      * @param value
      * @return
      */
-    public static Object parseSimpleValue(String type, String value){
+    public static Object parseSimpleValue(String type, String value) throws ParseException {
         Object valueParsed = null;
         if (type.equals(StringClass)) {
             valueParsed = value;
@@ -94,17 +106,31 @@ public class ClassUtils {
         } else if (type.equals(BooleanClass) || type.equals(booleanClass)) {
             valueParsed = Boolean.parseBoolean(value);
         } else if (type.equals(utilDateClass)) {
-            try {
-                valueParsed = DateUtils.parse(value, DATE_PATTERN);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+            valueParsed = DateUtils.tryParse(value);
+        } else if (type.equals(BigDecimalClass)){
+            valueParsed = new BigDecimal(value);
         }
         return valueParsed;
     }
 
     /**
-     *
+     * 转换值
+     * @param declaredField
+     * @param value
+     * @return
+     * @throws ParseException
+     */
+    public static Object convertValueByType(Field declaredField, String value) throws ParseException {
+        Class<?> fieldClazz = declaredField.getType();
+        if (isSimpleValueType(fieldClazz)) {
+            return parseSimpleValue(fieldClazz.getCanonicalName(), value);
+        } else {
+            throw new ParseException(String.format("Unsupported class type '%s', fieldName:%s", fieldClazz.getCanonicalName(), declaredField.getName() ), 0);
+        }
+    }
+
+    /**
+     * 简单数据类型 Object to String
      * @param type
      * @param value
      * @return
@@ -120,10 +146,14 @@ public class ClassUtils {
         return null;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ParseException {
         System.out.println(StringClass);
-        System.out.println(IntegerClass);
-        System.out.println(intClass);
+
+        System.out.println("Test int >>>" + parseSimpleValue(intClass, "1"));
+
+        System.out.println("Test boolean >>>" + parseSimpleValue(booleanClass, Boolean.TRUE.toString()));
+
+        System.out.println("Test date >>>" + parseSimpleValue(utilDateClass, "2016-11-01 20:00:01"));
 
     }
 

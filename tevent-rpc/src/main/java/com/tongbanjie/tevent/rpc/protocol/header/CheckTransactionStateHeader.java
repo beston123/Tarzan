@@ -12,6 +12,8 @@ import com.tongbanjie.tevent.rpc.exception.RpcCommandException;
  */
 public class CheckTransactionStateHeader implements CustomHeader{
 
+    private static final long serialVersionUID = 2242489515056994149L;
+
     private MQType mqType;
 
     private Long transactionId;
@@ -20,6 +22,9 @@ public class CheckTransactionStateHeader implements CustomHeader{
 
     @Override
     public void checkFields() throws RpcCommandException {
+        if(mqType == null){
+            throw new RpcCommandException("mqType can not be null!");
+        }
         if(transactionId == null){
             throw new RpcCommandException("transactionId can not be null!");
         }

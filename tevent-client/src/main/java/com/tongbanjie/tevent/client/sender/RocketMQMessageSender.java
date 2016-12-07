@@ -1,6 +1,8 @@
 package com.tongbanjie.tevent.client.sender;
 
 import com.tongbanjie.tevent.client.ClientController;
+import com.tongbanjie.tevent.client.transaction.LocalTransactionState;
+import com.tongbanjie.tevent.client.transaction.TransactionCheckListener;
 import com.tongbanjie.tevent.common.body.RocketMQBody;
 import com.tongbanjie.tevent.common.message.MQType;
 import com.tongbanjie.tevent.common.message.TransactionState;
@@ -110,7 +112,7 @@ public class RocketMQMessageSender extends AbstractMQMessageSender<RocketMQBody>
 
                 RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.TRANSACTION_MESSAGE, thisHeader, remark);
                 try {
-                    getClientController().getRpcClient().invokeOneway(serverAddr, request, 3000);
+                    getClientController().getRpcClient().invokeOneWay(serverAddr, request, 3000);
                 } catch (Exception e) {
                     LOGGER.error("Response checkLocalTransactionState exception. " + thisHeader, e);
                 }

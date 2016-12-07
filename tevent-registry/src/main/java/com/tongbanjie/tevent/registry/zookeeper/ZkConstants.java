@@ -1,9 +1,9 @@
 package com.tongbanjie.tevent.registry.zookeeper;
 
 /**
- * 〈一句话功能简述〉<p>
+ * ZooKeeper 常量 <p>
  *
- * 在ZooKeepr目录结构
+ * 在ZooKeeper目录结构
  * + /tevent
  *         + /servers
  *                  + /server-000001  [Ephemeral & Seq]

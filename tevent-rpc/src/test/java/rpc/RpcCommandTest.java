@@ -12,7 +12,7 @@ import org.junit.Test;
 import java.nio.ByteBuffer;
 
 /**
- * 〈一句话功能简述〉<p>
+ * RPC 命令测试 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao

@@ -6,8 +6,17 @@
 	</settings>
 
 	<typeAliases>
-		<typeAlias alias="RocketMQMessage" type="com.tongbanjie.tevent.common.message.RocketMQMessage" />
-		<typeAlias alias="RocketMQMessageQuery" type="com.tongbanjie.tevent.store.query.RocketMQMessageQuery" />
+		<typeAlias alias="ToCheckMessage" type="com.tongbanjie.tevent.store.model.ToCheckMessage" />
+		<typeAlias alias="ToSendMessage" type="com.tongbanjie.tevent.store.model.ToSendMessage" />
+		<typeAlias alias="MessageAggregatePlan" type="com.tongbanjie.tevent.store.model.MessageAggregatePlan" />
 
+		<typeAlias alias="ToCheckMessageQuery" type="com.tongbanjie.tevent.store.query.ToCheckMessageQuery" />
+		<typeAlias alias="ToSendMessageQuery" type="com.tongbanjie.tevent.store.query.ToSendMessageQuery" />
+		<typeAlias alias="MessageAggregatePlanQuery" type="com.tongbanjie.tevent.store.query.MessageAggregatePlanQuery" />
+
+		<typeAlias alias="MQMessageQuery" type="com.tongbanjie.tevent.store.query.MQMessageQuery" />
+
+		<typeAlias alias="RocketMQMessage" type="com.tongbanjie.tevent.common.message.RocketMQMessage" />
 	</typeAliases>
+
 </configuration>

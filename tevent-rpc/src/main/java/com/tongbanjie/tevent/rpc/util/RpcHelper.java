@@ -10,7 +10,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 /**
- * 〈一句话功能简述〉<p>
+ * RPC 帮助类 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao

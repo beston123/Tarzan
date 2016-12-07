@@ -12,15 +12,15 @@ public class ClientConfig{
     /**
      * 消息发送线程池大小
      */
-    private int sendMessageThreadPoolNums = Runtime.getRuntime().availableProcessors();
+    private int sendMessageThreadPoolNum = 4 + Runtime.getRuntime().availableProcessors();
 
     /**
      * 消息发送线程池队列容量
      */
-    private int sendThreadPoolQueueCapacity = 10000;
+    private int sendThreadPoolQueueCapacity = 20000;
 
     /**
-     * Heartbeat interval in microseconds with server
+     * Heartbeat interval in milliseconds with server
      */
     private int heartbeatInterval = 1000 * 30;
 
@@ -38,12 +38,12 @@ public class ClientConfig{
     /*********************************** setter getter ***********************************/
 
 
-    public int getSendMessageThreadPoolNums() {
-        return sendMessageThreadPoolNums;
+    public int getSendMessageThreadPoolNum() {
+        return sendMessageThreadPoolNum;
     }
 
-    public void setSendMessageThreadPoolNums(int sendMessageThreadPoolNums) {
-        this.sendMessageThreadPoolNums = sendMessageThreadPoolNums;
+    public void setSendMessageThreadPoolNum(int sendMessageThreadPoolNum) {
+        this.sendMessageThreadPoolNum = sendMessageThreadPoolNum;
     }
 
     public int getSendThreadPoolQueueCapacity() {
@@ -70,5 +70,13 @@ public class ClientConfig{
         this.registryAddress = registryAddress;
     }
 
-
+    @Override
+    public String toString() {
+        return "ClientConfig{" +
+                "sendMessageThreadPoolNum=" + sendMessageThreadPoolNum +
+                ", sendThreadPoolQueueCapacity=" + sendThreadPoolQueueCapacity +
+                ", heartbeatInterval=" + heartbeatInterval +
+                ", registryAddress='" + registryAddress + '\'' +
+                '}';
+    }
 }

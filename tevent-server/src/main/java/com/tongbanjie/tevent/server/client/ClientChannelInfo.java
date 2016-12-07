@@ -20,7 +20,11 @@ import com.tongbanjie.tevent.common.TEventVersion;
 import com.tongbanjie.tevent.common.Weighable;
 import io.netty.channel.Channel;
 
-public class ClientChannelInfo implements Weighable{
+import java.io.Serializable;
+
+public class ClientChannelInfo implements Weighable, Serializable{
+
+    private static final long serialVersionUID = 2123650512095253260L;
 
     private final Channel channel;
 

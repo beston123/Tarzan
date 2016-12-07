@@ -11,6 +11,8 @@ import com.tongbanjie.tevent.common.Weighable;
  */
 public class ServerAddress implements Address{
 
+    private static final long serialVersionUID = 6434571022066935703L;
+    
     /**
      * 地址
      * 作为equals因子
@@ -27,6 +29,11 @@ public class ServerAddress implements Address{
      * 是否可用
      */
     private boolean enable = true;
+
+    /**
+     * server唯一ID
+     */
+    private Integer serverId;
 
     public ServerAddress(String address){
         this(address, Weighable.DEFAULT_WEIGHT);
@@ -75,6 +82,14 @@ public class ServerAddress implements Address{
         this.weight = weight;
     }
 
+    public Integer getServerId() {
+        return serverId;
+    }
+
+    public void setServerId(Integer serverId) {
+        this.serverId = serverId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -84,7 +99,8 @@ public class ServerAddress implements Address{
 
         if (weight != that.weight) return false;
         if (enable != that.enable) return false;
-        return !(address != null ? !address.equals(that.address) : that.address != null);
+        if (address != null ? !address.equals(that.address) : that.address != null) return false;
+        return !(serverId != null ? !serverId.equals(that.serverId) : that.serverId != null);
 
     }
 
@@ -93,15 +109,17 @@ public class ServerAddress implements Address{
         int result = address != null ? address.hashCode() : 0;
         result = 31 * result + (int) weight;
         result = 31 * result + (enable ? 1 : 0);
+        result = 31 * result + (serverId != null ? serverId.hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
-        return "{" +
+        return "ServerAddress{" +
                 "address='" + address + '\'' +
                 ", weight=" + weight +
                 ", enable=" + enable +
+                ", serverId=" + serverId +
                 '}';
     }
 }

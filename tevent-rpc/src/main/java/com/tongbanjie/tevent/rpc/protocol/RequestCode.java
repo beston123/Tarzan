@@ -39,5 +39,10 @@ public abstract class RequestCode {
      */
     public static final int CHECK_TRANSACTION_STATE = 6;
 
+    /**
+     *
+     */
+    public static final int QUERY_MESSAGE = 7;
+
 
 }

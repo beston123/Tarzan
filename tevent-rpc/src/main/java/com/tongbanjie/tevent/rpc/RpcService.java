@@ -14,10 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.tongbanjie.tevent.rpc;
 
-public interface RpcService {
+import com.tongbanjie.tevent.common.Service;
+
+public interface RpcService extends Service {
 
     void start();
 
