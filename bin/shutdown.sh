@@ -1,9 +1,9 @@
 #!/bin/sh
 
 #===========================================================================================
-# TEvent Shutdown
+# Tarzan Shutdown
 #===========================================================================================
-export APP_MAIN="com.tongbanjie.tevent.server.ServerStartup"
+export APP_MAIN="com.tongbanjie.tarzan.server.ServerStartup"
 
 serverPid=0
 

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+
+    <bean id="testMQNotifyManager" class="com.tongbanjie.tarzan.tbjmq.TbjRocketMQNotifyManager" init-method="init" >
+        <constructor-arg name="groupId" value="-TEVENT_TEST_P_GROUP-" />
+        <constructor-arg name="name" value="RocketMQTest" />
+        <constructor-arg name="topic" value="-TEVENT_TEST_TOPIC-" />
+        <constructor-arg name="tag" value="" />
+        <constructor-arg name="namesrvAddr" value="192.168.1.42:9876" />
+        <constructor-arg name="transactionCheckListener" ref="testTransactionCheckListener" />
+        <constructor-arg name="clientConfig" ref="clientConfig" />
+    </bean>
+
+    <bean id="testTransactionCheckListener"
+          class="tbjmq.TestTransactionCheckListener" />
+
+    <bean id="clientConfig"  class="com.tongbanjie.tarzan.client.ClientConfig" >
+        <constructor-arg name="registryAddress" value="192.168.1.120:2181" />
+    </bean>
+
+</beans>

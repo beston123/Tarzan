@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <assembly>
-    <baseDirectory>tevent</baseDirectory>
+    <baseDirectory>tarzan</baseDirectory>
     <formats>
         <format>dir</format>
         <format>tar.gz</format>
@@ -20,13 +20,13 @@
     <moduleSets>
         <moduleSet>
             <includes>
-                <include>com.tongbanjie.tevent:tevent-server</include>
-                <include>com.tongbanjie.tevent:tevent-client</include>
-                <include>com.tongbanjie.tevent:tevent-common</include>
-                <include>com.tongbanjie.tevent:tevent-registry</include>
-                <include>com.tongbanjie.tevent:tevent-rpc</include>
-                <include>com.tongbanjie.tevent:tevent-store</include>
-                <include>com.tongbanjie.tevent:tevent-cluster</include>
+                <include>com.tongbanjie.tarzan:tarzan-server</include>
+                <include>com.tongbanjie.tarzan:tarzan-client</include>
+                <include>com.tongbanjie.tarzan:tarzan-common</include>
+                <include>com.tongbanjie.tarzan:tarzan-registry</include>
+                <include>com.tongbanjie.tarzan:tarzan-rpc</include>
+                <include>com.tongbanjie.tarzan:tarzan-store</include>
+                <include>com.tongbanjie.tarzan:tarzan-cluster</include>
             </includes>
             <binaries>
                 <outputDirectory>lib/</outputDirectory>

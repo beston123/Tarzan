@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="gbk"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+	http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+	">
+
+	<context:annotation-config />
+	<context:component-scan base-package="com.tongbanjie.tarzan.admin.controller" />
+
+	<mvc:annotation-driven
+		content-negotiation-manager="contentNegotiationManager">
+		<mvc:message-converters register-defaults="true">
+			<ref bean="fastJsonHttpMessageConverter" />
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+
+	<bean id="fastJsonHttpMessageConverter"
+		class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+		<property name="supportedMediaTypes">
+			<list>
+				<value>application/json;charset=UTF-8</value>
+				<value>text/html;charset=UTF-8</value>
+			</list>
+		</property>
+	</bean>
+
+
+	<!-- 配置内容协商管理器 -->
+	<bean id="contentNegotiationManager"
+		class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+		<property name="favorPathExtension" value="true" />
+		<property name="favorParameter" value="false" />
+		<property name="ignoreAcceptHeader" value="true" />
+		<property name="mediaTypes">
+			<props>
+				<prop key="json">application/json</prop>
+				<prop key="xml">application/xml</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="velocityConfig"
+		class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+		<property name="resourceLoaderPath" value="/WEB-INF/view/" />
+		<property name="velocityProperties">
+			<props>
+				<prop key="input.encoding">UTF-8</prop>
+				<prop key="output.encoding">UTF-8</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.velocity.VelocityLayoutViewResolver">
+		<property name="cache" value="true" />
+		<property name="prefix" value="" />
+		<property name="suffix" value=".vm" />
+		<property name="contentType" value="text/html;charset=utf-8"></property>
+		<property name="layoutUrl" value="include/layout.vm" />
+		<property name="order" value="1" />
+		<property name="requestContextAttribute" value="ac" />
+		<property name="exposeRequestAttributes" value="true"></property>
+		<property name="numberToolAttribute" value="numbertool" />
+		<property name="dateToolAttribute" value="datetool" />
+		<property name="toolboxConfigLocation" value="/WEB-INF/view/toolbox.xml" />
+	</bean>
+
+	<!-- SpringMVC upload file resolver -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="UTF-8" />
+		<property name="maxUploadSize" value="20971200" />
+	</bean>
+
+	<mvc:resources location="/assets/" mapping="/assets/**" />
+
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<bean id="globalInterceptor" class="com.tongbanjie.tarzan.admin.interceptor.GlobalInterceptor" />
+		</mvc:interceptor>
+		<!--mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<mvc:exclude-mapping path="/user/login" />
+			<mvc:exclude-mapping path="/assets/**" />
+			<bean class="com.tongbanjie.sso.interceptor.SSOInterceptor">
+				<property name="systemName">
+					<value>tarzan</value>
+				</property>
+				<property name="storeUserInSession">
+					<value>true</value>
+				</property>
+			</bean>
+		</mvc:interceptor-->
+	</mvc:interceptors>
+</beans>

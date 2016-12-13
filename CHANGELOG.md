@@ -4,19 +4,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+
+## [0.5.0] - 2016-12-12
 ### Added
 - 新增Redis锁，避免定时任务并发
 
 ### Changed
--
+- 项目更名为Tarzan
+- 事务检查和消息重发查询性能优化
+- 分表数调整：256张虚表（实际存储16张表）
 
 ## [0.3.1] - 2016-12-05
 ### Added
 - 新增从消息分表汇总到待处理表，超时的消息汇总到［待事务检查表］，
 发送失败的消息汇总到［待发送表］
 - 新增消息重发定时任务，对发送失败的MQ消息定时重发
-- 新增TEvent数据流图
+- 新增store模块的数据流图
 
 ### Changed
 - 优化消息事务状态检查定时任务
@@ -44,4 +47,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - 重构Server端MQ消息发送者
 - 重构MQ客户端
 
-[Unreleased]: https://github.com/beston123/tevent
+[0.5.0]: http://git.tongbanjie.com/ware/tarzan/tree/master

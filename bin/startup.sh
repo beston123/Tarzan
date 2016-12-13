@@ -14,24 +14,24 @@ error_exit ()
 
 export JAVA_HOME
 
-export TEVENT_HOME=$(dirname "$PWD")
-export LIB_PATH=${TEVENT_HOME}/lib
-export CLASSPATH=.:${TEVENT_HOME}/conf:${CLASSPATH}
+export TARZAN_HOME=$(dirname "$PWD")
+export LIB_PATH=${TARZAN_HOME}/lib
+export CLASSPATH=.:${TARZAN_HOME}/conf:${CLASSPATH}
 
 #===========================================================================================
 # JVM Configuration
 #===========================================================================================
 JAVA_OPT="${JAVA_OPT} -server -Xms2g -Xmx2g -Xmn768m -XX:PermSize=128m -XX:MaxPermSize=256m"
 JAVA_OPT="${JAVA_OPT} -XX:+UseConcMarkSweepGC -XX:+UseCMSCompactAtFullCollection -XX:CMSInitiatingOccupancyFraction=70 -XX:+CMSParallelRemarkEnabled -XX:SoftRefLRUPolicyMSPerMB=0 -XX:+CMSClassUnloadingEnabled -XX:SurvivorRatio=8 -XX:+DisableExplicitGC"
-JAVA_OPT="${JAVA_OPT} -verbose:gc -Xloggc:${TEVENT_HOME}/log/tevent_gc.log -XX:+PrintGCDetails"
+JAVA_OPT="${JAVA_OPT} -verbose:gc -Xloggc:${TARZAN_HOME}/log/tarzan_gc.log -XX:+PrintGCDetails"
 JAVA_OPT="${JAVA_OPT} -XX:-OmitStackTraceInFastThrow"
 JAVA_OPT="${JAVA_OPT} -Djava.ext.dirs=${LIB_PATH}"
 #JAVA_OPT="${JAVA_OPT} -Xdebug -Xrunjdwp:transport=dt_socket,address=9555,server=y,suspend=n"
 
 #===========================================================================================
-# TEvent Startup
+# Tarzan Startup
 #===========================================================================================
-export APP_MAIN="com.tongbanjie.tevent.server.ServerStartup"
+export APP_MAIN="com.tongbanjie.tarzan.server.ServerStartup"
 export LC_ALL=zh_CN.UTF-8
 
 serverPid=0
@@ -52,11 +52,11 @@ startup(){
         echo "The server(pid=$serverPid) has already been started!"
     else
         printf "Starting the server "
-        if [ ! -d "${TEVENT_HOME}/log" ]; then
-          mkdir "${TEVENT_HOME}/log"
+        if [ ! -d "${TARZAN_HOME}/log" ]; then
+          mkdir "${TARZAN_HOME}/log"
         fi
 
-        nohup $JAVA_HOME/bin/java ${JAVA_OPT} -cp ${CLASSPATH} ${APP_MAIN} 2 > ${TEVENT_HOME}/log/startup.log &
+        nohup $JAVA_HOME/bin/java ${JAVA_OPT} -cp ${CLASSPATH} ${APP_MAIN} 2 > ${TARZAN_HOME}/log/startup.log &
 
         for i in {1..10} #循环检测5秒
             do
