@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.5.0] - 2016-12-12
 ### Added
 - 新增Redis锁，避免定时任务并发
+- 新增事务消息查询功能
 
 ### Changed
 - 项目更名为Tarzan

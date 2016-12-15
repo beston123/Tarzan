@@ -121,12 +121,13 @@ public class RocketMQStoreService implements StoreService<RocketMQMessage> {
     }
 
     @Override
-    public Result<List<RocketMQMessage>> queryByMessageKey(String messageKey) {
+    public Result<List<RocketMQMessage>> queryByMessageKey(String messageKey, int limit) {
         Result<List<RocketMQMessage>> result;
         try {
             Validate.notNull(messageKey, "messageKey can not be null");
             MQMessageQuery query = new MQMessageQuery();
             query.setMessageKey(messageKey);
+            query.setPagingParam(new PagingParam(limit));
             List<RocketMQMessage> mqMessageList = rocketMQMessageDAO.selectByCondition(query);
             result = Result.buildSucc(mqMessageList);
         } catch (Exception e) {

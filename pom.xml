@@ -260,7 +260,7 @@
         </plugins>
     </build>
 
-    <distributionManagement>
+    <!--distributionManagement>
         <repository>
             <id>nexus-releases</id>
             <name>Nexus Release Repository</name>
@@ -271,7 +271,7 @@
             <name>Nexus Snapshot Repository</name>
             <url>http://192.168.1.6:8081/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
-    </distributionManagement>
+    </distributionManagement-->
 
     <modules>
         <module>tarzan-server</module>

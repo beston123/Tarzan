@@ -21,9 +21,9 @@ export CLASSPATH=.:${TARZAN_HOME}/conf:${CLASSPATH}
 #===========================================================================================
 # JVM Configuration
 #===========================================================================================
-JAVA_OPT="${JAVA_OPT} -server -Xms2g -Xmx2g -Xmn768m -XX:PermSize=128m -XX:MaxPermSize=256m"
+JAVA_OPT="${JAVA_OPT} -server -Xms2g -Xmx2g -Xmn800m -XX:PermSize=128m -XX:MaxPermSize=256m"
 JAVA_OPT="${JAVA_OPT} -XX:+UseConcMarkSweepGC -XX:+UseCMSCompactAtFullCollection -XX:CMSInitiatingOccupancyFraction=70 -XX:+CMSParallelRemarkEnabled -XX:SoftRefLRUPolicyMSPerMB=0 -XX:+CMSClassUnloadingEnabled -XX:SurvivorRatio=8 -XX:+DisableExplicitGC"
-JAVA_OPT="${JAVA_OPT} -verbose:gc -Xloggc:${TARZAN_HOME}/log/tarzan_gc.log -XX:+PrintGCDetails"
+JAVA_OPT="${JAVA_OPT} -verbose:gc -Xloggc:${TARZAN_HOME}/log/tarzan_gc.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps"
 JAVA_OPT="${JAVA_OPT} -XX:-OmitStackTraceInFastThrow"
 JAVA_OPT="${JAVA_OPT} -Djava.ext.dirs=${LIB_PATH}"
 #JAVA_OPT="${JAVA_OPT} -Xdebug -Xrunjdwp:transport=dt_socket,address=9555,server=y,suspend=n"

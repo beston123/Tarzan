@@ -51,7 +51,7 @@
                 <li #if($leftLevel2 == 2) class="active" #end >
                     <a href="/server/ids" >
                         <i class="menu-icon fa fa-caret-right"></i>
-                        已注册Id
+                        Id列表
                     </a>
                     <b class="arrow"></b>
                 </li>

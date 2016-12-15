@@ -17,6 +17,7 @@
 package com.tongbanjie.tarzan.server;
 
 import com.tongbanjie.tarzan.common.Constants;
+import com.tongbanjie.tarzan.common.util.DistributedIdGenerator;
 import com.tongbanjie.tarzan.rpc.netty.NettyServerConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.PropertyConfigurator;
@@ -73,8 +74,8 @@ public class ServerStartup {
         final NettyServerConfig nettyServerConfig = new NettyServerConfig();
 
         try {
-            if (serverConfig.getServerId() < 0 || serverConfig.getServerId() > 31) {
-                LOGGER.error("ServerId must between 0 and 31 !");
+            if (DistributedIdGenerator.validate(serverConfig.getServerId())) {
+                LOGGER.error("ServerId must between 0 and "+ DistributedIdGenerator.getMaxWorkId());
                 System.exit(-3);
             }
 

@@ -3,19 +3,10 @@
 #set($leftLevel2 = 1)
 
 ## 面包屑
+#parse("include/breadcrumbs.vm")
 #breadcrumbs(["/server/list",""],["服务端","在线列表"])
 
 ## 主面板
-<!--div class="page-header">
-    <h1>
-        服务端
-        <small>
-            <i class="ace-icon fa fa-angle-double-right"></i>
-            overview &amp; stats
-        </small>
-    </h1>
-</div><!-- /.page-header -->
-
 <div class="row">
     <div class="col-xs-12">
 
@@ -25,7 +16,7 @@
             <div class="pull-right tableTools-container"></div>
         </div>
         <div class="table-header">
-            服务端在线列表
+            服务端－在线列表
         </div>
 
         <!-- div.table-responsive -->
@@ -37,47 +28,50 @@
                 <tr>
                     <th class="center">
                         <label class="pos-rel">
-                            <input type="checkbox" class="ace" />
-                            <span class="lbl"></span>
+                            <span class="lbl">序号</span>
                         </label>
                     </th>
-                    <th>IP:端口</th>
-                    <th>ServerId</th>
-                    <th>权重</th>
-                    <th class="hidden-480">状态</th>
-                    <th>操作</th>
+                    <th class="center">IP:端口</th>
+                    <th class="center">ServerId</th>
+                    <th class="center">权重</th>
+                    <th class="center">状态</th>
+                    <th class="center">操作</th>
                 </tr>
                 </thead>
 
                 <tbody>
-                #foreach($!{item} in $!{data})
-                <tr>
-                    <td class="center">
-                        <label class="pos-rel">
-                            <input type="checkbox" class="ace" />
-                            <span class="lbl"></span>
-                        </label>
-                    </td>
-                    <td>$!{item.address}</td>
-                    <td>$!{item.serverId}</td>
-                    <td>$!{item.weight}</td>
+                #foreach ($!{item} in $!{data})
+                    <tr>
+                        <td class="center">
+                            $foreach.count
+                        </td>
+                        <td>$!{item.address}</td>
+                        <td class="center">$!{item.serverId}</td>
+                        <td class="center">$!{item.weight}</td>
 
-                    <td class="hidden-480">
-                        #if($!{item.enable})
-                            <span class="label label-sm label-success">已起用</span>
-                        #else
-                            <span class="label label-sm label-grey">已禁用</span>
-                        #end
-                    </td>
+                        <td class="center">
+                            #if($!{item.enable})
+                                <span class="label label-sm label-success">已启用</span>
+                            #else
+                                <span class="label label-sm label-grey">已禁用</span>
+                            #end
+                        </td>
 
-                    <td>
-                        <div class="hidden-sm hidden-xs action-buttons">
-                            <a class="red" href="#" title="删除">
-                                <i class="ace-icon fa fa-trash-o bigger-130"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
+                        <td>
+                            <div class="hidden-sm hidden-xs action-buttons">
+                            #if($!{item.enable})
+                                <a class="red" href="#" title="禁用">
+                                    <i class="ace-icon fa fa-remove bigger-130"></i>
+                                </a>
+                            #else
+                                <a class="green" href="#" title="启用">
+                                    <i class="ace-icon fa fa-check bigger-130"></i>
+                                </a>
+                            #end
+                            </div>
+                        </td>
+
+                    </tr>
                 #end
 
                 </tbody>

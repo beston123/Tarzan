@@ -30,4 +30,15 @@ public class DistributedIdGenerator {
         }
     }
 
+    public static long getMaxWorkId(){
+        return IdWorker.maxWorkerId;
+    }
+
+    public static boolean validate(long workId){
+        if(workId < 0 || workId > getMaxWorkId()){
+            return true;
+        }
+        return false;
+    }
+
 }

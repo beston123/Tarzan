@@ -39,7 +39,7 @@ public interface StoreService<T extends MQMessage> {
      * @param messageKey
      * @return
      */
-    Result<List<T>> queryByMessageKey(String messageKey);
+    Result<List<T>> queryByMessageKey(String messageKey, int limit);
 
     /**
      * 查询待检查事务状态的消息列表

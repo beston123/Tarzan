@@ -3,6 +3,7 @@ package com.tongbanjie.tarzan.common.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Calendar;
 import java.util.Random;
 
 /**
@@ -29,34 +30,45 @@ public class IdWorker {
     protected static final Logger LOG = LoggerFactory.getLogger(IdWorker.class);
 
     // 时间起始标记点，作为基准，一般取系统的最近时间
-    private long twepoch = 1481508003103L; //2016-12-12 10:00:00
+    private static long EPOCH;
+
+    static {
+        //2016-12-12 00:00:00
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2016, Calendar.DECEMBER, 12);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        EPOCH = calendar.getTimeInMillis();
+    }
 
     // 机器标识(或者进程标识)
     private long workerId;
     // 数据中心标识
-    private long datacenterId;
+    private long dataCenterId;
 
     // 机器标识位数
-    private long workerIdBits = 5L;
+    private static final long workerIdBits = 5L;
     // 数据中心标识位数
-    private long datacenterIdBits = 3L;
+    private static final long dataCenterIdBits = 3L;
 
     //机器ID最大值
-    private long maxWorkerId = -1L ^ (-1L << workerIdBits);
+    public static final long maxWorkerId = -1L ^ (-1L << workerIdBits);
     //数据中心ID最大值
-    private long maxDatacenterId = -1L ^ (-1L << datacenterIdBits);
+    private static final long maxDataCenterId = -1L ^ (-1L << dataCenterIdBits);
 
     //毫秒内自增位数
-    private long sequenceBits = 12L;
+    private static final long sequenceBits = 12L;
 
-    private long workerIdShift = sequenceBits;
-    private long datacenterIdShift = sequenceBits + workerIdBits;
+    private static final long workerIdShift = sequenceBits;
+    private static final long dataCenterIdShift = sequenceBits + workerIdBits;
 
     // 时间毫秒左移
-    private long timestampLeftShift = sequenceBits + workerIdBits + datacenterIdBits;
+    private static final long timestampLeftShift = sequenceBits + workerIdBits + dataCenterIdBits;
 
     //毫秒内自增最大值 4095,12位
-    private long sequenceMask = -1L ^ (-1L << sequenceBits);
+    private static final long sequenceMask = -1L ^ (-1L << sequenceBits);
 
     //毫秒内自增最大值
     private long sequence = 0L;
@@ -64,26 +76,26 @@ public class IdWorker {
     private long lastTimestamp = -1L;
 
     //随机数
-    private Random sequenceRandom = new Random();
+    private final Random sequenceRandom = new Random();
 
     //sequence随机值范围 0-SEQ_ROUND
-    private final int SEQ_ROUND = 256;
+    private static final int SEQ_ROUND = 256;
 
     public IdWorker(long workerId) {
         this(workerId, 0L);
     }
 
-    public IdWorker(long workerId, long datacenterId) {
+    public IdWorker(long workerId, long dataCenterId) {
         // sanity check for workerId
         if (workerId > maxWorkerId || workerId < 0) {
             throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", maxWorkerId));
         }
-        if (datacenterId > maxDatacenterId || datacenterId < 0) {
-            throw new IllegalArgumentException(String.format("datacenter Id can't be greater than %d or less than 0", maxDatacenterId));
+        if (dataCenterId > maxDataCenterId || dataCenterId < 0) {
+            throw new IllegalArgumentException(String.format("data center Id can't be greater than %d or less than 0", maxDataCenterId));
         }
         this.workerId = workerId;
-        this.datacenterId = datacenterId;
-        LOG.info(String.format("worker starting. timestamp left shift %d, datacenter id bits %d, worker id bits %d, sequence bits %d, workerid %d", timestampLeftShift, datacenterIdBits, workerIdBits, sequenceBits, workerId));
+        this.dataCenterId = dataCenterId;
+        LOG.info(String.format("worker starting. timestamp left shift %d, data center id bits %d, worker id bits %d, sequence bits %d, worker Id %d", timestampLeftShift, dataCenterIdBits, workerIdBits, sequenceBits, workerId));
     }
 
     public synchronized long nextId() {
@@ -108,7 +120,7 @@ public class IdWorker {
 
         lastTimestamp = timestamp;
         //ID偏移组合生成最终的ID，并返回ID
-        return ((timestamp - twepoch) << timestampLeftShift) | (datacenterId << datacenterIdShift) | (workerId << workerIdShift) | sequence;
+        return ((timestamp - EPOCH) << timestampLeftShift) | (dataCenterId << dataCenterIdShift) | (workerId << workerIdShift) | sequence;
     }
 
     /**
@@ -130,9 +142,6 @@ public class IdWorker {
     }
 
     public static void main(String[] args) {
-        //最新时间
-        System.out.println("twepoch: " + System.currentTimeMillis());
-
         final IdWorker idWorker = new IdWorker(0);
         for(int t=0;t<20;t++) {
             new Thread(new Runnable() {

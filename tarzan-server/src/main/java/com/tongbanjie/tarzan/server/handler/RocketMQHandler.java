@@ -289,7 +289,7 @@ public class RocketMQHandler implements MQMessageHandler {
         if(id != null){
             return queryById(id);
         }else if ( StringUtils.isNotEmpty(messageHeader.getMessageKey()) ){
-            return queryByMessageKey(messageHeader.getMessageKey());
+            return queryByMessageKey(messageHeader.getMessageKey(), messageHeader.getLimit());
         }
         return RpcCommandBuilder.buildFail("查询参数不正确");
     }
@@ -305,8 +305,8 @@ public class RocketMQHandler implements MQMessageHandler {
         return response;
     }
 
-    private RpcCommand queryByMessageKey(String messageKey){
-        Result<List<RocketMQMessage>> result = mQStoreService.queryByMessageKey(messageKey);
+    private RpcCommand queryByMessageKey(String messageKey, int limit){
+        Result<List<RocketMQMessage>> result = mQStoreService.queryByMessageKey(messageKey, limit);
         RpcCommand response;
         if(result.isSuccess()){
             response = RpcCommandBuilder.buildSuccess(result.getData());

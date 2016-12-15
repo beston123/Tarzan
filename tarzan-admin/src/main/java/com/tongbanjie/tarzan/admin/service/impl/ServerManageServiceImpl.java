@@ -4,6 +4,7 @@ import com.tongbanjie.tarzan.admin.component.AdminDiscovery;
 import com.tongbanjie.tarzan.admin.service.ServerManageService;
 import com.tongbanjie.tarzan.common.Result;
 import com.tongbanjie.tarzan.common.FailResult;
+import com.tongbanjie.tarzan.common.util.DistributedIdGenerator;
 import com.tongbanjie.tarzan.registry.Address;
 import com.tongbanjie.tarzan.registry.ServerAddress;
 import com.tongbanjie.tarzan.registry.zookeeper.ZkConstants;
@@ -35,8 +36,28 @@ public class ServerManageServiceImpl implements ServerManageService{
 
     @Override
     public Result<List<ServerAddress>> getServerIds() {
-        List<Address> list = adminDiscovery.discover(ZkConstants.SERVER_IDS_ROOT);
-        return Result.buildSucc(castToServerAddress(list));
+        List<Address> occupiedList = adminDiscovery.discover(ZkConstants.SERVER_IDS_ROOT);
+        List<ServerAddress> list = mergeServerIdList(castToServerAddress(occupiedList));
+        return Result.buildSucc(list);
+    }
+
+    private List<ServerAddress> mergeServerIdList(List<ServerAddress> occuipedList){
+        List<ServerAddress> all = new ArrayList<ServerAddress>();
+        for(int i=0; i<=DistributedIdGenerator.getMaxWorkId(); i++){
+            boolean isOccupied = false;
+            for(ServerAddress occupied : occuipedList){
+                if(i == occupied.getServerId()){
+                    isOccupied = true;
+                    all.add(occupied);
+                }
+            }
+            if(!isOccupied){
+                ServerAddress address = new ServerAddress(null);
+                address.setServerId(i);
+                all.add(address);
+            }
+        }
+        return all;
     }
 
     private List<ServerAddress> castToServerAddress(List<Address> list){

@@ -20,6 +20,8 @@ public class QueryMessageHeader implements CustomHeader {
 
     private MQType mqType;
 
+    private int limit = 100;
+
     @Override
     public void checkFields() throws RpcCommandException {
         if(mqType == null){
@@ -54,12 +56,21 @@ public class QueryMessageHeader implements CustomHeader {
         this.mqType = mqType;
     }
 
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
+
     @Override
     public String toString() {
         return "QueryMessageHeader{" +
                 "transactionId=" + transactionId +
                 ", messageKey='" + messageKey + '\'' +
                 ", mqType=" + mqType +
+                ", limit=" + limit +
                 '}';
     }
 }

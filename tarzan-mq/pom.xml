@@ -14,7 +14,7 @@
 
     <modules>
         <module>tarzan-rocketmq</module>
-        <module>tarzan-tbjmq</module>
+        <!--module>tarzan-tbjmq</module-->
     </modules>
 
     <properties>

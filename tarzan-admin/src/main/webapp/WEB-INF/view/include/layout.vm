@@ -4,6 +4,7 @@
 ## 切换环境
 #set($env = $develop)
 
+
 <!DOCTYPE html>
 <html>
 ## header
@@ -24,8 +25,6 @@
 
     <div class="main-content">
         <div class="main-content-inner">
-            <!-- breadcrumbs -->
-            #parse("include/breadcrumbs.vm")
 
             <div class="page-content">
                 <!-- content -->
