@@ -12,7 +12,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class IdGeneratorFactory {
 
-    private static final IdGeneratorFactory idGeneratorFactory = new IdGeneratorFactory();
+    private static final IdGeneratorFactory ID_GENERATOR_FACTORY = new IdGeneratorFactory();
 
     private final ReentrantLock createLock = new ReentrantLock();
 
@@ -21,7 +21,7 @@ public class IdGeneratorFactory {
     private IdGeneratorFactory(){}
 
     public static IdGeneratorFactory getInstance(){
-        return idGeneratorFactory;
+        return ID_GENERATOR_FACTORY;
     }
 
     public IdWorker getAndCreate(int workerId){

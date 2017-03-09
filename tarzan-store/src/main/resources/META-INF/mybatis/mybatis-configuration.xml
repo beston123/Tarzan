@@ -9,14 +9,20 @@
 		<typeAlias alias="ToCheckMessage" type="com.tongbanjie.tarzan.store.model.ToCheckMessage" />
 		<typeAlias alias="ToSendMessage" type="com.tongbanjie.tarzan.store.model.ToSendMessage" />
 		<typeAlias alias="MessageAggregatePlan" type="com.tongbanjie.tarzan.store.model.MessageAggregatePlan" />
+		<typeAlias alias="MessageConsume" type="com.tongbanjie.tarzan.store.model.MessageConsume" />
 
 		<typeAlias alias="ToCheckMessageQuery" type="com.tongbanjie.tarzan.store.query.ToCheckMessageQuery" />
 		<typeAlias alias="ToSendMessageQuery" type="com.tongbanjie.tarzan.store.query.ToSendMessageQuery" />
 		<typeAlias alias="MessageAggregatePlanQuery" type="com.tongbanjie.tarzan.store.query.MessageAggregatePlanQuery" />
+		<typeAlias alias="MessageConsumeQuery" type="com.tongbanjie.tarzan.store.query.MessageConsumeQuery" />
 
 		<typeAlias alias="MQMessageQuery" type="com.tongbanjie.tarzan.store.query.MQMessageQuery" />
 
 		<typeAlias alias="RocketMQMessage" type="com.tongbanjie.tarzan.common.message.RocketMQMessage" />
 	</typeAliases>
+	
+	<plugins>
+		<plugin interceptor="com.dianping.cat.mybaties.CatMybatisPlugins" />
+	</plugins>
 
 </configuration>

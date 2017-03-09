@@ -40,7 +40,7 @@ public class ExampleClient {
 
     private final String producerGroup;
 
-    private final String clientId = "123456";
+    private final String clientId = "Example/127.0.0.1";
 
     private final RpcClient rpcClient;
 
@@ -54,22 +54,22 @@ public class ExampleClient {
 
     public void sendHeartbeat() throws RpcException, InterruptedException {
         HeartbeatData heartbeatData = new HeartbeatData();
-        heartbeatData.setGroup(producerGroup);
+        heartbeatData.addGroup(producerGroup);
         heartbeatData.setClientId(clientId);
 
-        Address addrress = clusterClient.selectOne();
-        if(addrress == null){
+        Address address = clusterClient.selectOne();
+        if(address == null){
             return;
         }
         RpcCommand request = RpcCommandBuilder.buildRequest(RequestCode.HEART_BEAT, null);
         request.setBody(heartbeatData);
 
-        RpcCommand response = this.rpcClient.invokeSync(addrress.getAddress(), request, 3000);
+        RpcCommand response = this.rpcClient.invokeSync(address.getAddress(), request, 3000);
         assert response != null;
         switch (response.getCmdCode()) {
             case ResponseCode.SUCCESS: {
                 LOGGER.info(">>>Send heartbeat '{}' to server {} success!",
-                        heartbeatData.getGroup(), addrress.getAddress());
+                        producerGroup, address.getAddress());
                 return;
             }
             default:

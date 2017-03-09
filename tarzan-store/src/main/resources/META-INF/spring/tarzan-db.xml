@@ -18,43 +18,43 @@
         </property>
 
         <property name="filters">
-            <value>${jdbc.druid.filters}</value>
+            <value>stat</value>
         </property>
         <property name="maxActive">
-            <value>${jdbc.druid.maxActive}</value>
+            <value>20</value>
         </property>
         <property name="initialSize">
-            <value>${jdbc.druid.initialSize}</value>
+            <value>1</value>
         </property>
         <property name="maxWait">
-            <value>${jdbc.druid.maxWait}</value>
+            <value>60000</value>
         </property>
         <property name="minIdle">
-            <value>${jdbc.druid.minIdle}</value>
+            <value>1</value>
         </property>
         <property name="timeBetweenEvictionRunsMillis">
-            <value>${jdbc.druid.timeBetweenEvictionRunsMillis}</value>
+            <value>60000</value>
         </property>
         <property name="minEvictableIdleTimeMillis">
-            <value>${jdbc.druid.minEvictableIdleTimeMillis}</value>
+            <value>300000</value>
         </property>
         <property name="validationQuery">
-            <value>${jdbc.druid.validationQuery}</value>
+            <value>SELECT 'x'</value>
         </property>
         <property name="testWhileIdle">
-            <value>${jdbc.druid.testWhileIdle}</value>
+            <value>true</value>
         </property>
         <property name="testOnBorrow">
-            <value>${jdbc.druid.testOnBorrow}</value>
+            <value>false</value>
         </property>
         <property name="testOnReturn">
-            <value>${jdbc.druid.testOnReturn}</value>
+            <value>false</value>
         </property>
         <property name="poolPreparedStatements">
-            <value>${jdbc.druid.poolPreparedStatements}</value>
+            <value>true</value>
         </property>
         <property name="maxOpenPreparedStatements">
-            <value>${jdbc.druid.maxOpenPreparedStatements}</value>
+            <value>20</value>
         </property>
     </bean>
 

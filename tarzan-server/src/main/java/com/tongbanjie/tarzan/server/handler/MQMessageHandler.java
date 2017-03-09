@@ -17,15 +17,13 @@ public interface MQMessageHandler {
 
     RpcCommand sendMessage(ChannelHandlerContext ctx, RpcCommand request);
 
-    Result<String> sendMessage(MQMessage mqMessage);
+    Result<String/* msgId */> sendMessage(MQMessage mqMessage);
 
     RpcCommand prepareMessage(ChannelHandlerContext ctx, RpcCommand request);
 
     RpcCommand commitMessage(ChannelHandlerContext ctx, RpcCommand request, Long transactionId);
 
     RpcCommand rollbackMessage(ChannelHandlerContext ctx, RpcCommand request, Long transactionId);
-
-    RpcCommand unknownMessage(ChannelHandlerContext ctx, RpcCommand request, Long transactionId);
 
     RpcCommand queryMessage(ChannelHandlerContext ctx, QueryMessageHeader queryMessageHeader);
 }

@@ -5,7 +5,7 @@ import com.tongbanjie.tarzan.client.ClientConfig;
 import com.tongbanjie.tarzan.client.MessageResult;
 import com.tongbanjie.tarzan.client.transaction.TransactionCheckListener;
 import com.tongbanjie.tarzan.common.Constants;
-import com.tongbanjie.tarzan.rocketmq.RocketMQNotifyManager;
+import com.tongbanjie.tarzan.rocketmq.RocketMQMessageNotifier;
 import com.tongbanjie.tarzan.rocketmq.RocketMQParam;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,11 +29,11 @@ public class RocketMQClientTest {
     @Test
     public void sendMessage() throws Exception {
 
-        RocketMQNotifyManager mqNotifyManager = create();
+        RocketMQMessageNotifier mqNotifyManager = create();
 
         for(int i=0; i< 10; i++) {
             Message message = new Message();
-            message.setTopic(Constants.TEVENT_TEST_TOPIC);
+            message.setTopic(Constants.TARZAN_TEST_TOPIC);
             message.setKeys("cluster_msg_" + i);
             message.setBody(("RocketMQTest " + i).getBytes());
 
@@ -49,14 +49,12 @@ public class RocketMQClientTest {
 
     }
 
-    private RocketMQNotifyManager create() throws Exception {
+    private RocketMQMessageNotifier create() throws Exception {
         RocketMQParam rocketMQParam = new RocketMQParam();
-        rocketMQParam.setGroupId(Constants.TEVENT_TEST_P_GROUP)
-                .setName("RocketMQTest")
-                .setTopic(Constants.TEVENT_TEST_TOPIC)
-                .setNamesrvAddr("192.168.1.42:9876");
+        rocketMQParam.setGroupId(Constants.TARZAN_TEST_P_GROUP)
+                .setTopic(Constants.TARZAN_TEST_TOPIC);
         TransactionCheckListener checkListener = new TestTransactionCheckListener();
-        RocketMQNotifyManager mqNotifyManager = new RocketMQNotifyManager(rocketMQParam, checkListener, clientConfig);
+        RocketMQMessageNotifier mqNotifyManager = new RocketMQMessageNotifier(rocketMQParam, checkListener, clientConfig);
         mqNotifyManager.init();
         return mqNotifyManager;
     }

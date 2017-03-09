@@ -1,5 +1,6 @@
 package com.tongbanjie.tarzan.registry.zookeeper;
 
+import com.tongbanjie.tarzan.common.exception.TarzanException;
 import com.tongbanjie.tarzan.registry.Address;
 import com.tongbanjie.tarzan.registry.RecoverableRegistry;
 import com.tongbanjie.tarzan.registry.RegistryType;
@@ -37,7 +38,7 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry, 
     /**
      * zk client
      */
-    protected final ZkClient zkClient;
+    protected ZkClient zkClient;
 
     /**
      * 连接状态
@@ -67,15 +68,20 @@ public abstract class AbstractZooKeeperRegistry implements RecoverableRegistry, 
     protected AbstractZooKeeperRegistry(RegistryType registryType, String zkAddress) {
         this.registryType = registryType;
         this.zkAddress = zkAddress;
-
-        // 创建 ZooKeeper 客户端
-        zkClient = new ZkClient(this.zkAddress, ZkConstants.SESSION_TIMEOUT, ZkConstants.CONNECTION_TIMEOUT);
-        this.connected = true;
-        LOGGER.debug("connect to zookeeper {} success.", zkAddress);
     }
 
     @Override
     public void start() throws Exception {
+        // 0、创建 ZooKeeper 客户端
+        try {
+            zkClient = new ZkClient(this.zkAddress, ZkConstants.SESSION_TIMEOUT, ZkConstants.CONNECTION_TIMEOUT);
+            this.connected = true;
+            LOGGER.info("connect to zookeeper {} success.", zkAddress);
+        } catch (Exception e) {
+            throw new TarzanException(String.format("connect to zookeeper failed, zkAddress: %s, connectionTimeout: %s ms",
+                            this.zkAddress, ZkConstants.CONNECTION_TIMEOUT), e);
+        }
+
         // 1、创建根目录
         if (!zkClient.exists(this.registerRootPath)) {
             zkClient.createPersistent(registerRootPath, true);

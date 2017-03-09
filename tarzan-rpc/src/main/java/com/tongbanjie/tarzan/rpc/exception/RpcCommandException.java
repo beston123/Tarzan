@@ -15,6 +15,8 @@ public class RpcCommandException extends RpcException {
 
     private static final long serialVersionUID = 6043282122067443721L;
 
+    public static final String ERROR_MSG = "参数格式不正确";
+
     public RpcCommandException(String message){
         super(message);
     }

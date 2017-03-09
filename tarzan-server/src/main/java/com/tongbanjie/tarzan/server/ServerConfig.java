@@ -16,7 +16,9 @@
  */
 package com.tongbanjie.tarzan.server;
 
-import com.tongbanjie.tarzan.common.Constants;
+import com.tongbanjie.tarzan.common.Weighable;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * Server配置
@@ -24,6 +26,7 @@ import com.tongbanjie.tarzan.common.Constants;
  * @author zixiao
  * @date 16/10/12
  */
+@Component
 public class ServerConfig {
 
     /**
@@ -42,24 +45,37 @@ public class ServerConfig {
     private int sendThreadPoolQueueCapacity = 100000;
 
     /**
-     * ServerId，每个server必须唯一， 取值范围 0-31
+     * Server监听端口
      */
-    private int serverId = Integer.parseInt(System.getProperty(Constants.TARZAN_SERVER_ID, "0"));
+    @Value("${tarzan.server.port}")
+    private int serverPort;
 
     /**
-     * Server权重，取值范围 1~32767
+     * ServerId，每个server必须唯一
+     * 取值范围 0-31
      */
-    private short serverWeight = Short.parseShort(System.getProperty(Constants.TARZAN_SERVER_WEIGHT, "1"));
+    @Value("${tarzan.server.id}")
+    private int serverId;
+
+    /**
+     * Server权重
+     * 取值范围 1-10000
+     * @see Weighable
+     */
+    @Value("${tarzan.server.weight}")
+    private short serverWeight;
 
     /**
      * 注册中心地址
      */
-    private String registryAddress = System.getProperty(Constants.TARZAN_REGISTRY_ADDRESS);
+    @Value("${tarzan.registry.address}")
+    private String registryAddress;
 
     /**
-     * RocketMQ nameserv 地址
+     * RocketMQ namesrv 地址
      */
-    private String rocketMQNamesrv =  System.getProperty(Constants.TARZAN_ROCKETMQ_NAMESRV);
+    @Value("${tarzan.rocketmq.namesrv}")
+    private String rocketMQNamesrv;
 
 
     public int getSendMessageThreadPoolNum() {
@@ -84,6 +100,14 @@ public class ServerConfig {
 
     public void setSendThreadPoolQueueCapacity(int sendThreadPoolQueueCapacity) {
         this.sendThreadPoolQueueCapacity = sendThreadPoolQueueCapacity;
+    }
+
+    public int getServerPort() {
+        return serverPort;
+    }
+
+    public void setServerPort(int serverPort) {
+        this.serverPort = serverPort;
     }
 
     public int getServerId() {

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 随机算法 负载均衡<p>
+ * 基于［随机算法］的负载均衡<p>
  * Random
  *
  * @author zixiao
@@ -17,7 +17,12 @@ public class RandomLoadBalance<T extends Weighable> extends AbstractLoadBalance<
 
     private final Random random = new Random();
 
-    public T doSelect(List<T> list) {
+    @Override
+    public T select(List<T> list) {
+        return doSelect(list);
+    }
+
+    private T doSelect(List<T> list) {
         if(CollectionUtils.isEmpty(list)){
             return null;
         }
@@ -26,17 +31,12 @@ public class RandomLoadBalance<T extends Weighable> extends AbstractLoadBalance<
             lastSelected = list.get(0);
         }else if(size == 2){
             //轮询
-            lastSelected = lastSelected == list.get(0) ? list.get(1) : list.get(0);
+            lastSelected = list.get(0).equals(lastSelected) ? list.get(1) : list.get(0);
         }else{
             //随机
             lastSelected = list.get(random.nextInt(size));
         }
         return lastSelected;
-    }
-
-    @Override
-    public T select(List<T> list) {
-        return doSelect(list);
     }
 
 }

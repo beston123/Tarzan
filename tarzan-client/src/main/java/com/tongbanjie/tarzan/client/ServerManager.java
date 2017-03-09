@@ -39,6 +39,8 @@ public class ServerManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerManager.class);
 
+    private static final int BATCH_SIZE = 64;
+
     private final ClientController clientController;
 
     public ServerManager(ClientController clientController) {
@@ -46,7 +48,7 @@ public class ServerManager {
     }
 
     public void sendHeartbeatToAllServer(){
-        List<Address> copy = clientController.getClientRegistry().getDiscovered();
+        List<Address> copy = this.clientController.getClientRegistry().getDiscovered();
         if(LOGGER.isDebugEnabled()){
             LOGGER.debug("Start to send heartbeat to {} servers.",  copy.size());
         }
@@ -55,11 +57,26 @@ public class ServerManager {
         }
     }
 
+    /**
+     * 心跳发送到Server
+     * 每 BATCH_SIZE 个group合并成一个心跳发送
+     * @param serverAddr
+     */
     private void sendHeartbeatToServer(final Address serverAddr){
-        for(String producerGroup : this.clientController.getMessageSenderTable().keySet()){
-            HeartbeatData heartbeatData = new HeartbeatData();
-            heartbeatData.setClientId("");//TODO clientId
-            heartbeatData.setGroup(producerGroup);
+        Set<String> groupSet = this.clientController.getMessageSenderTable().keySet();
+        List<HeartbeatData> heartbeatDataList = new ArrayList<HeartbeatData>(128);
+        int groupCount = 0;
+        HeartbeatData tempHeartbeat = null;
+        for(String producerGroup : groupSet){
+            if(groupCount % BATCH_SIZE == 0){
+                tempHeartbeat = new HeartbeatData();
+                tempHeartbeat.setClientId(this.clientController.getClientConfig().getClientId());
+                heartbeatDataList.add(tempHeartbeat);
+            }
+            tempHeartbeat.addGroup(producerGroup);
+            groupCount++;
+        }
+        for(HeartbeatData heartbeatData : heartbeatDataList){
             sendHeartbeat(serverAddr, heartbeatData, 3000);
         }
     }

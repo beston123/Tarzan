@@ -6,8 +6,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import java.util.List;
 
 /**
- * 轮询算法 <p>
- * 〈功能详细描述〉
+ * 基于［轮询算法］的负载均衡 <p>
+ * RoundRobin
  *
  * @author zixiao
  * @date 16/10/18
@@ -40,7 +40,7 @@ public class RoundRobinLoadBalance<T extends Weighable> extends AbstractLoadBala
         int maxIndex = list.size()-1;
 
         //list数据有变动，重新开始轮询
-        if( lastIndex >= maxIndex || list.get(lastIndex) != lastSelected ){
+        if( lastIndex >= maxIndex || !list.get(lastIndex).equals(lastSelected) ){
             lastIndex = -1;
             return doRoundRobin(list);
         }

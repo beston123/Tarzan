@@ -2,6 +2,7 @@ package com.tongbanjie.tarzan.server;
 
 import com.tongbanjie.tarzan.common.ScheduledService;
 import com.tongbanjie.tarzan.common.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
  * @author zixiao
  * @date 16/12/5
  */
+@Component
 public class ScheduledServiceManager implements Service{
 
     private List<ScheduledService> scheduledServices;

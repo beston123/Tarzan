@@ -16,13 +16,14 @@
  */
 package com.tongbanjie.tarzan.server.client;
 
-import com.tongbanjie.tarzan.server.ServerController;
 import com.tongbanjie.tarzan.common.ScheduledService;
 import com.tongbanjie.tarzan.common.util.NamedSingleThreadFactory;
 import com.tongbanjie.tarzan.rpc.netty.ChannelEventListener;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -35,17 +36,19 @@ import java.util.concurrent.TimeUnit;
  * @author zixiao
  * @date 16/10/15
  */
+@Component
 public class ClientChannelManageService implements ScheduledService, ChannelEventListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientChannelManageService.class);
 
-    private final ServerController serverController;
+    @Autowired
+    private ClientManager clientManager;
 
     private ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(
             new NamedSingleThreadFactory("ClientChannelManageService"));
 
-    public ClientChannelManageService(final ServerController serverController) {
-        this.serverController = serverController;
+    public ClientChannelManageService() {
+
     }
 
     @Override
@@ -74,7 +77,7 @@ public class ClientChannelManageService implements ScheduledService, ChannelEven
 
 
     private void scanExceptionChannel() {
-        this.serverController.getClientManager().scanNotActiveChannel();
+        this.clientManager.scanNotActiveChannel();
     }
 
 
@@ -86,18 +89,18 @@ public class ClientChannelManageService implements ScheduledService, ChannelEven
 
     @Override
     public void onChannelClose(String remoteAddr, Channel channel) {
-        this.serverController.getClientManager().doChannelCloseEvent(remoteAddr, channel);
+        this.clientManager.doChannelCloseEvent(remoteAddr, channel);
     }
 
 
     @Override
     public void onChannelException(String remoteAddr, Channel channel) {
-        this.serverController.getClientManager().doChannelCloseEvent(remoteAddr, channel);
+        this.clientManager.doChannelCloseEvent(remoteAddr, channel);
     }
 
 
     @Override
     public void onChannelIdle(String remoteAddr, Channel channel) {
-        this.serverController.getClientManager().doChannelCloseEvent(remoteAddr, channel);
+        this.clientManager.doChannelCloseEvent(remoteAddr, channel);
     }
 }

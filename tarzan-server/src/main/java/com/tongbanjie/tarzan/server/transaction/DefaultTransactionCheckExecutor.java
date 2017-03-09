@@ -17,6 +17,8 @@ import com.tongbanjie.tarzan.server.client.ClientChannelInfo;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * 向消息生产者回查事务状态 <p>
@@ -25,14 +27,15 @@ import org.slf4j.LoggerFactory;
  * @author zixiao
  * @date 16/10/9
  */
+@Component
 public class DefaultTransactionCheckExecutor implements TransactionCheckExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTransactionCheckExecutor.class);
 
-    private final ServerController serverController;
+    @Autowired
+    private ServerController serverController;
 
-    public DefaultTransactionCheckExecutor(final ServerController serverController) {
-        this.serverController = serverController;
+    public DefaultTransactionCheckExecutor() {
     }
 
     @Override

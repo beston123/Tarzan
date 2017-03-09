@@ -11,5 +11,6 @@ public enum  LoadBalanceStrategy {
 
     Random,
     RoundRobin,
-    WeightedRandom
+    WeightedRandom,
+    WeightedRoundRobin
 }

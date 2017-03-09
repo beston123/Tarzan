@@ -1,5 +1,8 @@
 package com.tongbanjie.tarzan.client;
 
+import com.tongbanjie.tarzan.common.Constants;
+import com.tongbanjie.tarzan.common.util.NetworkUtils;
+
 /**
  * Client配置 <p>
  * 〈功能详细描述〉
@@ -30,57 +33,82 @@ public class ClientConfig{
     private int heartbeatInterval = 30 * 1000;
 
     /**
+     * 事务反查请求容量
+     */
+    private int checkTransactionRequestCapacity = 2000;
+
+    /**
      * 注册中心地址
      * 格式 ip:port
      * 例：192.168.1.120:2181
      */
     private String registryAddress;
 
+    /**
+     * 应用名称
+     * 例：loan,trade,pay,merchant
+     */
+    private String appName;
+
+    /**
+     * 客户端Id
+     * 格式：appName/hostIp
+     * 例：trade/192.168.1.120
+     */
+    private String clientId;
+
     public ClientConfig(String registryAddress){
+        this(registryAddress, "Unknown");
+    }
+
+    public ClientConfig(String registryAddress, String appName){
         this.registryAddress = registryAddress;
+        this.appName = appName;
+        initClientId();
+    }
+
+    private void initClientId(){
+        String hostIp = null;
+        try {
+            hostIp = NetworkUtils.getLocalHostIp();
+        } catch (Exception e){
+            //ignore
+        }
+        this.clientId = this.getAppName() + Constants.SEPARATOR_SLASH + (hostIp == null ? "UnknownIp" : hostIp);
     }
 
     /*********************************** setter getter ***********************************/
 
-
     public int getSendMessageThreadPoolNum() {
         return sendMessageThreadPoolNum;
-    }
-
-    public void setSendMessageThreadPoolNum(int sendMessageThreadPoolNum) {
-        this.sendMessageThreadPoolNum = sendMessageThreadPoolNum;
     }
 
     public int getSendThreadPoolQueueCapacity() {
         return sendThreadPoolQueueCapacity;
     }
 
-    public void setSendThreadPoolQueueCapacity(int sendThreadPoolQueueCapacity) {
-        this.sendThreadPoolQueueCapacity = sendThreadPoolQueueCapacity;
-    }
-
     public int getHeartbeatInterval() {
         return heartbeatInterval;
     }
 
-    public void setHeartbeatInterval(int heartbeatInterval) {
-        this.heartbeatInterval = heartbeatInterval;
+    public int getCheckTransactionRequestCapacity() {
+        return checkTransactionRequestCapacity;
     }
 
     public String getRegistryAddress() {
         return registryAddress;
     }
 
-    public void setRegistryAddress(String registryAddress) {
-        this.registryAddress = registryAddress;
-    }
-
     public int getSendMessageTimeout() {
         return sendMessageTimeout;
     }
 
-    public void setSendMessageTimeout(int sendMessageTimeout) {
-        this.sendMessageTimeout = sendMessageTimeout;
+    public String getAppName() {
+        return appName;
+    }
+
+    public String getClientId(){
+        return clientId;
     }
 
     @Override
@@ -88,9 +116,11 @@ public class ClientConfig{
         return "ClientConfig{" +
                 "sendMessageThreadPoolNum=" + sendMessageThreadPoolNum +
                 ", sendThreadPoolQueueCapacity=" + sendThreadPoolQueueCapacity +
-                ", heartbeatInterval=" + heartbeatInterval +
                 ", sendMessageTimeout=" + sendMessageTimeout +
+                ", heartbeatInterval=" + heartbeatInterval +
+                ", checkTransactionRequestCapacity=" + checkTransactionRequestCapacity +
                 ", registryAddress='" + registryAddress + '\'' +
+                ", appName='" + appName + '\'' +
                 '}';
     }
 }

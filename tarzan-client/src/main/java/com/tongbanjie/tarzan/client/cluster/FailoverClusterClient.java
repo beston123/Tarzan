@@ -43,17 +43,21 @@ public class FailoverClusterClient extends ClusterClient {
                 RpcCommand result = doInvokeSync(timeoutMillis, address, arg);
                 return result;
             } catch (RpcConnectException e) {
-                //连接超时异常 failover
                 if(retryTimes > 0){
                     retryTimes--;
-                }else {
+                } else {
                     throw e;
                 }
             } catch (RpcTooMuchRequestException e) {
-                //连接超时异常 failover
                 if(retryTimes > 0){
                     retryTimes--;
-                }else {
+                } else {
+                    throw e;
+                }
+            } catch (RpcSendRequestException e) {
+                if(retryTimes > 0){
+                    retryTimes--;
+                } else {
                     throw e;
                 }
             }
@@ -77,17 +81,21 @@ public class FailoverClusterClient extends ClusterClient {
                 doInvokeAsync(timeoutMillis, address, arg, callback);
                 return;
             } catch (RpcConnectException e) {
-                //连接超时异常 failover
                 if(retryTimes > 0){
                     retryTimes--;
-                }else {
+                } else {
                     throw e;
                 }
             } catch (RpcTooMuchRequestException e) {
-                //连接超时异常 failover
                 if(retryTimes > 0){
                     retryTimes--;
-                }else {
+                } else {
+                    throw e;
+                }
+            } catch (RpcSendRequestException e) {
+                if(retryTimes > 0){
+                    retryTimes--;
+                } else {
                     throw e;
                 }
             }

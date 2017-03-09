@@ -21,7 +21,6 @@ public class NetworkUtils {
             System.out.println("Unknown host," + e.getMessage());
         }
         return null;
-
     }
 
     public static String getHostIp(InetAddress netAddress){
@@ -33,6 +32,10 @@ public class NetworkUtils {
 
     public static String getLocalHostIp(){
         return getHostIp(getInetAddress());
+    }
+
+    public static void main(String[] args) {
+        getLocalHostIp();
     }
 
 }

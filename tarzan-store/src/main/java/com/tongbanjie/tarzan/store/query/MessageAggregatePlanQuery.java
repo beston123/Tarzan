@@ -56,4 +56,12 @@ public class MessageAggregatePlanQuery extends PagingQuery {
         return statusList;
     }
 
+    @Override
+    public String toString() {
+        return "MessageAggregatePlanQuery{" +
+                "mqType=" + mqType +
+                ", aggregateType=" + aggregateType +
+                ", statusList=" + statusList +
+                '}';
+    }
 }

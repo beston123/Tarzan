@@ -14,18 +14,18 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class ClientControllerFactory {
 
-    private static final ClientControllerFactory instance = new ClientControllerFactory();
+    private static final ClientControllerFactory INSTANCE = new ClientControllerFactory();
+
+    public static final String DEFAULT_CLIENT = "DEFAULT_CLIENT";
 
     private final ReentrantLock createLock = new ReentrantLock();
 
-    private final ConcurrentHashMap<String, ClientController> clientTable = new ConcurrentHashMap<String, ClientController>();
-
-    public static final String DEFAULT_CLIENT = "DEFAULT_CLIENT";
+    private final ConcurrentHashMap<String, ClientController> clientTable = new ConcurrentHashMap<String, ClientController>(1);
 
     private ClientControllerFactory(){}
 
     public static ClientControllerFactory getInstance(){
-        return instance;
+        return INSTANCE;
     }
 
     public ClientController getAndCreate(ClientConfig clientConfig){

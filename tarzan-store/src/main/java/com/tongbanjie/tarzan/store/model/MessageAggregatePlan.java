@@ -73,6 +73,7 @@ public class MessageAggregatePlan implements Serializable {
     /**
      * 修改时间
      */
+    @NotNull
     private Date modifyTime;
 
     /**
@@ -166,5 +167,22 @@ public class MessageAggregatePlan implements Serializable {
 
     public void setRemark(String remark) {
         this.remark = remark == null ? null : remark.trim();
+    }
+
+    @Override
+    public String toString() {
+        return "MessageAggregatePlan{" +
+                "id=" + id +
+                ", timeStart=" + timeStart +
+                ", timeEnd=" + timeEnd +
+                ", mqType=" + mqType +
+                ", aggregateType=" + aggregateType +
+                ", status=" + status +
+                ", recordCount=" + recordCount +
+                ", elapsedTime=" + elapsedTime +
+                ", createTime=" + createTime +
+                ", modifyTime=" + modifyTime +
+                ", remark='" + remark + '\'' +
+                '}';
     }
 }

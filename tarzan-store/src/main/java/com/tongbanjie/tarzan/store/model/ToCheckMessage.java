@@ -20,6 +20,12 @@ public class ToCheckMessage implements Serializable {
      * 主键
      */
     @NotNull
+    private Long id;
+
+    /**
+     * 主键
+     */
+    @NotNull
     private Long tid;
 
     /**
@@ -49,12 +55,21 @@ public class ToCheckMessage implements Serializable {
     /**
      * 修改时间
      */
+    @NotNull
     private Date modifyTime;
 
     /**
      * 备注
      */
     private String remark;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Long getTid() {
         return tid;
@@ -112,4 +127,17 @@ public class ToCheckMessage implements Serializable {
         this.remark = remark == null ? null : remark.trim();
     }
 
+    @Override
+    public String toString() {
+        return "ToCheckMessage{" +
+                "id=" + id +
+                ", tid=" + tid +
+                ", mqType=" + mqType +
+                ", sourceTime=" + sourceTime +
+                ", retryCount=" + retryCount +
+                ", createTime=" + createTime +
+                ", modifyTime=" + modifyTime +
+                ", remark='" + remark + '\'' +
+                '}';
+    }
 }

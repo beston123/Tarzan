@@ -43,7 +43,7 @@ public class ExampleClientTest {
 
         Thread.sleep(1500);
 
-        client = new ExampleClient(clientController, Constants.TEVENT_TEST_P_GROUP);
+        client = new ExampleClient(clientController, Constants.TARZAN_TEST_P_GROUP);
         //注册
         client.sendHeartbeat();
     }
@@ -64,12 +64,8 @@ public class ExampleClientTest {
     public void transactionMessageTest() throws InterruptedException {
         for(int i=0; i< 5; i++){
             Address serverAddr = clientController.getClusterClient().selectOne();
-            if(serverAddr == null){
-                LOGGER.error(">>>Send message failed , can not find a server ");
-                continue;
-            }
             Message message = new Message();
-            message.setTopic(Constants.TEVENT_TEST_TOPIC);
+            message.setTopic(Constants.TARZAN_TEST_TOPIC);
             message.setKeys("msg_" + i);
             message.setBody(("TransactionMessageTest " + i).getBytes());
             try {
@@ -92,7 +88,7 @@ public class ExampleClientTest {
     public void sendMessageTest() throws InterruptedException {
         for(int i=0; i< 10; i++){
             Message message = new Message();
-            message.setTopic(Constants.TEVENT_TEST_TOPIC);
+            message.setTopic(Constants.TARZAN_TEST_TOPIC);
             message.setKeys("cluster_msg_" + i);
             message.setBody(("Hello Tarzan " + i).getBytes());
             try {

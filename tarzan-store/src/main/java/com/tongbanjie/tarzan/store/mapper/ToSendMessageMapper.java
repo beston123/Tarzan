@@ -7,13 +7,13 @@ import java.util.List;
 
 public interface ToSendMessageMapper {
 
-    ToSendMessage selectByPrimaryKey(Long tid);
+    ToSendMessage selectByTid(Long tid);
 
     int insert(ToSendMessage record);
 
-    int deleteByPrimaryKey(Long tid);
+    int deleteByTid(Long tid);
 
-    int updateByPrimaryKeySelective(ToSendMessage record);
+    int updateByTid(ToSendMessage record);
 
     List<ToSendMessage> selectByCondition(ToSendMessageQuery query);
 

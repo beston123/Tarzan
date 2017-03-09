@@ -1,5 +1,10 @@
 package com.tongbanjie.tarzan.common.body;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 心跳数据 <p>
  * 〈功能详细描述〉
@@ -13,15 +18,7 @@ public class HeartbeatData implements CustomBody {
 
     private String clientId;
 
-    private String group;
-
-    public String getGroup() {
-        return group;
-    }
-
-    public void setGroup(String group) {
-        this.group = group;
-    }
+    private List<String> groups = new ArrayList<String>();
 
     public String getClientId() {
         return clientId;
@@ -31,11 +28,19 @@ public class HeartbeatData implements CustomBody {
         this.clientId = clientId;
     }
 
+    public List<String> getGroups() {
+        return groups;
+    }
+
+    public void addGroup(String group) {
+        this.groups.add(group);
+    }
+
     @Override
     public String toString() {
         return "HeartbeatData{" +
                 "clientId='" + clientId + '\'' +
-                ", group='" + group + '\'' +
+                ", groups='" + StringUtils.join(groups.iterator(), ",") + '\'' +
                 '}';
     }
 }

@@ -40,6 +40,7 @@ public class ClientController implements Service {
 
     private final NettyClientConfig nettyClientConfig;
 
+    //消息发送者 producerGroup->MQMessageSender
     private final ConcurrentHashMap<String/* producer group */, MQMessageSender> messageSenderTable = new ConcurrentHashMap<String,MQMessageSender>();
 
     /********************** 服务 ***********************/
@@ -47,7 +48,7 @@ public class ClientController implements Service {
     private final RecoverableRegistry clientRegistry;
 
     //远程通信层对象
-    private RpcClient rpcClient;
+    private final RpcClient rpcClient;
 
     // 服务端连接管理
     private ServerManager serverManager;
@@ -59,7 +60,10 @@ public class ClientController implements Service {
     // 处理发送消息线程池
     private ExecutorService sendMessageExecutor;
 
-    // 对消息写入进行流控
+    //处理事务反查请求线程池
+    private ExecutorService checkTransactionExecutor;
+
+    //对消息写入进行流控
     private final BlockingQueue<Runnable> sendThreadPoolQueue;
 
     //客户端定时线程
@@ -91,6 +95,14 @@ public class ClientController implements Service {
         }, this.rpcClient, this.clientRegistry);
 
         this.serverManager = new ServerManager(this);
+
+        this.checkTransactionExecutor = new ThreadPoolExecutor(//
+                2, //
+                8, //
+                1000 * 60, //
+                TimeUnit.MILLISECONDS, //
+                new LinkedBlockingQueue<Runnable>(this.clientConfig.getCheckTransactionRequestCapacity()),
+                new NamedThreadFactory("CheckTransactionThread_"));
     }
 
     private void registerProcessor() {
@@ -141,14 +153,13 @@ public class ClientController implements Service {
     }
 
     private void doStart() throws ClientException{
-        //rpcClient
+
         if (this.rpcClient != null) {
             this.rpcClient.start();
         }
 
         this.registerProcessor();
 
-        //start Registry
         try {
             clientRegistry.start();
         } catch (Exception e) {
@@ -180,11 +191,15 @@ public class ClientController implements Service {
             this.sendMessageExecutor.shutdown();
         }
 
-        if(this.clientRegistry != null){
+        if (this.checkTransactionExecutor != null) {
+            this.checkTransactionExecutor.shutdown();
+        }
+
+        if (this.clientRegistry != null){
             this.clientRegistry.shutdown();
         }
 
-        if(this.scheduledExecutorService != null){
+        if (this.scheduledExecutorService != null){
             this.scheduledExecutorService.shutdown();
         }
     }
@@ -221,4 +236,7 @@ public class ClientController implements Service {
         return serviceState;
     }
 
+    public ExecutorService getCheckTransactionExecutor() {
+        return checkTransactionExecutor;
+    }
 }

@@ -30,6 +30,12 @@ public abstract class MQMessage implements Serializable{
     protected String messageKey;
 
     /**
+     * 消息topic
+     */
+    @NotNull
+    private String topic;
+
+    /**
      * 生产者group
      */
     @NotNull
@@ -74,6 +80,7 @@ public abstract class MQMessage implements Serializable{
     /**
      * 修改时间
      */
+    @NotNull
     protected Date modifyTime;
 
 
@@ -93,6 +100,13 @@ public abstract class MQMessage implements Serializable{
         this.messageKey = messageKey;
     }
 
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
 
     public String getProducerGroup() {
         return producerGroup;
@@ -162,6 +176,7 @@ public abstract class MQMessage implements Serializable{
     public String toString() {
         return  "id=" + id +
                 ", messageKey='" + messageKey + '\'' +
+                ", topic='" + topic + '\'' +
                 ", producerGroup='" + producerGroup + '\'' +
                 ", messageBody=" + Arrays.toString(messageBody) +
                 ", transactionState=" + transactionState +

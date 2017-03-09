@@ -30,6 +30,8 @@ import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 /**
  * 客户端连接请求处理者<p>
  * 〈功能详细描述〉
@@ -55,14 +57,17 @@ public class ClientManageProcessor implements NettyRequestProcessor {
                 return this.heartBeat(ctx, request);
             case RequestCode.UNREGISTER_CLIENT:
                 return this.unregisterClient(ctx, request);
+            case RequestCode.HEALTH_CHECK:
+                return this.healthCheck(ctx, request);
             default:
                 LOGGER.warn("Unknown request code "+request.getCmdCode());
                 break;
         }
-        return null;
+        return RpcCommandBuilder.buildResponse(ResponseCode.INVALID_REQUEST,
+                "Invalid request，requestCode：" + request.getCmdCode());
     }
 
-    public RpcCommand unregisterClient(ChannelHandlerContext ctx, RpcCommand request)
+    private RpcCommand unregisterClient(ChannelHandlerContext ctx, RpcCommand request)
             throws RpcCommandException {
         final RpcCommand response = RpcCommandBuilder.buildResponse();
         final RegisterRequestHeader requestHeader = (RegisterRequestHeader) request.decodeCustomHeader(RegisterRequestHeader.class);
@@ -83,11 +88,11 @@ public class ClientManageProcessor implements NettyRequestProcessor {
         return response;
     }
 
-    public RpcCommand heartBeat(ChannelHandlerContext ctx, RpcCommand request) {
+    private RpcCommand heartBeat(ChannelHandlerContext ctx, RpcCommand request) {
         RpcCommand response = RpcCommandBuilder.buildResponse();
 
         HeartbeatData heartbeatData = request.getBody(HeartbeatData.class);
-        String group = heartbeatData.getGroup();
+        List<String> groups = heartbeatData.getGroups();
 
         ClientChannelInfo clientChannelInfo = new ClientChannelInfo(//
             ctx.channel(),//
@@ -95,7 +100,17 @@ public class ClientManageProcessor implements NettyRequestProcessor {
             request.getVersion()//
             );
 
-        this.serverController.getClientManager().register(group, clientChannelInfo);
+        for(String group : groups){
+            this.serverController.getClientManager().register(group, clientChannelInfo);
+        }
+
+        response.setCmdCode(ResponseCode.SUCCESS);
+        response.setRemark(null);
+        return response;
+    }
+
+    public RpcCommand healthCheck(ChannelHandlerContext ctx, RpcCommand request) {
+        RpcCommand response = RpcCommandBuilder.buildResponse();
 
         response.setCmdCode(ResponseCode.SUCCESS);
         response.setRemark(null);

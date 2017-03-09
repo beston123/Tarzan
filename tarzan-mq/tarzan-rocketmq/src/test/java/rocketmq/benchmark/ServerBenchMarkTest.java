@@ -3,9 +3,9 @@ package rocketmq.benchmark;
 import com.alibaba.rocketmq.common.message.Message;
 import com.tongbanjie.tarzan.client.ClientConfig;
 import com.tongbanjie.tarzan.client.MessageResult;
-import com.tongbanjie.tarzan.client.mq.MQNotifyManager;
+import com.tongbanjie.tarzan.client.mq.MQMessageNotifier;
 import com.tongbanjie.tarzan.common.Constants;
-import com.tongbanjie.tarzan.rocketmq.RocketMQNotifyManager;
+import com.tongbanjie.tarzan.rocketmq.RocketMQMessageNotifier;
 import com.tongbanjie.tarzan.rocketmq.RocketMQParam;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.After;
@@ -38,7 +38,9 @@ public class ServerBenchMarkTest {
     /**
      * 测试消息总数
      */
-    private final int totalMessage = 200 * 10000;
+    private final int totalPage = 1;
+
+    private final int totalMessage = totalPage * 10000;
 
     /**
      * 测试Topic总数
@@ -47,19 +49,17 @@ public class ServerBenchMarkTest {
 
     private final int threadsNum = topicsNum;
 
-    private final String mqNameSrv = "192.168.1.43:9876";
-
     private final String registryAddress = "192.168.1.120:2181";
 
     private ExecutorService executorService;
 
-    private List<RocketMQNotifyManager> mqNotifyManagerList = new ArrayList<RocketMQNotifyManager>();
+    private List<RocketMQMessageNotifier> mqNotifyManagerList = new ArrayList<RocketMQMessageNotifier>();
 
     private final Random random = new Random();
 
     @Before
     public void before() throws Exception {
-        ClientConfig clientConfig = new ClientConfig(registryAddress);
+        ClientConfig clientConfig = new ClientConfig(registryAddress, "BenchMark");
         executorService = Executors.newFixedThreadPool(threadsNum);
         for(int i=0; i< topicsNum; i++){
             mqNotifyManagerList.add(createMqNotifyManager(i, clientConfig));
@@ -68,7 +68,7 @@ public class ServerBenchMarkTest {
 
     @Test
     public void transactionListen() throws InterruptedException {
-        for(RocketMQNotifyManager mqNotifyManager : mqNotifyManagerList){
+        for(RocketMQMessageNotifier mqNotifyManager : mqNotifyManagerList){
             mqNotifyManager.setTransactionCheckListener(new TestTransactionCheckListener());
         }
         Thread.sleep(50 * 60 * 1000);
@@ -78,13 +78,12 @@ public class ServerBenchMarkTest {
     public void start() throws Exception {
         long start = System.currentTimeMillis();
         Random random = new Random();
-        int totalPage = 100;
         int perCount = totalMessage / totalPage;
 
         for(int t=0; t<totalPage; t++){
             CountDownLatch latch = new CountDownLatch(perCount);
             for(int i=0; i<perCount; i++) {
-                MQNotifyManager mqNotifyManager = mqNotifyManagerList.get(random.nextInt(topicsNum));
+                MQMessageNotifier mqNotifyManager = mqNotifyManagerList.get(random.nextInt(topicsNum));
                 Message message = buildMessage(i);
                 executorService.execute(new Task(message, latch, mqNotifyManager));
             }
@@ -102,9 +101,9 @@ public class ServerBenchMarkTest {
 
         private CountDownLatch countDownLatch;
 
-        private MQNotifyManager mqNotifyManager;
+        private MQMessageNotifier mqNotifyManager;
 
-        public Task(Message message, CountDownLatch countDownLatch, MQNotifyManager mqNotifyManager){
+        public Task(Message message, CountDownLatch countDownLatch, MQMessageNotifier mqNotifyManager){
             this.message = message;
             this.countDownLatch = countDownLatch;
             this.mqNotifyManager = mqNotifyManager;
@@ -150,13 +149,11 @@ public class ServerBenchMarkTest {
     }
 
 
-    private RocketMQNotifyManager createMqNotifyManager(int index, ClientConfig clientConfig) throws Exception {
+    private RocketMQMessageNotifier createMqNotifyManager(int index, ClientConfig clientConfig) throws Exception {
         RocketMQParam rocketMQParam = new RocketMQParam();
-        rocketMQParam.setGroupId(Constants.TEVENT_TEST_P_GROUP + index)
-                .setName("RocketMQTest" + index)
-                .setTopic(Constants.TEVENT_TEST_TOPIC + index)
-                .setNamesrvAddr(mqNameSrv);
-        RocketMQNotifyManager mqNotifyManager = new RocketMQNotifyManager(rocketMQParam, null, clientConfig);
+        rocketMQParam.setGroupId(Constants.TARZAN_TEST_P_GROUP + index)
+                .setTopic(Constants.TARZAN_TEST_TOPIC + index);
+        RocketMQMessageNotifier mqNotifyManager = new RocketMQMessageNotifier(rocketMQParam, null, clientConfig);
         mqNotifyManager.init();
         return mqNotifyManager;
     }

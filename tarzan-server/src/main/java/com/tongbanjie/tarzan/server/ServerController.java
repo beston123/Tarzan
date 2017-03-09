@@ -32,15 +32,13 @@ import com.tongbanjie.tarzan.server.client.ClientChannelManageService;
 import com.tongbanjie.tarzan.server.client.ClientManager;
 import com.tongbanjie.tarzan.server.processer.ClientManageProcessor;
 import com.tongbanjie.tarzan.server.processer.QueryMessageProcessor;
+import com.tongbanjie.tarzan.server.processer.RecordConsumeProcessor;
 import com.tongbanjie.tarzan.server.processer.SendMessageProcessor;
 import com.tongbanjie.tarzan.server.transaction.TransactionCheckService;
 import com.tongbanjie.tarzan.store.StoreManager;
 import com.tongbanjie.tarzan.common.util.DistributedIdGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.concurrent.*;
 
@@ -51,145 +49,134 @@ import java.util.concurrent.*;
  * @author zixiao
  * @date 16/9/29
  */
+@Component
 public class ServerController implements Service {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServerController.class);
-
-    /********************** 配置 ***********************/
     // 服务器配置
-    private final ServerConfig serverConfig;
+    @Autowired
+    private ServerConfig serverConfig;
 
     // 通信层配置
-    private final NettyServerConfig nettyServerConfig;
+    private NettyServerConfig nettyServerConfig;
 
-    /********************** 客户端管理 ***********************/
-    // 客户端连接管理
-    private final ClientManager clientManager;
+    // 服务注册中心
+    private RecoverableRegistry serverRegistry;
 
-    // 检测所有客户端连接
-    private final ClientChannelManageService clientChannelManageService;
-
-    /********************** 服务 ***********************/
-    //服务注册
-    private final RecoverableRegistry serverRegistry;
-
-    //事件存储
-    private StoreManager storeManager;
-
-    //远程通信层对象
+    // 远程通信层对象
     private RpcServer rpcServer;
 
-    /********************** 线程池 ***********************/
+    // 客户端连接管理
+    @Autowired
+    private ClientManager clientManager;
+
+    // 存储管理
+    @Autowired
+    private StoreManager storeManager;
+
+    // 定时任务管理器
+    @Autowired
+    private ScheduledServiceManager scheduledServiceManager;
+
+    // 事务状态检查服务
+    @Autowired
+    private TransactionCheckService transactionCheckService;
+
+    // 消息重发服务
+    @Autowired
+    private MessageResendService messageResendService;
+
+    // 检测所有客户端连接
+    @Autowired
+    private ClientChannelManageService clientChannelManageService;
+
     // 处理发送消息线程池
     private ExecutorService sendMessageExecutor;
-
-    // 对消息写入进行流控
-    private final BlockingQueue<Runnable> sendThreadPoolQueue;
 
     // 处理管理Client线程池
     private ExecutorService clientManageExecutor;
 
-    /********************** 其他 ***********************/
-    //定时任务管理器
-    private ScheduledServiceManager scheduledServiceManager;
-
-    //服务器地址
+    // 服务器地址
     private ServerAddress serverAddress;
 
-    public ServerController(final ServerConfig serverConfig, //
-                            final NettyServerConfig nettyServerConfig//
-    ) {
-        this.serverConfig = serverConfig;
-        this.nettyServerConfig = nettyServerConfig;
-
-        this.clientManager = new ClientManager(this.serverConfig);
-        this.clientChannelManageService = new ClientChannelManageService(this);
-
-        this.sendThreadPoolQueue = new LinkedBlockingQueue<Runnable>(this.serverConfig.getSendThreadPoolQueueCapacity());
-
-        this.serverRegistry = new ServerZooKeeperRegistry(this.serverConfig.getRegistryAddress());
+    public ServerController() {
 
     }
 
-
-    public boolean initialize() {
-        boolean result = true;
+    public void initialize() {
+        /**
+         * 0、配置参数校验
+         */
+        if(serverConfig.getServerPort() < 1024 || serverConfig.getServerPort() > 65535){
+            throw new ServerException(Constants.TARZAN_SERVER_PORT + " must be between 1024 and 65535.");
+        }
+        if (DistributedIdGenerator.validate(serverConfig.getServerId())) {
+            throw new ServerException(Constants.TARZAN_SERVER_ID + " must be between 0 and "+ DistributedIdGenerator.getMaxWorkId());
+        }
 
         /**
-         * 1、加载存储管理器
+         * 1、初始化实例
          */
-        try {
-            ApplicationContext act = new ClassPathXmlApplicationContext(Constants.TARZAN_STORE_CONTEXT);
-            this.storeManager = act.getBean(StoreManager.class);
-        } catch (BeansException e) {
-            result = false;
-            LOGGER.error("Load store manager failed.", e);
-        }
+        this.nettyServerConfig = new NettyServerConfig(this.serverConfig.getServerPort());
+        this.serverRegistry = new ServerZooKeeperRegistry(this.serverConfig.getRegistryAddress());
+        this.rpcServer = new NettyRpcServer(this.nettyServerConfig, this.clientChannelManageService);
 
-        if (result) {
-            /**
-             * 2、初始化RpcServer
-             */
-            this.rpcServer = new NettyRpcServer(this.nettyServerConfig, this.clientChannelManageService);
-            //注册请求处理器
-            this.registerProcessor();
+        /**
+         * 2、注册请求处理器
+         */
+        this.registerProcessor();
 
-            /**
-             * 3、初始化定时任务
-             */
-            this.scheduledServiceManager = new ScheduledServiceManager();
-            this.scheduledServiceManager
-                    .add(new TransactionCheckService(this))     //事务状态检查服务
-                    .add(new MessageResendService(this))        //消息重发Job
-                    .add(this.clientChannelManageService);      //检测所有客户端连接
+        /**
+         * 3、连接注册中心，并注册地址
+         */
+        this.registerServer();
 
-            /**
-             * 4、初始化注册中心，并注册地址到注册中心
-             */
-            try {
-                serverRegistry.start();
-                registerServer();
-            } catch (ServerException e) {
-                throw e;
-            }catch (Exception e) {
-                throw new ServerException("The registry connect failed, address: " + serverConfig.getRegistryAddress(), e);
-            }
+        /**
+         * 4、初始化定时任务
+         */
+        this.scheduledServiceManager
+                .add(this.transactionCheckService)     //事务状态检查服务
+                .add(this.messageResendService)        //消息重发Job
+                .add(this.clientChannelManageService); //检测所有客户端连接
 
-            //设置分布式Id生成器的WorkId
-            DistributedIdGenerator.setUniqueWorkId(serverConfig.getServerId());
-
-        }
-
-        return result;
+        /**
+         * 5、设置分布式Id生成器的WorkId
+         */
+        DistributedIdGenerator.setUniqueWorkId(serverConfig.getServerId());
     }
 
     /**
-     * 注册ServerId和地址
+     * 连接注册中心，并注册ServerId和地址
      * @return
      */
     private boolean registerServer() {
-        //1、获取服务器地址 [ip]:[port]
+        //1、连接注册中心
+        try {
+            serverRegistry.start();
+        } catch (Exception e) {
+            throw new ServerException("The registry connect failed, address: " + serverConfig.getRegistryAddress(), e);
+        }
+
+        //2、获取服务器地址 [ip]:[port]
         String localIp = NetworkUtils.getLocalHostIp();
         if (localIp == null) {
             throw new ServerException("Get localHost ip failed.");
         }
-        serverAddress = new ServerAddress(localIp, nettyServerConfig.getListenPort());
-        serverAddress.setWeight(serverConfig.getServerWeight());
+        serverAddress = new ServerAddress(localIp, serverConfig.getServerPort(),serverConfig.getServerWeight());
         serverAddress.setServerId(serverConfig.getServerId());
 
         if (serverRegistry.isConnected()) {
-            //2、注册serverId
+            //3.1、注册serverId
             boolean registerFlag = ((ServerZooKeeperRegistry) this.serverRegistry)
                     .registerId(serverAddress.getServerId(), serverAddress);
             if (!registerFlag) {
                 throw new ServerException("The server id '" + serverAddress.getServerId() +
                         "' already in use, it must be unique in cluster.");
             }
-            //3、注册服务器地址
+            //3.2、注册服务器地址
             serverRegistry.register(serverAddress);
             return true;
         }
-        throw new ServerException("Register failed, address: " + serverConfig.getRegistryAddress()
+        throw new ServerException("Register server failed, registry address: " + serverConfig.getRegistryAddress()
                 + ", server id: " + serverAddress.getServerId());
     }
 
@@ -202,7 +189,7 @@ public class ServerController implements Service {
                 this.serverConfig.getSendMessageThreadPoolNum(),//
                 1000 * 60,//
                 TimeUnit.MILLISECONDS,//
-                this.sendThreadPoolQueue,//
+                new LinkedBlockingQueue<Runnable>(this.serverConfig.getSendThreadPoolQueueCapacity()),//
                 new NamedThreadFactory("SendMessageThread_"));
 
         this.clientManageExecutor = Executors.newFixedThreadPool(
@@ -219,7 +206,10 @@ public class ServerController implements Service {
         ClientManageProcessor clientProcessor = new ClientManageProcessor(this);
         this.rpcServer.registerProcessor(RequestCode.HEART_BEAT, clientProcessor, this.clientManageExecutor);
         this.rpcServer.registerProcessor(RequestCode.UNREGISTER_CLIENT, clientProcessor, this.clientManageExecutor);
+        this.rpcServer.registerProcessor(RequestCode.HEALTH_CHECK, clientProcessor, this.clientManageExecutor);
 
+        RecordConsumeProcessor recordConsumeProcessor = new RecordConsumeProcessor(this);
+        this.rpcServer.registerProcessor(RequestCode.RECORD_CONSUME, recordConsumeProcessor, this.sendMessageExecutor);
     }
 
     public void start() throws Exception {
@@ -238,33 +228,33 @@ public class ServerController implements Service {
     }
 
     public void shutdown() {
+        if (this.serverRegistry != null){
+            this.serverRegistry.shutdown();
+        }
+
         if (this.rpcServer != null) {
             this.rpcServer.shutdown();
+        }
+
+        if (this.sendMessageExecutor != null) {
+            this.sendMessageExecutor.shutdown();
+        }
+        if (this.clientManageExecutor != null) {
+            this.clientManageExecutor.shutdown();
         }
 
         if (this.storeManager != null) {
             this.storeManager.shutdown();
         }
 
-        if (this.sendMessageExecutor != null) {
-            this.sendMessageExecutor.shutdown();
-        }
-
         if (this.scheduledServiceManager != null) {
             this.scheduledServiceManager.shutdown();
         }
 
-        if (this.serverRegistry != null){
-            this.serverRegistry.shutdown();
-        }
     }
 
     public ServerConfig getServerConfig() {
         return serverConfig;
-    }
-
-    public NettyServerConfig getNettyServerConfig() {
-        return nettyServerConfig;
     }
 
     public ClientManager getClientManager() {

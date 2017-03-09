@@ -22,8 +22,6 @@ public interface StoreService<T extends MQMessage> {
 
     String errorMsg = "数据库操作异常";
 
-    /************************************** 基本增删改查 **************************************/
-
     Result<Long> put(T mqMessage);
 
     Result<T> get(Long id);
@@ -73,6 +71,12 @@ public interface StoreService<T extends MQMessage> {
      */
     Result<Void> updateAggregated(Long id);
 
-    Result<Void> updateSendSuccess(Long id);
+    /**
+     * 更新消息为发送成功
+     * @param id
+     * @param msgId
+     * @return
+     */
+    Result<Void> updateSendSuccess(Long id, String msgId);
 
 }

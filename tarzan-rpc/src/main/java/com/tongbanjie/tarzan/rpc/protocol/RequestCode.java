@@ -15,9 +15,9 @@ public abstract class RequestCode {
     public static final int HEART_BEAT = 1;
 
     /**
-     * 注册客户端
+     * 健康检查
      */
-    public static final int REGISTER_CLIENT = 2;
+    public static final int HEALTH_CHECK = 2;
 
     /**
      * 反注册客户端
@@ -40,9 +40,14 @@ public abstract class RequestCode {
     public static final int CHECK_TRANSACTION_STATE = 6;
 
     /**
-     *
+     * 查询消息
      */
     public static final int QUERY_MESSAGE = 7;
 
+
+    /**
+     * 记录消费结果
+     */
+    public static final int RECORD_CONSUME = 8;
 
 }

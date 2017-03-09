@@ -7,13 +7,13 @@ import java.util.List;
 
 public interface ToCheckMessageMapper {
 
-    ToCheckMessage selectByPrimaryKey(Long tid);
+    ToCheckMessage selectByTid(Long tid);
 
     int insert(ToCheckMessage record);
 
-    int deleteByPrimaryKey(Long tid);
+    int deleteByTid(Long tid);
 
-    int updateByPrimaryKeySelective(ToCheckMessage record);
+    int updateByTid(ToCheckMessage record);
 
     List<ToCheckMessage> selectByCondition(ToCheckMessageQuery query);
 

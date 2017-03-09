@@ -1,11 +1,7 @@
 package com.tongbanjie.tarzan.store;
 
-import com.tongbanjie.tarzan.store.service.RocketMQStoreService;
-import com.tongbanjie.tarzan.store.service.StoreService;
-import com.tongbanjie.tarzan.store.service.ToCheckMessageService;
-import com.tongbanjie.tarzan.store.service.ToSendMessageService;
+import com.tongbanjie.tarzan.store.service.*;
 import com.tongbanjie.tarzan.common.message.MQType;
-import com.tongbanjie.tarzan.common.redis.RedisComponent;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -32,19 +28,13 @@ public class DefaultStoreManager implements StoreManager {
     private RocketMQStoreService rocketMQStoreService;
 
     @Resource
-    private ToCheckMessageService toCheckMessageService;
-
-    @Resource
-    private ToSendMessageService toSendMessageService;
-
-    @Resource
     private MessageToCheckJob messageToCheckJob;
 
     @Resource
     private MessageToSendJob messageToSendJob;
 
     @Resource
-    private RedisComponent redisComponent;
+    private MessageConsumeService messageConsumeService;
 
     @Override
     public void start() throws Exception {
@@ -56,6 +46,9 @@ public class DefaultStoreManager implements StoreManager {
 
     @Override
     public void shutdown() {
+        messageToCheckJob.shutdown();
+        messageToSendJob.shutdown();
+
         mqStoreServiceTable.clear();
     }
 
@@ -70,19 +63,7 @@ public class DefaultStoreManager implements StoreManager {
     }
 
     @Override
-    public ToCheckMessageService getToCheckMessageService() {
-        return this.toCheckMessageService;
+    public MessageConsumeService getMessageConsumeService() {
+        return messageConsumeService;
     }
-
-    @Override
-    public ToSendMessageService getToSendMessageService() {
-        return this.toSendMessageService;
-    }
-
-    @Override
-    public RedisComponent getRedisComponent() {
-        return this.redisComponent;
-    }
-
-
 }

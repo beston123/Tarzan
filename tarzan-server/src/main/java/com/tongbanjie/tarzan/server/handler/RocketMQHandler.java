@@ -3,6 +3,7 @@ package com.tongbanjie.tarzan.server.handler;
 import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.client.producer.*;
 import com.alibaba.rocketmq.common.message.Message;
+import com.tongbanjie.tarzan.common.Constants;
 import com.tongbanjie.tarzan.common.message.*;
 import com.tongbanjie.tarzan.common.message.SendStatus;
 import com.tongbanjie.tarzan.server.ServerController;
@@ -15,7 +16,6 @@ import com.tongbanjie.tarzan.rpc.protocol.header.MessageResultHeader;
 import com.tongbanjie.tarzan.rpc.protocol.header.QueryMessageHeader;
 import com.tongbanjie.tarzan.common.Result;
 import com.tongbanjie.tarzan.store.service.RocketMQStoreService;
-import com.tongbanjie.tarzan.store.service.ToCheckMessageService;
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -45,8 +45,6 @@ public class RocketMQHandler implements MQMessageHandler {
 
     private final RocketMQStoreService mQStoreService;
 
-    private final ToCheckMessageService toCheckMessageService;
-
     private final ServerController serverController;
 
     private final String nameSrvAddr;
@@ -54,7 +52,6 @@ public class RocketMQHandler implements MQMessageHandler {
     public RocketMQHandler(ServerController serverController) {
         this.serverController = serverController;
         this.mQStoreService = (RocketMQStoreService) this.serverController.getStoreManager().getMQStoreService(MQType.ROCKET_MQ);
-        this.toCheckMessageService = this.serverController.getStoreManager().getToCheckMessageService();
         this.nameSrvAddr = this.serverController.getServerConfig().getRocketMQNamesrv();
     }
 
@@ -77,7 +74,7 @@ public class RocketMQHandler implements MQMessageHandler {
     }
 
     @Override
-    public Result<String> sendMessage(MQMessage mqMessage){
+    public Result<String/* msgId */> sendMessage(MQMessage mqMessage){
         Result<String> result;
         if(mqMessage instanceof RocketMQMessage){
             RocketMQMessage rocketMQMessage = (RocketMQMessage) mqMessage;
@@ -120,10 +117,13 @@ public class RocketMQHandler implements MQMessageHandler {
         /*************** 2、组装并发送消息 ***************/
         Message msg = new Message(mqMessage.getTopic(), mqMessage.getTags(),
                 mqMessage.getMessageKey(), mqMessage.getMessageBody());
+        if(mqMessage.getId() != null){
+            msg.putUserProperty(Constants.TARZAN_MQ_TID, String.valueOf(mqMessage.getId()));
+        }
         try {
             return producer.send(msg);
         } catch (Exception e) {
-            throw new SystemException("Send to RocketMQ failed.", e);
+            throw new SystemException("Send to RocketMQ failed, nameSrvAddress "+this.nameSrvAddr, e);
         }
     }
 
@@ -248,37 +248,6 @@ public class RocketMQHandler implements MQMessageHandler {
         }else{
             LOGGER.error("事务消息回滚失败, transactionId: " + transactionId+", error: "+ rollbackResult.getErrorDetail());
             response = RpcCommandBuilder.buildFail("事务消息回滚失败," + rollbackResult.getErrorDetail());
-        }
-        return response;
-    }
-
-    @Override
-    public RpcCommand unknownMessage(ChannelHandlerContext ctx, RpcCommand request, Long transactionId) {
-        /*************** 1、检查是否需要更新事务消息计数 ***************/
-        Result<RocketMQMessage> getResult = mQStoreService.get(transactionId);
-        if(!getResult.isSuccess()){
-            LOGGER.error("事务消息计数更新失败, transactionId: " + transactionId+", error: "+ getResult.getErrorDetail());
-            return RpcCommandBuilder.buildFail("事务消息状态更新失败," + getResult.getErrorDetail());
-        }
-
-        RocketMQMessage mqMessage = getResult.getData();
-        if(mqMessage == null){
-            LOGGER.warn("事务消息计数更新失败, 消息不存在, transactionId:" + transactionId);
-            return RpcCommandBuilder.buildResponse(ResponseCode.NOT_EXIST, "该事务消息不存在");
-        }else if(mqMessage.getTransactionState() != TransactionState.PREPARE.getCode()){
-            return RpcCommandBuilder.buildSuccess();
-        }
-
-        /*************** 2、事务消息计数更新 ***************/
-        final RpcCommand response;
-
-        Result<Void> updateResult = toCheckMessageService.incrRetryCount(transactionId);
-
-        if(updateResult.isSuccess()){
-            response = RpcCommandBuilder.buildSuccess();
-        }else{
-            LOGGER.error("事务消息计数更新失败, transactionId: " + transactionId+", error: "+ updateResult.getErrorDetail());
-            response = RpcCommandBuilder.buildFail("事务消息计数更新失败," + updateResult.getErrorDetail());
         }
         return response;
     }

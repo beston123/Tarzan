@@ -37,4 +37,12 @@ public class ToCheckMessageQuery extends PagingQuery {
     public void setTidFromExclude(Long tidFromExclude) {
         this.tidFromExclude = tidFromExclude;
     }
+
+    @Override
+    public String toString() {
+        return "ToCheckMessageQuery{" +
+                "mqType=" + mqType +
+                ", tidFromExclude=" + tidFromExclude +
+                '}';
+    }
 }

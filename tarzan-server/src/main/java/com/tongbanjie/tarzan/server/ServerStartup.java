@@ -17,18 +17,14 @@
 package com.tongbanjie.tarzan.server;
 
 import com.tongbanjie.tarzan.common.Constants;
-import com.tongbanjie.tarzan.common.util.DistributedIdGenerator;
-import com.tongbanjie.tarzan.rpc.netty.NettyServerConfig;
-import org.apache.commons.lang3.StringUtils;
+import com.tongbanjie.tarzan.common.util.LogUtils;
 import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -50,47 +46,41 @@ public class ServerStartup {
         ServerController controller = createServerController(args);
         try {
             controller.start();
-            String tip = "The tarzan server[" + controller.getServerAddress() + "] boot success.";
-            LOGGER.info(tip);
+            String successInfo = "The tarzan server[" + controller.getServerAddress() + "] boot success.";
+            LOGGER.info(successInfo);
+            LogUtils.stdInfo(successInfo, ServerStartup.class);
             return controller;
-        }
-        catch (Throwable e) {
-            LOGGER.error("The tarzan server[" + controller.getServerAddress() + "] boot failed.", e);
+        } catch (Throwable e) {
+            String errorMsg = "The tarzan server[" + controller.getServerAddress() + "] boot failed.";
+            LOGGER.error(errorMsg, e);
+            LogUtils.stdError(errorMsg, ServerStartup.class, e);
             System.exit(-1);
         }
         return null;
     }
 
     private static ServerController createServerController(String[] args) {
-        //配置加载
         try {
-            loadConfig(args);
-        } catch (IOException e) {
-            LOGGER.error("Configuration load failed.", e);
-            System.exit(-3);
-        }
-
-        final ServerConfig serverConfig = new ServerConfig();
-        final NettyServerConfig nettyServerConfig = new NettyServerConfig();
-
-        try {
-            if (DistributedIdGenerator.validate(serverConfig.getServerId())) {
-                LOGGER.error("ServerId must between 0 and "+ DistributedIdGenerator.getMaxWorkId());
-                System.exit(-3);
+            /**
+             * 1、配置加载和检查
+             */
+            try {
+                loadConfig(args);
+            } catch (IOException e) {
+                throw new ServerException("Load Configuration file failed.", e);
             }
 
-            final ServerController controller = new ServerController(//
-                serverConfig, //
-                nettyServerConfig//
-                );
+            /**
+             * 2、初始化server
+             */
+            ApplicationContext act = new ClassPathXmlApplicationContext(Constants.TARZAN_CONTEXT);
+            final ServerController controller = act.getBean(ServerController.class);
 
-            boolean initResult = controller.initialize();
-            if (!initResult) {
-                controller.shutdown();
-                System.exit(-3);
-            }
+            controller.initialize();
 
-            //优雅停机
+            /**
+             * 3、优雅停机：注册一个JVM关闭的钩子
+             */
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 private volatile boolean hasShutdown = false;
                 private AtomicInteger shutdownTimes = new AtomicInteger(0);
@@ -111,9 +101,10 @@ public class ServerStartup {
             }, "ShutdownHook"));
 
             return controller;
-        }
-        catch (Throwable e) {
-            LOGGER.error("The tarzan server boot failed.", e);
+
+        } catch (Throwable e) {
+            LOGGER.error("The tarzan server initialize failed.", e);
+            LogUtils.stdError("The tarzan server initialize failed.", ServerStartup.class, e);
             System.exit(-1);
         }
 
@@ -126,13 +117,7 @@ public class ServerStartup {
      */
     private static void loadConfig(String[] args) throws IOException {
         /*************** 检查配置文件是否存在 ***************/
-        try {
-            ConfigManager.checkConfigFiles();
-        } catch (IOException e) {
-            System.err.println("Check configuration file failed:");
-            e.printStackTrace();
-            throw e;
-        }
+        ConfigManager.checkConfigFiles();
 
         /*************** 加载日志配置 ***************/
         if( args.length > 0 && Constants.RUN_IN_IDE.equals(args[0]) ){
@@ -144,28 +129,28 @@ public class ServerStartup {
             }
         }
 
-        /*************** 加载业务配置 ***************/
-        String configFilePath = ConfigManager.configFilePath;
-        Properties properties = new Properties();
-        InputStream is = null;
-        try {
-            if (configFilePath.startsWith(Constants.CLASSPATH_PREFIX)) {
-                configFilePath = StringUtils.substringAfter(configFilePath, Constants.CLASSPATH_PREFIX);
-                is = ServerStartup.class.getClassLoader().getResourceAsStream(configFilePath);
-            } else {
-                is = new FileInputStream(configFilePath);
-            }
-            properties.load(is);
-        }finally {
-            if(is != null){
-                is.close();
-            }
-        }
-
-        Set<String> propNames = properties.stringPropertyNames();
-        for(String propName : propNames){
-            System.setProperty(propName, properties.getProperty(propName));
-        }
-
+//        /*************** 加载业务配置 ***************/
+//        String configFilePath = ConfigManager.configFilePath;
+//        Properties properties = new Properties();
+//        InputStream is = null;
+//        try {
+//            if (configFilePath.startsWith(Constants.CLASSPATH_PREFIX)) {
+//                configFilePath = StringUtils.substringAfter(configFilePath, Constants.CLASSPATH_PREFIX);
+//                is = ServerStartup.class.getClassLoader().getResourceAsStream(configFilePath);
+//            } else {
+//                is = new FileInputStream(configFilePath);
+//            }
+//            properties.load(is);
+//        }finally {
+//            if(is != null){
+//                is.close();
+//            }
+//        }
+//
+//        Set<String> propNames = properties.stringPropertyNames();
+//        for(String propName : propNames){
+//            System.setProperty(propName, properties.getProperty(propName));
+//        }
     }
+
 }

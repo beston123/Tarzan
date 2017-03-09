@@ -82,7 +82,7 @@ public class Result<V> implements Serializable {
      * @return
      */
     public String getErrorDetail() {
-        return String.format("%s: %s", (errorMsg == null ? "Error" : errorMsg), exceptionMsg);
+        return String.format("%s%s", (errorMsg == null ? "Error" : errorMsg), (exceptionMsg == null ? "" : ": "+exceptionMsg));
     }
 
     public static <T> Result<T> buildFail(String errorCode) {

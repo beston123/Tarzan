@@ -108,7 +108,7 @@ public class SendMessageProcessor implements NettyRequestProcessor {
             case ROLLBACK:
                 return producer.rollbackMessage(ctx, request, header.getTransactionId());
             case UNKNOWN:
-                return producer.unknownMessage(ctx, request, header.getTransactionId());
+                return RpcCommandBuilder.buildSuccess();
             default:
                 break;
         }

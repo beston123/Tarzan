@@ -66,7 +66,7 @@ public class MessageAggregatePlanService {
             Date now = messageAggregatePlanMapper.getNow();
             Date end = DateUtils.addSeconds(start, BATCH_PERIOD_SEC);
             if(end.after(now) ){
-                LOGGER.warn("批次结束时间大于当前时间，等待下一次生成批次");
+                //LOGGER.warn("批次结束时间大于当前时间，等待下一次生成批次");
                 return Result.buildSucc(null);
             }
             MessageAggregatePlan messageBatch = new MessageAggregatePlan();
@@ -98,20 +98,16 @@ public class MessageAggregatePlanService {
         return result;
     }
 
-    public Result<Void> updateSuccess(int id, Integer recordCount){
-        return updateSuccess(id, recordCount, null);
-    }
-
     public Result<Void> updateSuccess(int id, Integer recordCount, Long cost){
         return updateStatus(id, AggregateStatus.SUCCESS, recordCount, "执行成功", cost);
     }
 
-    public Result<Void> updateFail(int id, Integer recordCount){
-        return updateStatus(id, AggregateStatus.FAILED, recordCount, "执行失败", null);
+    public Result<Void> updateFail(int id, Integer recordCount, Long cost){
+        return updateStatus(id, AggregateStatus.FAILED, recordCount, "执行失败", cost);
     }
 
-    public Result<Void> updateTimeout(int id, Integer recordCount){
-        return updateStatus(id, AggregateStatus.FAILED, recordCount, "执行超时", null);
+    public Result<Void> updateTimeout(int id, Integer recordCount, Long cost){
+        return updateStatus(id, AggregateStatus.FAILED, recordCount, "执行超时", cost);
     }
 
     private Result<Void> updateStatus(int id, Byte status, Integer recordCount, String remark, Long cost){

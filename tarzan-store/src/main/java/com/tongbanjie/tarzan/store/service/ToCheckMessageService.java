@@ -25,7 +25,7 @@ public class ToCheckMessageService {
     private ToCheckMessageMapper toCheckMessageDAO;
 
     public Result<Boolean> exists(Long tid){
-        ToCheckMessage toCheckMessage = toCheckMessageDAO.selectByPrimaryKey(tid);
+        ToCheckMessage toCheckMessage = toCheckMessageDAO.selectByTid(tid);
         return Result.buildSucc(toCheckMessage != null);
     }
 
@@ -72,7 +72,7 @@ public class ToCheckMessageService {
     public Result<Void> delete(Long tid) {
         Result<Void> result;
         try {
-            toCheckMessageDAO.deleteByPrimaryKey(tid);
+            toCheckMessageDAO.deleteByTid(tid);
             result = Result.buildSucc(null);
         } catch (Exception e) {
             result = Result.buildFail(FailResult.STORE, e.getMessage());
@@ -83,7 +83,7 @@ public class ToCheckMessageService {
     public Result<Void> update(ToCheckMessage toCheckMessage){
         Result<Void> result;
         try {
-            toCheckMessageDAO.updateByPrimaryKeySelective(toCheckMessage);
+            toCheckMessageDAO.updateByTid(toCheckMessage);
             result = Result.buildSucc(null);
         } catch (Exception e) {
             result = Result.buildFail(FailResult.STORE, e.getMessage());

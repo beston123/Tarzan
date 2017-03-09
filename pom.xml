@@ -7,9 +7,9 @@
     <groupId>com.tongbanjie.tarzan</groupId>
     <artifactId>tarzan</artifactId>
     <packaging>pom</packaging>
-    <version>0.5.0</version>
+    <version>0.7.0</version>
     
-    <name>Tarzan</name>
+    <name>tarzan</name>
     <description>可靠事件系统</description>
     <url>http://maven.apache.org</url>
 
@@ -47,6 +47,8 @@
         <version.druid>1.0.14</version.druid>
         <version.baymax-spring>3.0.0</version.baymax-spring>
         <version.jedis>2.8.2</version.jedis>
+        <version.cat>1.3.9</version.cat>
+        <version.plexus>1.6</version.plexus>
 
         <version.maven-compiler-plugin>3.2</version.maven-compiler-plugin>
         <version.maven-surefire-plugin>2.18.1</version.maven-surefire-plugin>
@@ -209,6 +211,18 @@
                 <version>${version.jedis}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.dianping.cat</groupId>
+                <artifactId>cat-client</artifactId>
+                <version>${version.cat}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-container-default</artifactId>
+                <version>${version.plexus}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -260,7 +274,7 @@
         </plugins>
     </build>
 
-    <!--distributionManagement>
+    <distributionManagement>
         <repository>
             <id>nexus-releases</id>
             <name>Nexus Release Repository</name>
@@ -271,7 +285,7 @@
             <name>Nexus Snapshot Repository</name>
             <url>http://192.168.1.6:8081/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
-    </distributionManagement-->
+    </distributionManagement>
 
     <modules>
         <module>tarzan-server</module>
@@ -282,7 +296,6 @@
         <module>tarzan-store</module>
         <module>tarzan-cluster</module>
         <module>tarzan-mq</module>
-        <module>tarzan-admin</module>
     </modules>
 
 </project>

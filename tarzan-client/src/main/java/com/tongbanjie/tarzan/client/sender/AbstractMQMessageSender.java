@@ -6,7 +6,10 @@ import com.tongbanjie.tarzan.client.transaction.TransactionCheckListener;
 import com.tongbanjie.tarzan.common.body.MQBody;
 import com.tongbanjie.tarzan.common.message.MQType;
 import com.tongbanjie.tarzan.common.message.TransactionState;
-import com.tongbanjie.tarzan.common.exception.RpcException;
+import com.tongbanjie.tarzan.rpc.exception.RpcConnectException;
+import com.tongbanjie.tarzan.rpc.exception.RpcSendRequestException;
+import com.tongbanjie.tarzan.rpc.exception.RpcTimeoutException;
+import com.tongbanjie.tarzan.rpc.exception.RpcTooMuchRequestException;
 import com.tongbanjie.tarzan.rpc.protocol.RequestCode;
 import com.tongbanjie.tarzan.rpc.protocol.ResponseCode;
 import com.tongbanjie.tarzan.rpc.protocol.RpcCommand;
@@ -14,6 +17,8 @@ import com.tongbanjie.tarzan.rpc.protocol.RpcCommandBuilder;
 import com.tongbanjie.tarzan.rpc.protocol.header.MessageResultHeader;
 import com.tongbanjie.tarzan.rpc.protocol.header.SendMessageHeader;
 import com.tongbanjie.tarzan.rpc.protocol.header.TransactionMessageHeader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.*;
 
@@ -26,13 +31,9 @@ import java.util.concurrent.*;
  */
 public abstract class AbstractMQMessageSender<T extends MQBody> implements MQMessageSender<T> {
 
-    private static int checkThreadPoolCoreSize = 1;
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractMQMessageSender.class);
 
-    private static int checkThreadPoolMaxSize = 1;
-
-    private static int checkRequestHoldMax = 1000;
-
-    private int sendMessageTimeOut = 3000;
+    private final int sendMessageTimeOut;
 
     private final ClientController clientController;
 
@@ -48,13 +49,7 @@ public abstract class AbstractMQMessageSender<T extends MQBody> implements MQMes
         this.clientController = clientController;
         this.sendMessageTimeOut = this.clientController.getClientConfig().getSendMessageTimeout();
         this.transactionCheckListener = transactionCheckListener;
-
-        this.checkExecutor = new ThreadPoolExecutor(//
-                checkThreadPoolCoreSize, //
-                checkThreadPoolMaxSize, //
-                1000 * 60, //
-                TimeUnit.MILLISECONDS, //
-                new LinkedBlockingQueue<Runnable>(checkRequestHoldMax));
+        this.checkExecutor = this.clientController.getCheckTransactionExecutor();
     }
 
     @Override
@@ -74,11 +69,8 @@ public abstract class AbstractMQMessageSender<T extends MQBody> implements MQMes
                 result = MessageResult.buildFail("系统异常, code:"+response.getCmdCode()
                         +", error:"+ response.getRemark());
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            result = MessageResult.buildFail("应用被中断", e);
-        } catch (RpcException e) {
-            result = MessageResult.buildFail("远程调用失败", e);
+        } catch (Exception e){
+            result = exceptionToResult(e);
         }
         return result;
     }
@@ -101,11 +93,8 @@ public abstract class AbstractMQMessageSender<T extends MQBody> implements MQMes
                 result = MessageResult.buildFail("系统异常, code:"+response.getCmdCode()
                         +", error:"+ response.getRemark());
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            result = MessageResult.buildFail("应用被中断", e);
-        } catch (RpcException e) {
-            result = MessageResult.buildFail("远程调用失败", e);
+        } catch (Exception e){
+            result = exceptionToResult(e);
         }
         return result;
     }
@@ -128,11 +117,8 @@ public abstract class AbstractMQMessageSender<T extends MQBody> implements MQMes
                 result = MessageResult.buildFail("系统异常, code:"+response.getCmdCode()
                         +", error:"+ response.getRemark());
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            result = MessageResult.buildFail("应用被中断", e);
-        } catch (RpcException e) {
-            result = MessageResult.buildFail("远程调用失败", e);
+        } catch (Exception e){
+            result = exceptionToResult(e);
         }
         return result;
     }
@@ -155,15 +141,41 @@ public abstract class AbstractMQMessageSender<T extends MQBody> implements MQMes
                 result = MessageResult.buildFail("系统异常, code:"+response.getCmdCode()
                         +", error:"+ response.getRemark());
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            result = MessageResult.buildFail("应用被中断", e);
-        } catch (RpcException e) {
-            result = MessageResult.buildFail("远程调用失败", e);
+        } catch (Exception e){
+            result = exceptionToResult(e);
         }
         return result;
     }
 
+    /**
+     * 异常打印，并转换为MessageResult
+     * @param e
+     * @return
+     */
+    private MessageResult exceptionToResult(Throwable e){
+        MessageResult result;
+        if (e instanceof InterruptedException) {
+            Thread.currentThread().interrupt();
+            LOGGER.error("系统异常,执行被中断", e);
+            result = MessageResult.buildFail("系统异常");
+        } else if (e instanceof RpcConnectException) {
+            LOGGER.error(RpcConnectException.ERROR_MSG, e);
+            result = MessageResult.buildFail(RpcConnectException.ERROR_MSG);
+        } else if (e instanceof RpcTimeoutException) {
+            LOGGER.error(RpcTimeoutException.ERROR_MSG, e);
+            result = MessageResult.buildFail(RpcTimeoutException.ERROR_MSG);
+        } else if (e instanceof RpcSendRequestException) {
+            LOGGER.error(RpcSendRequestException.ERROR_MSG, e);
+            result = MessageResult.buildFail(RpcSendRequestException.ERROR_MSG);
+        } else if (e instanceof RpcTooMuchRequestException) {
+            LOGGER.error(RpcTooMuchRequestException.ERROR_MSG, e);
+            result = MessageResult.buildFail(RpcTooMuchRequestException.ERROR_MSG);
+        } else {
+            LOGGER.error("系统异常", e);
+            result = MessageResult.buildFail("系统异常");
+        }
+        return result;
+    }
 
     @Override
     public TransactionCheckListener transactionCheckListener(){

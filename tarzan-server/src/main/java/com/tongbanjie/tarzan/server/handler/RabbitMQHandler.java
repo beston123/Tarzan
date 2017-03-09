@@ -49,11 +49,6 @@ public class RabbitMQHandler implements MQMessageHandler {
     }
 
     @Override
-    public RpcCommand unknownMessage(ChannelHandlerContext ctx, RpcCommand request, Long transactionId) {
-        return null;
-    }
-
-    @Override
     public RpcCommand queryMessage(ChannelHandlerContext ctx, QueryMessageHeader queryMessageHeader) {
         return null;
     }

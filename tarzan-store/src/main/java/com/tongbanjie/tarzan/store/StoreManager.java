@@ -1,5 +1,6 @@
 package com.tongbanjie.tarzan.store;
 
+import com.tongbanjie.tarzan.store.service.MessageConsumeService;
 import com.tongbanjie.tarzan.store.service.StoreService;
 import com.tongbanjie.tarzan.store.service.ToCheckMessageService;
 import com.tongbanjie.tarzan.store.service.ToSendMessageService;
@@ -27,10 +28,6 @@ public interface StoreManager extends Service {
 
     Set<Map.Entry<MQType, StoreService>> mqStoreServiceSet();
 
-    ToCheckMessageService getToCheckMessageService();
-
-    ToSendMessageService getToSendMessageService();
-
-    RedisComponent getRedisComponent();
+    MessageConsumeService getMessageConsumeService();
 
 }

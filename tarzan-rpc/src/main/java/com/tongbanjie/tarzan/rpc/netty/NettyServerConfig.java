@@ -16,12 +16,9 @@
  */
 package com.tongbanjie.tarzan.rpc.netty;
 
-
-import com.tongbanjie.tarzan.common.Constants;
-
 public class NettyServerConfig implements Cloneable{
 
-    private int listenPort = Integer.parseInt(System.getProperty(Constants.TARZAN_SERVER_PORT, "7700"));
+    private int listenPort = 7700;
 
     private int serverWorkerThreads = 8;
     private int serverCallbackExecutorThreads = 0;
@@ -45,6 +42,10 @@ public class NettyServerConfig implements Cloneable{
      * --host=x86_64-linux-gnu \ --build=x86_64-pc-linux-gnu \ --without-gd
      */
     private boolean useEpollNativeSelector = false;
+
+    public NettyServerConfig(int listenPort){
+        this.listenPort = listenPort;
+    }
 
     public int getListenPort() {
         return listenPort;

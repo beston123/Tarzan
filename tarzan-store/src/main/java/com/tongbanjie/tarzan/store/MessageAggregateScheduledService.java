@@ -87,16 +87,16 @@ public abstract class MessageAggregateScheduledService implements ScheduledServi
         Assert.notNull(getJobKey());
         Assert.isTrue(getJobExpireMillis() > 0L);
         if(!redisComponent.acquireLock(getJobKey(), getJobExpireMillis())){
-            LOGGER.warn("Job[{}] 并发执行！", getJobKey());
+            LOGGER.warn("Job [{}] 并发执行", getJobName());
             return;
         }
-        LOGGER.info("Job[{}] 开始执行", getJobKey());
+        LOGGER.info("Job [{}] 开始执行", getJobName());
         try{
             execute();
         } finally {
             redisComponent.releaseLock(getJobKey());
         }
-        LOGGER.info("Job[{}] 执行结束", getJobKey());
+        LOGGER.info("Job [{}] 执行结束", getJobName());
     }
 
     protected abstract void execute();
@@ -177,22 +177,22 @@ public abstract class MessageAggregateScheduledService implements ScheduledServi
                 continue;
             }
 
+            Timeout timeout = new Timeout(PLAN_TIMEOUT);
             /*************** 2、查询总记录数 ***************/
             Result<Integer> totalRet = storeService.countByCondition(query);
             if(!totalRet.isSuccess()){
-                messageAggregatePlanService.updateFail(aggregatePlan.getId(), null);
+                messageAggregatePlanService.updateFail(aggregatePlan.getId(), null, timeout.cost());
                 continue;
             }
             int total = totalRet.getData();
             if(total == 0){
-                messageAggregatePlanService.updateSuccess(aggregatePlan.getId(), 0);
+                messageAggregatePlanService.updateSuccess(aggregatePlan.getId(), 0, timeout.cost());
                 continue;
             }
 
             /*************** 3、分页查询，并处理***************/
             PagingParam pagingParam = new PagingParam(PAGE_SIZE, total);
             Result<List<MQMessage>> dataRet;
-            Timeout timeout = new Timeout(PLAN_TIMEOUT);
             try {
                 for(int times=0; times < pagingParam.getTotalPage(); times++){
                     dataRet = storeService.selectByCondition(query, pagingParam);
@@ -207,15 +207,17 @@ public abstract class MessageAggregateScheduledService implements ScheduledServi
                     //超时退出
                     timeout.validate();
                 }
-                LOGGER.info(String.format("Aggregate Plan [timeStart:%s] exec success, cost %s ms",
+                LOGGER.info(String.format("Aggregate Plan [%s] exec success, cost %s ms",
                         aggregatePlan.getTimeStart(), timeout.cost()));
                 messageAggregatePlanService.updateSuccess(aggregatePlan.getId(), total, timeout.cost());
             } catch (TimeoutException e) {
-                LOGGER.error("",e);
-                messageAggregatePlanService.updateTimeout(aggregatePlan.getId(), total);
+                LOGGER.error(String.format("Aggregate Plan [%s] exec timeout, cost %s ms",
+                        aggregatePlan.getTimeStart(), timeout.cost()), e);
+                messageAggregatePlanService.updateTimeout(aggregatePlan.getId(), total, timeout.cost());
             } catch (Exception e){
-                LOGGER.error("",e);
-                messageAggregatePlanService.updateFail(aggregatePlan.getId(), total);
+                LOGGER.error(String.format("Aggregate Plan [%s] exec fail, cost %s ms",
+                        aggregatePlan.getTimeStart(), timeout.cost()), e);
+                messageAggregatePlanService.updateFail(aggregatePlan.getId(), total, timeout.cost());
             }
         }
     }

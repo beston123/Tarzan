@@ -25,6 +25,9 @@ public class LoadBalanceFactory {
             case WeightedRandom:
                 loadBalance = new WeightedRandomLoadBalance();
                 break;
+            case WeightedRoundRobin:
+                loadBalance = new WeightedRoundRobinLoadBalance();
+                break;
             default:
                 loadBalance = new RandomLoadBalance();
                 break;

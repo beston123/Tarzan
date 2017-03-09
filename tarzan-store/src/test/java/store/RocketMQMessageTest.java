@@ -1,6 +1,7 @@
 package store;
 
 import com.tongbanjie.tarzan.common.Constants;
+import com.tongbanjie.tarzan.common.PagingParam;
 import com.tongbanjie.tarzan.common.Result;
 import com.tongbanjie.tarzan.common.message.RocketMQMessage;
 import com.tongbanjie.tarzan.common.message.TransactionState;
@@ -9,7 +10,6 @@ import com.tongbanjie.tarzan.common.util.DistributedIdGenerator;
 import com.tongbanjie.tarzan.store.dao.RocketMQMessageDAO;
 import com.tongbanjie.tarzan.store.query.MQMessageQuery;
 import com.tongbanjie.tarzan.store.service.RocketMQStoreService;
-import org.apache.commons.lang3.RandomUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.util.Assert;
@@ -41,26 +41,26 @@ public class RocketMQMessageTest extends BaseTest{
 
     @Test
     public void insert() throws InterruptedException {
-        for(int i=1; i<= 256; i++){
+        for(int i=0; i<256; i++){
             final RocketMQMessage mqMessage = new RocketMQMessage();
-            mqMessage.setMessageKey(RandomUtils.nextLong(100000, 200000) + "_" + Constants.TEVENT_TEST_TOPIC);
-            mqMessage.setProducerGroup(Constants.TEVENT_TEST_P_GROUP);
-            mqMessage.setTopic(Constants.TEVENT_TEST_TOPIC);
+            mqMessage.setMessageKey("2017_"+String.valueOf(System.currentTimeMillis()));
+            mqMessage.setProducerGroup(Constants.TARZAN_TEST_P_GROUP);
+            mqMessage.setTopic(Constants.TARZAN_TEST_TOPIC);
             mqMessage.setTransactionState(TransactionState.PREPARE.getCode());
             mqMessage.setMessageBody(("TEST_" + mqMessage.getMessageKey()).getBytes());
             Result<Long> result = RocketMQMessageTest.this.rocketMQStoreService.put(mqMessage);
             if(!result.isSuccess()){
-                System.out.println(result.getErrorDetail());
+                throw new RuntimeException(result.getErrorDetail());
             }
         }
     }
 
     @Test
     public void selectByPrimaryKey(){
-        Long tid =6542728632467544L;
+        Long tid =3593673693466624L;
         RocketMQMessage rocketMQMessage = rocketMQMessageDAO.selectByPrimaryKey(tid);
         Assert.notNull(rocketMQMessage);
-        Assert.isTrue(rocketMQMessage.getId() == tid);
+        Assert.isTrue(tid.equals(rocketMQMessage.getId()));
     }
 
     @Test
@@ -78,10 +78,13 @@ public class RocketMQMessageTest extends BaseTest{
     @Test
     public void selectByCondition() throws ParseException {
         MQMessageQuery messageQuery = new MQMessageQuery();
-        messageQuery.setCreateTimeFromInclude(DateUtils.tryParse("2016-12-08 15:22:06"));
-        messageQuery.setCreateTimeToExclude(DateUtils.tryParse("2016-12-08 15:22:07"));
+        messageQuery.setCreateTimeFromInclude(DateUtils.tryParse("2017-01-09 11:40:50"));
+        messageQuery.setCreateTimeToExclude(DateUtils.tryParse("2017-01-29 11:40:51"));
+        messageQuery.setPagingParam(new PagingParam(5));
         List<RocketMQMessage> list = rocketMQMessageDAO.selectByCondition(messageQuery);
-        list.size();
+        for(RocketMQMessage mqMessage : list){
+            System.out.println(mqMessage.getId());
+        }
     }
 
 }

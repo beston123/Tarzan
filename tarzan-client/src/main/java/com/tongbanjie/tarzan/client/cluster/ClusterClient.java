@@ -37,7 +37,10 @@ public abstract class ClusterClient implements Cluster<RpcCommand, Address, RpcC
         this.registry = registry;
     }
 
-    protected Address select(List<Address> addressList){
+    protected Address select(List<Address> addressList) throws RpcConnectException {
+        if(addressList == null || addressList.isEmpty()){
+            throw new RpcConnectException("Invoke failed: No live servers available.");
+        }
         return loadBalance.get().select(addressList);
     }
 
@@ -210,9 +213,6 @@ public abstract class ClusterClient implements Cluster<RpcCommand, Address, RpcC
             throws InterruptedException, RpcConnectException, RpcTooMuchRequestException,
             RpcTimeoutException, RpcSendRequestException
     {
-        if(address == null){
-            throw new RpcConnectException("Invoke failed, address is null.");
-        }
         return this.rpcClient.invokeSync(address.getAddress(), request, timeoutMillis);
     }
 
@@ -220,9 +220,6 @@ public abstract class ClusterClient implements Cluster<RpcCommand, Address, RpcC
             throws InterruptedException, RpcConnectException, RpcTooMuchRequestException,
             RpcTimeoutException, RpcSendRequestException
     {
-        if(address == null){
-            throw new RpcConnectException("Invoke failed, address is null.");
-        }
         if(invokeCallback != null){
             this.rpcClient.invokeAsync(address.getAddress(), request, timeoutMillis, invokeCallback);
         }else {
@@ -231,7 +228,7 @@ public abstract class ClusterClient implements Cluster<RpcCommand, Address, RpcC
     }
 
     @Override
-    public Address selectOne(){
+    public Address selectOne() throws RpcConnectException {
         List<Address> addressList = this.registry.getDiscovered();
         return select(addressList);
     }

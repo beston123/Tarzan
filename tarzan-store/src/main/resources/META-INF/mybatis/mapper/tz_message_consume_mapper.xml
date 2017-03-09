@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tongbanjie.tarzan.store.mapper.MessageConsumeMapper" >
+  <resultMap id="BaseResultMap" type="MessageConsume" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="tid" property="tid" jdbcType="BIGINT" />
+    <result column="message_id" property="messageId" jdbcType="VARCHAR" />
+    <result column="message_key" property="messageKey" jdbcType="VARCHAR" />
+    <result column="consumer_group" property="consumerGroup" jdbcType="VARCHAR" />
+    <result column="topic" property="topic" jdbcType="VARCHAR" />
+    <result column="consumer" property="consumer" jdbcType="VARCHAR" />
+    <result column="mq_type" property="mqType" jdbcType="TINYINT" />
+    <result column="consume_status" property="consumeStatus" jdbcType="BIT" />
+    <result column="reconsume_times" property="reconsumeTimes" jdbcType="SMALLINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    tid, id, message_id, message_key, consumer_group, topic, consumer, mq_type, consume_status,
+    reconsume_times, create_time, modify_time
+  </sql>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from tz_message_consume
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+
+  <insert id="insert" parameterType="MessageConsume" useGeneratedKeys="true" keyProperty="id" >
+    insert into tz_message_consume (tid, message_id, message_key, consumer_group,
+      topic, consumer, mq_type, 
+      consume_status, reconsume_times,
+      create_time, modify_time)
+    values (#{tid,jdbcType=BIGINT}, #{messageId,jdbcType=VARCHAR}, #{messageKey,jdbcType=VARCHAR}, #{consumerGroup,jdbcType=VARCHAR},
+      #{topic,jdbcType=VARCHAR}, #{consumer,jdbcType=VARCHAR}, #{mqType,jdbcType=TINYINT}, 
+      #{consumeStatus,jdbcType=BIT}, #{reconsumeTimes,jdbcType=SMALLINT},
+      now(), now())
+  </insert>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from tz_message_consume
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+
+  <update id="updateByPrimaryKeySelective" parameterType="MessageConsume" >
+    update tz_message_consume
+    <set >
+      <if test="consumer != null" >
+        consumer = #{consumer,jdbcType=VARCHAR},
+      </if>
+      <if test="consumeStatus != null" >
+        consume_status = #{consumeStatus,jdbcType=BIT},
+      </if>
+      <if test="reconsumeTimes != null" >
+        reconsume_times = #{reconsumeTimes,jdbcType=SMALLINT},
+      </if>
+      modify_time = now()
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="selectByCondition" resultMap="BaseResultMap" parameterType="MessageConsumeQuery" >
+    select 
+    <include refid="Base_Column_List" />
+    from tz_message_consume
+    <where >
+      <include refid="where_sql" />
+    </where>
+  </select>
+
+  <sql id="where_sql">
+    <if test="tid != null" >
+      and tid = #{tid,jdbcType=BIGINT}
+    </if>
+    <if test="messageId != null" >
+      and message_id = #{messageId,jdbcType=VARCHAR}
+    </if>
+    <if test="messageKey != null" >
+      and message_key = #{messageKey,jdbcType=VARCHAR}
+    </if>
+    <if test="consumerGroup != null" >
+      and consumer_group = #{consumerGroup,jdbcType=VARCHAR}
+    </if>
+    <if test="topic != null" >
+      and topic = #{topic,jdbcType=VARCHAR}
+    </if>
+    <if test="mqType != null" >
+      and mq_type = #{mqType,jdbcType=TINYINT}
+    </if>
+    <if test="consumeStatus != null" >
+      and consume_status = #{consumeStatus,jdbcType=BIT}
+    </if>
+  </sql>
+
+  <select id="selectCountByCondition" resultType="int" parameterType="MessageConsumeQuery" >
+    select count(1) from tz_message_consume
+    <where >
+      <include refid="where_sql" />
+    </where>
+  </select>
+
+</mapper>

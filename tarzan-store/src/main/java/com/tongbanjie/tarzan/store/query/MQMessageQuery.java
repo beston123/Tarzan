@@ -106,6 +106,15 @@ public class MQMessageQuery extends PagingQuery {
         this.hasAggregated = hasAggregated;
     }
 
-
-
+    @Override
+    public String toString() {
+        return "MQMessageQuery{" +
+                "messageKey='" + messageKey + '\'' +
+                ", transactionState=" + transactionState +
+                ", sendStatusList=" + sendStatusList +
+                ", createTimeFromInclude=" + createTimeFromInclude +
+                ", createTimeToExclude=" + createTimeToExclude +
+                ", hasAggregated=" + hasAggregated +
+                '}';
+    }
 }

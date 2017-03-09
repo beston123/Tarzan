@@ -1,5 +1,6 @@
 package com.tongbanjie.tarzan.rocketmq;
 
+import com.tongbanjie.tarzan.common.NotNull;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -11,62 +12,52 @@ import org.apache.commons.lang3.Validate;
  */
 public class RocketMQParam {
 
+    /**
+     * 生产者Group
+     */
+    @NotNull
     private String groupId;
 
-    private String name;
-
+    /**
+     * 消息Topic
+     */
+    @NotNull
     private String topic;
 
-    private String tag;
-
-    private String namesrvAddr;
+    /**
+     * 消息Tags
+     */
+    private String tags;
 
     public RocketMQParam(){
 
     }
 
-    public RocketMQParam(String groupId, String name, String topic, String tag, String namesrvAddr){
+    public RocketMQParam(String groupId, String topic, String tags){
         this.groupId = groupId;
-        this.name = name;
         this.topic = topic;
-        this.tag = tag;
-        this.namesrvAddr = namesrvAddr;
+        this.tags = tags;
     }
 
     public void validate() throws Exception{
         Validate.notBlank(groupId, "The 'groupId' can not be blank");
-        Validate.notBlank(name, "The 'name' can not be blank");
         Validate.notBlank(groupId, "The 'topic' can not be blank");
-        Validate.notBlank(namesrvAddr, "The 'namesrvAddr' can not be blank");
     }
 
     public String getGroupId() {
         return groupId;
     }
 
-    public String getNamesrvAddr() {
-        return namesrvAddr;
-    }
-
     public String getTopic() {
         return topic;
     }
 
-    public String getTag() {
-        return tag;
-    }
-
-    public String getName() {
-        return name;
+    public String getTags() {
+        return tags;
     }
 
     public RocketMQParam setGroupId(String groupId) {
         this.groupId = groupId;
-        return this;
-    }
-
-    public RocketMQParam setName(String name) {
-        this.name = name;
         return this;
     }
 
@@ -75,13 +66,8 @@ public class RocketMQParam {
         return this;
     }
 
-    public RocketMQParam setTag(String tag) {
-        this.tag = tag;
-        return this;
-    }
-
-    public RocketMQParam setNamesrvAddr(String namesrvAddr) {
-        this.namesrvAddr = namesrvAddr;
+    public RocketMQParam setTags(String tags) {
+        this.tags = tags;
         return this;
     }
 
@@ -89,10 +75,8 @@ public class RocketMQParam {
     public String toString() {
         return "RocketMQParam{" +
                 "groupId='" + groupId + '\'' +
-                ", name='" + name + '\'' +
                 ", topic='" + topic + '\'' +
-                ", tag='" + tag + '\'' +
-                ", namesrvAddr='" + namesrvAddr + '\'' +
+                ", tags='" + tags + '\'' +
                 '}';
     }
 }

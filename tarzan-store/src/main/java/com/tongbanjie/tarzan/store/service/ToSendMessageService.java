@@ -25,7 +25,7 @@ public class ToSendMessageService {
     private ToSendMessageMapper toSendMessageDAO;
 
     public Result<Boolean> exists(Long tid){
-        ToSendMessage toSendMessage = toSendMessageDAO.selectByPrimaryKey(tid);
+        ToSendMessage toSendMessage = toSendMessageDAO.selectByTid(tid);
         return Result.buildSucc(toSendMessage != null);
     }
 
@@ -72,7 +72,7 @@ public class ToSendMessageService {
     public Result<Void> delete(Long tid) {
         Result<Void> result;
         try {
-            toSendMessageDAO.deleteByPrimaryKey(tid);
+            toSendMessageDAO.deleteByTid(tid);
             result = Result.buildSucc(null);
         } catch (Exception e) {
             result = Result.buildFail(FailResult.STORE, e.getMessage());
@@ -83,7 +83,7 @@ public class ToSendMessageService {
     public Result<Void> update(ToSendMessage toCheckMessage){
         Result<Void> result;
         try {
-            toSendMessageDAO.updateByPrimaryKeySelective(toCheckMessage);
+            toSendMessageDAO.updateByTid(toCheckMessage);
             result = Result.buildSucc(null);
         } catch (Exception e) {
             result = Result.buildFail(FailResult.STORE, e.getMessage());

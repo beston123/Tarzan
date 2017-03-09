@@ -227,9 +227,10 @@ public class RocketMQStoreService implements StoreService<RocketMQMessage> {
     }
 
     @Override
-    public Result<Void> updateSendSuccess(Long id) {
+    public Result<Void> updateSendSuccess(Long id, String msgId) {
         RocketMQMessage record = new RocketMQMessage();
         record.setId(id);
+        record.setMessageId(msgId);
         record.setSendStatus(SendStatus.SUCCESS.getCode());
         return update(id, record);
     }

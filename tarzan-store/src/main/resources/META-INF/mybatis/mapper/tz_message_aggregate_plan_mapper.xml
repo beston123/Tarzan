@@ -35,7 +35,7 @@
       remark)
     values (#{timeStart,jdbcType=TIMESTAMP}, #{timeEnd,jdbcType=TIMESTAMP}, #{mqType,jdbcType=TINYINT},
       #{aggregateType,jdbcType=TINYINT}, #{status,jdbcType=TINYINT}, #{recordCount,jdbcType=INTEGER},
-      #{elapsedTime,jdbcType=BIGINT}, now(), #{modifyTime,jdbcType=TIMESTAMP},
+      #{elapsedTime,jdbcType=BIGINT}, now(), now(),
       #{remark,jdbcType=VARCHAR})
   </insert>
 
@@ -71,6 +71,7 @@
     <where >
       <include refid="where_sql" />
     </where>
+    order by id asc
   </select>
 
   <sql id="where_sql">

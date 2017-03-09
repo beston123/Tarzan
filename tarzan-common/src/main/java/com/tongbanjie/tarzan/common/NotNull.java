@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 /**
  * 〈非空注解〉<p>
- * 〈功能详细描述〉
+ * 〈必填字段〉
  *
  * @author zixiao
  * @date 16/12/12

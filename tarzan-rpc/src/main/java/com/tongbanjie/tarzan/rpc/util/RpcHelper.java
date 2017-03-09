@@ -22,8 +22,6 @@ public class RpcHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcHelper.class);
 
-    public static final String RpcLogName = "TEventRpc";
-
     public static final String OS_NAME = System.getProperty("os.name");
 
     private RpcHelper(){}
@@ -35,9 +33,9 @@ public class RpcHelper {
 
             StackTraceElement[] stackTrace = e.getStackTrace();
             if (stackTrace != null && stackTrace.length > 0) {
-                StackTraceElement elment = stackTrace[0];
+                StackTraceElement element = stackTrace[0];
                 sb.append(", ");
-                sb.append(elment.toString());
+                sb.append(element.toString());
             }
         }
 

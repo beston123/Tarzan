@@ -17,6 +17,12 @@ public class ToSendMessage implements Serializable {
     private static final long serialVersionUID = 2000494453797571292L;
 
     /**
+     * 主键
+     */
+    @NotNull
+    private Long id;
+
+    /**
      * tid
      */
     @NotNull
@@ -49,12 +55,21 @@ public class ToSendMessage implements Serializable {
     /**
      * 修改时间
      */
+    @NotNull
     private Date modifyTime;
 
     /**
      * 备注
      */
     private String remark;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Long getTid() {
         return tid;
@@ -110,5 +125,19 @@ public class ToSendMessage implements Serializable {
 
     public void setRemark(String remark) {
         this.remark = remark == null ? null : remark.trim();
+    }
+
+    @Override
+    public String toString() {
+        return "ToSendMessage{" +
+                "id=" + id +
+                ", tid=" + tid +
+                ", mqType=" + mqType +
+                ", sourceTime=" + sourceTime +
+                ", retryCount=" + retryCount +
+                ", createTime=" + createTime +
+                ", modifyTime=" + modifyTime +
+                ", remark='" + remark + '\'' +
+                '}';
     }
 }

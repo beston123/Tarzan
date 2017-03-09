@@ -1,5 +1,6 @@
 package com.tongbanjie.tarzan.server;
 
+import com.tongbanjie.tarzan.common.redis.RedisComponent;
 import com.tongbanjie.tarzan.server.handler.MQMessageHandler;
 import com.tongbanjie.tarzan.common.PagingParam;
 import com.tongbanjie.tarzan.common.Result;
@@ -19,7 +20,8 @@ import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -35,6 +37,7 @@ import java.util.concurrent.TimeUnit;
  * @author zixiao
  * @date 16/12/4
  */
+@Component
 public class MessageResendService implements ScheduledService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageResendService.class);
@@ -59,17 +62,22 @@ public class MessageResendService implements ScheduledService {
      */
     private static final String JOB_KEY = MessageResendService.class.getCanonicalName();
 
-    private final ServerController serverController;
+    @Autowired
+    private ServerController serverController;
 
+    @Autowired
     private StoreManager storeManager;
 
+    @Autowired
+    private RedisComponent redisComponent;
+
+    @Autowired
     private ToSendMessageService toSendMessageService;
 
     private ScheduledExecutorService scheduledExecutorService = Executors
             .newSingleThreadScheduledExecutor(new NamedThreadFactory("MessageResendService"));
 
-    public MessageResendService(final ServerController serverController) {
-        this.serverController = serverController;
+    public MessageResendService() {
     }
 
     @Override
@@ -83,7 +91,7 @@ public class MessageResendService implements ScheduledService {
                     LOGGER.error("MessageResendJob 执行失败", e);
                 }
             }
-        }, RandomUtils.nextInt(15 * 60, 18 * 60), 10 * 60 , TimeUnit.SECONDS);
+        }, RandomUtils.nextInt(15 * 60, 18 * 60), 10 * 60, TimeUnit.SECONDS);
     }
 
     @Override
@@ -92,22 +100,14 @@ public class MessageResendService implements ScheduledService {
     }
 
     private void init() {
-        if(storeManager == null){
-            storeManager = this.serverController.getStoreManager();
-        }
-        Assert.notNull(storeManager);
 
-        if(toSendMessageService == null){
-            toSendMessageService = this.storeManager.getToSendMessageService();
-        }
-        Assert.notNull(toSendMessageService);
     }
 
     @Override
     public void schedule(){
         init();
 
-        if(!this.storeManager.getRedisComponent().acquireLock(JOB_KEY, JOB_EXPIRE_MILLIS)){
+        if(!redisComponent.acquireLock(JOB_KEY, JOB_EXPIRE_MILLIS)){
             LOGGER.warn("Job [MessageResendService] 并发执行");
             return;
         }
@@ -119,7 +119,7 @@ public class MessageResendService implements ScheduledService {
                 queryAndResendMessage(mqType,entry.getValue());
             }
         }finally {
-            this.storeManager.getRedisComponent().releaseLock(JOB_KEY);
+            redisComponent.releaseLock(JOB_KEY);
         }
         LOGGER.info("Job [MessageResendService] 执行结束");
     }
@@ -186,7 +186,7 @@ public class MessageResendService implements ScheduledService {
             Result<String> sendResult = producer.sendMessage(mqMessage);
             if(sendResult.isSuccess()){
                 //3.1、成功：更新消息发送状态，并从待发送列表移除
-                updateSendSuccessAndRemoveFromToSend(mqMessage, storeService);
+                onSendSuccess(mqMessage, storeService, sendResult.getData());
             }else{
                 //3.2、失败：重试次数＋1
                 toSendMessageService.incrRetryCount(mqMessage.getId());
@@ -210,10 +210,10 @@ public class MessageResendService implements ScheduledService {
      * @param mqMessage
      * @param storeService
      */
-    private void updateSendSuccessAndRemoveFromToSend(MQMessage mqMessage, StoreService storeService){
+    private void onSendSuccess(MQMessage mqMessage, StoreService storeService, String msgId){
         try {
             //1、更新消息发送状态
-            Result<Void> updateResult = storeService.updateSendSuccess(mqMessage.getId());
+            Result<Void> updateResult = storeService.updateSendSuccess(mqMessage.getId(), msgId);
             ResultValidate.isTrue(updateResult);
             //2、从［待发送］列表删除
             this.toSendMessageService.delete(mqMessage.getId());

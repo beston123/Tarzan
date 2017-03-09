@@ -17,12 +17,12 @@
 package com.tongbanjie.tarzan.server.client;
 
 
-import com.tongbanjie.tarzan.server.ServerConfig;
 import com.tongbanjie.tarzan.rpc.util.RpcHelper;
 import io.netty.channel.Channel;
 import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -37,12 +37,13 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author zixiao
  * @date 16/10/15
  */
+@Component
 public class ClientManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientManager.class);
 
-    private static final long LockTimeoutMillis = 3000;
+    private static final long LOCK_TIMEOUT_MILLIS = 3000;
 
-    private static final long ChannelExpiredTimeout = 1000 * 120;
+    private static final long CHANNEL_EXPIRED_TIMEOUT = 1000 * 120;
 
     private final Lock groupChannelLock = new ReentrantLock();
 
@@ -51,16 +52,15 @@ public class ClientManager {
 
     private final Random random = new Random();
 
-    public ClientManager(ServerConfig serverConfig) {
+    public ClientManager() {
 
     }
-
 
     public HashMap<String, HashMap<Channel, ClientChannelInfo>> getGroupChannelTable() {
         HashMap<String, HashMap<Channel, ClientChannelInfo>> newGroupChannelTable =
                 new HashMap<String, HashMap<Channel, ClientChannelInfo>>();
         try {
-            if (this.groupChannelLock.tryLock(LockTimeoutMillis, TimeUnit.MILLISECONDS)){
+            if (this.groupChannelLock.tryLock(LOCK_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)){
                 try {
                     newGroupChannelTable.putAll(groupChannelTable);
                 } finally {
@@ -68,7 +68,8 @@ public class ClientManager {
                 }
             }
         } catch (InterruptedException e) {
-           LOGGER.error("", e);
+            Thread.currentThread().interrupt();
+            LOGGER.error("", e);
         }
         return newGroupChannelTable;
     }
@@ -76,10 +77,9 @@ public class ClientManager {
 
     public void scanNotActiveChannel() {
         try {
-            if (this.groupChannelLock.tryLock(LockTimeoutMillis, TimeUnit.MILLISECONDS)) {
+            if (this.groupChannelLock.tryLock(LOCK_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)) {
                 try {
-                    for (final Entry<String, HashMap<Channel, ClientChannelInfo>> entry : this.groupChannelTable
-                        .entrySet()) {
+                    for (final Entry<String, HashMap<Channel, ClientChannelInfo>> entry : this.groupChannelTable.entrySet()) {
                         final String group = entry.getKey();
                         final HashMap<Channel, ClientChannelInfo> chlMap = entry.getValue();
 
@@ -90,7 +90,7 @@ public class ClientManager {
                             final ClientChannelInfo info = item.getValue();
 
                             long diff = System.currentTimeMillis() - info.getLastUpdateTimestamp();
-                            if (diff > ChannelExpiredTimeout) {
+                            if (diff > CHANNEL_EXPIRED_TIMEOUT) {
                                 it.remove();
                                 LOGGER.warn(
                                         "SCAN: remove expired channel[{}] from ClientManager groupChannelTable, client group name: {}",
@@ -99,16 +99,14 @@ public class ClientManager {
                             }
                         }
                     }
-                }
-                finally {
+                } finally {
                     this.groupChannelLock.unlock();
                 }
-            }
-            else {
+            } else {
                 LOGGER.warn("ClientManager scanNotActiveChannel lock timeout");
             }
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             LOGGER.error("", e);
         }
     }
@@ -116,32 +114,26 @@ public class ClientManager {
     public void doChannelCloseEvent(final String remoteAddr, final Channel channel) {
         if (channel != null) {
             try {
-                if (this.groupChannelLock.tryLock(LockTimeoutMillis, TimeUnit.MILLISECONDS)) {
+                if (this.groupChannelLock.tryLock(LOCK_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)) {
                     try {
-                        for (final Entry<String, HashMap<Channel, ClientChannelInfo>> entry : this.groupChannelTable
-                            .entrySet()) {
+                        for (final Entry<String, HashMap<Channel, ClientChannelInfo>> entry : this.groupChannelTable.entrySet()) {
                             final String group = entry.getKey();
-                            final HashMap<Channel, ClientChannelInfo> clientChannelInfoTable =
-                                    entry.getValue();
-                            final ClientChannelInfo clientChannelInfo =
-                                    clientChannelInfoTable.remove(channel);
+                            final HashMap<Channel, ClientChannelInfo> clientChannelInfoTable = entry.getValue();
+                            final ClientChannelInfo clientChannelInfo = clientChannelInfoTable.remove(channel);
                             if (clientChannelInfo != null) {
                                 LOGGER.info(
                                         "NETTY EVENT: remove channel[{}][{}] from ClientManager groupChannelTable, client group: {}",
                                         clientChannelInfo.toString(), remoteAddr, group);
                             }
-
                         }
-                    }
-                    finally {
+                    } finally {
                         this.groupChannelLock.unlock();
                     }
-                }
-                else {
+                } else {
                     LOGGER.warn("ClientManager doChannelCloseEvent lock timeout");
                 }
-            }
-            catch (InterruptedException e) {
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 LOGGER.error("", e);
             }
         }
@@ -151,7 +143,7 @@ public class ClientManager {
         try {
             ClientChannelInfo clientChannelInfoFound = null;
 
-            if (this.groupChannelLock.tryLock(LockTimeoutMillis, TimeUnit.MILLISECONDS)) {
+            if (this.groupChannelLock.tryLock(LOCK_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)) {
                 try {
                     HashMap<Channel, ClientChannelInfo> channelTable = this.groupChannelTable.get(group);
                     if (null == channelTable) {
@@ -165,8 +157,7 @@ public class ClientManager {
                         LOGGER.info("New client connected, group: {} channel: {}", group,
                                 clientChannelInfo.toString());
                     }
-                }
-                finally {
+                } finally {
                     this.groupChannelLock.unlock();
                 }
 
@@ -174,19 +165,18 @@ public class ClientManager {
                     LOGGER.debug("Get heartbeat from client, group: {} channel: {}", group, clientChannelInfoFound);
                     clientChannelInfoFound.setLastUpdateTimestamp(System.currentTimeMillis());
                 }
-            }
-            else {
+            } else {
                 LOGGER.warn("ClientManager register lock timeout");
             }
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             LOGGER.error("", e);
         }
     }
 
     public void unregister(final String group, final ClientChannelInfo clientChannelInfo) {
         try {
-            if (this.groupChannelLock.tryLock(LockTimeoutMillis, TimeUnit.MILLISECONDS)) {
+            if (this.groupChannelLock.tryLock(LOCK_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)) {
                 try {
                     HashMap<Channel, ClientChannelInfo> channelTable = this.groupChannelTable.get(group);
                     if (null != channelTable && !channelTable.isEmpty()) {
@@ -201,16 +191,14 @@ public class ClientManager {
                             LOGGER.info("unregister a client group[{}] from groupChannelTable", group);
                         }
                     }
-                }
-                finally {
+                } finally {
                     this.groupChannelLock.unlock();
                 }
-            }
-            else {
+            } else {
                 LOGGER.warn("ClientManager unregister client lock timeout");
             }
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             LOGGER.error("", e);
         }
     }
@@ -222,7 +210,6 @@ public class ClientManager {
         }
         List<ClientChannelInfo> clientChannelInfoList = new ArrayList<ClientChannelInfo>(map.values());
         int size = clientChannelInfoList.size();
-        //TODO 均衡负载
         return clientChannelInfoList.get(random.nextInt(size));
     }
 }

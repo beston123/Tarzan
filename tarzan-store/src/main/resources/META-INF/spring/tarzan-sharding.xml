@@ -17,13 +17,13 @@
         </baymax:columns>
 
         <!-- 取最后一位%分表数 作为表后缀 -->
-        <baymax:function class="com.tongbanjie.tarzan.store.sharding.VirtualModFunction256_16"/>
+        <baymax:function class="com.tongbanjie.tarzan.store.sharding.VirtualModFunction256_64"/>
 
         <!-- 指定 每个数据库上分别有哪些表后缀 -->
         <baymax:nodeMapping class="com.tongbanjie.baymax.router.strategy.SimpleTableNodeMapping">
             <!-- p0 代表是一个数据源，与 multipleDataSource 定义的 identity 对应 -->
             <!-- 这个配置代表的是 p0 数据库存储的表 -->
-            <baymax:node>p0:000,016,032,048,064,080,096,112,128,144,160,176,192,208,224,240</baymax:node>
+            <baymax:node>p0:000,004,008,012,016,020,024,028,032,036,040,044,048,052,056,060,064,068,072,076,080,084,088,092,096,100,104,108,112,116,120,124,128,132,136,140,144,148,152,156,160,164,168,172,176,180,184,188,192,196,200,204,208,212,216,220,224,228,232,236,240,244,248,252</baymax:node>
 
             <!-- 这个配置代表的是 p1 数据库存储的表 -->
             <!--baymax:node>p1:000</baymax:node-->

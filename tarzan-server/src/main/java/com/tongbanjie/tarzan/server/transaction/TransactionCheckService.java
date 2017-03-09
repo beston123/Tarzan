@@ -1,6 +1,6 @@
 package com.tongbanjie.tarzan.server.transaction;
 
-import com.tongbanjie.tarzan.server.ServerController;
+import com.tongbanjie.tarzan.common.redis.RedisComponent;
 import com.tongbanjie.tarzan.common.ScheduledService;
 import com.tongbanjie.tarzan.common.message.MQMessage;
 import com.tongbanjie.tarzan.common.message.MQType;
@@ -20,7 +20,8 @@ import com.tongbanjie.tarzan.store.service.ToSendMessageService;
 import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ import java.util.concurrent.TimeUnit;
  * @author zixiao
  * @date 16/10/14
  */
+@Component
 public class TransactionCheckService implements ScheduledService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransactionCheckService.class);
@@ -60,22 +62,26 @@ public class TransactionCheckService implements ScheduledService {
      */
     private static final String JOB_KEY = TransactionCheckService.class.getCanonicalName();
 
-    private final ServerController serverController;
+    @Autowired
+    private TransactionCheckExecutor transactionCheckExecutor;
 
-    private final TransactionCheckExecutor transactionCheckExecutor;
-
+    @Autowired
     private ToCheckMessageService toCheckMessageService;
 
+    @Autowired
     private ToSendMessageService toSendMessageService;
 
+    @Autowired
     private StoreManager storeManager;
+
+    @Autowired
+    private RedisComponent redisComponent;
 
     private ScheduledExecutorService scheduledExecutorService = Executors
             .newSingleThreadScheduledExecutor(new NamedThreadFactory("TransactionCheckService"));
 
-    public TransactionCheckService(final ServerController serverController) {
-        this.serverController = serverController;
-        this.transactionCheckExecutor  = new DefaultTransactionCheckExecutor(serverController);
+    public TransactionCheckService() {
+
     }
 
     @Override
@@ -98,26 +104,14 @@ public class TransactionCheckService implements ScheduledService {
     }
 
     private void init() {
-        if(storeManager == null){
-            storeManager = this.serverController.getStoreManager();
-        }
-        Assert.notNull(storeManager);
 
-        if(toCheckMessageService == null){
-            toCheckMessageService = this.storeManager.getToCheckMessageService();
-        }
-        if(toSendMessageService == null){
-            toSendMessageService = this.storeManager.getToSendMessageService();
-        }
-        Assert.notNull(toCheckMessageService);
-        Assert.notNull(toSendMessageService);
     }
 
     @Override
     public void schedule(){
         init();
 
-        if(!storeManager.getRedisComponent().acquireLock(JOB_KEY, JOB_EXPIRE_MILLIS)){
+        if(!redisComponent.acquireLock(JOB_KEY, JOB_EXPIRE_MILLIS)){
             LOGGER.warn("Job [TransactionCheckService] 并发执行");
             return;
         }
@@ -129,7 +123,7 @@ public class TransactionCheckService implements ScheduledService {
                 checkTransactionState(mqType, entry.getValue());
             }
         }finally {
-            storeManager.getRedisComponent().releaseLock(JOB_KEY);
+            redisComponent.releaseLock(JOB_KEY);
         }
         LOGGER.info("Job [TransactionCheckService] 执行结束");
     }

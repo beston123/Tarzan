@@ -35,6 +35,7 @@ public class DateUtils {
      * yyyyMMddHHmmss
      * EEE MMM dd HH:mm:ss Z yyyy
      * yyyyMMdd
+     * yyyy-MM-dd
      */
     private static final List<DateFormatRegex> dateFormatRegexList = new ArrayList<DateFormatRegex>();
 
@@ -46,11 +47,14 @@ public class DateUtils {
 
     private static final String REGEX_yyyyMMdd = "^\\d{8}$";
 
+    private static final String REGEX_yyyy_MM_dd = "^\\d{4}\\D+\\d{1,2}\\D+\\d{1,2}\\D*$";
+
     static {
         dateFormatRegexList.add(new DateFormatRegex("yyyy-MM-dd-HH-mm-ss", REGEX_yyyy_MM_dd_HH_mm_ss));
         dateFormatRegexList.add(new DateFormatRegex("yyyyMMddHHmmss", REGEX_yyyyMMddHHmmss));
         dateFormatRegexList.add(new DateFormatRegex("EEE MMM dd HH:mm:ss Z yyyy", REGEX_EEE_MMM_dd_HH_mm_ss_Z_yyyy, Locale.US));
         dateFormatRegexList.add(new DateFormatRegex("yyyyMMdd", REGEX_yyyyMMdd));
+        dateFormatRegexList.add(new DateFormatRegex("yyyy-MM-dd", REGEX_yyyy_MM_dd));
     }
 
     private static class DateFormatRegex{
@@ -158,6 +162,7 @@ public class DateUtils {
      * 20140312120534
      * Wed Mar 12 13:05:34 CST 2014
      * 20140312
+     * 2014年3月12日，2014-03-12，2014/3/12，2014 03 12
      *
      * @param dateStr
      * @return
@@ -167,7 +172,8 @@ public class DateUtils {
         String copy = dateStr;
         for(DateFormatRegex dfr: dateFormatRegexList){
             if (dfr.regexPattern.matcher(dateStr).matches()) {
-                if(dfr.regexPattern.pattern().equals(REGEX_yyyy_MM_dd_HH_mm_ss)){
+                if(dfr.regexPattern.pattern().equals(REGEX_yyyy_MM_dd_HH_mm_ss)
+                        || dfr.regexPattern.pattern().equals(REGEX_yyyy_MM_dd)){
                     copy = copy.replaceAll("\\D+", "-");
                 }
                 if(dfr.locale != null){
@@ -190,6 +196,8 @@ public class DateUtils {
         dateParseTest("Wed Mar 12 13:05:34 CST 2014");
 
         dateParseTest("20140312");
+        dateParseTest("2014-03-12");
+        dateParseTest("2014年3月12号");
     }
 
     private static void dateParseTest(String dateStr) throws ParseException {

@@ -53,7 +53,7 @@ public class NettyRpcClient extends NettyRpcAbstract implements RpcClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(NettyRpcClient.class);
 
     //锁超时时间
-    private static final long LockTimeoutMillis = 3000;
+    private static final long LOCK_TIMEOUT_MILLIS = 3000;
 
     /******************************** Netty *******************************/
     private final NettyClientConfig nettyClientConfig;
@@ -208,7 +208,7 @@ public class NettyRpcClient extends NettyRpcAbstract implements RpcClient {
         final String addrRemote = null == addr ? RpcHelper.parseChannelRemoteAddr(channel) : addr;
 
         try {
-            if (this.lockChannelTables.tryLock(LockTimeoutMillis, TimeUnit.MILLISECONDS)) {
+            if (this.lockChannelTables.tryLock(LOCK_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)) {
                 try {
                     boolean removeItemFromTable = true;
                     final ChannelWrapper prevCW = this.channelTables.get(addrRemote);
@@ -236,7 +236,7 @@ public class NettyRpcClient extends NettyRpcAbstract implements RpcClient {
                     this.lockChannelTables.unlock();
                 }
             } else {
-                LOGGER.warn("closeChannel: try to lock channel table, but timeout, {}ms", LockTimeoutMillis);
+                LOGGER.warn("closeChannel: try to lock channel table, but timeout, {}ms", LOCK_TIMEOUT_MILLIS);
             }
         } catch (InterruptedException e) {
             LOGGER.error("closeChannel exception", e);
@@ -248,7 +248,7 @@ public class NettyRpcClient extends NettyRpcAbstract implements RpcClient {
             return;
 
         try {
-            if (this.lockChannelTables.tryLock(LockTimeoutMillis, TimeUnit.MILLISECONDS)) {
+            if (this.lockChannelTables.tryLock(LOCK_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)) {
                 try {
                     boolean removeItemFromTable = true;
                     ChannelWrapper prevCW = null;
@@ -281,7 +281,7 @@ public class NettyRpcClient extends NettyRpcAbstract implements RpcClient {
                     this.lockChannelTables.unlock();
                 }
             } else {
-                LOGGER.warn("closeChannel: try to lock channel table, but timeout, {}ms", LockTimeoutMillis);
+                LOGGER.warn("closeChannel: try to lock channel table, but timeout, {}ms", LOCK_TIMEOUT_MILLIS);
             }
         } catch (InterruptedException e) {
             LOGGER.error("closeChannel exception", e);
@@ -318,7 +318,7 @@ public class NettyRpcClient extends NettyRpcAbstract implements RpcClient {
             }
         } else {
             this.closeChannel(addr, channel);
-            throw new RpcConnectException(addr);
+            throw new RpcConnectException("Connection is not available, address:"+addr);
         }
     }
 
@@ -340,7 +340,7 @@ public class NettyRpcClient extends NettyRpcAbstract implements RpcClient {
             return cw.getChannel();
         }
 
-        if (this.lockChannelTables.tryLock(LockTimeoutMillis, TimeUnit.MILLISECONDS)) {
+        if (this.lockChannelTables.tryLock(LOCK_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)) {
             try {
                 boolean createNewConnection = false;
                 cw = this.channelTables.get(addr);
@@ -376,7 +376,7 @@ public class NettyRpcClient extends NettyRpcAbstract implements RpcClient {
                 this.lockChannelTables.unlock();
             }
         } else {
-            LOGGER.warn("createChannel: try to lock channel table, but timeout, {}ms", LockTimeoutMillis);
+            LOGGER.warn("createChannel: try to lock channel table, but timeout, {}ms", LOCK_TIMEOUT_MILLIS);
         }
 
         if (cw != null) {

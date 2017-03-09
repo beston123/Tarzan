@@ -4,6 +4,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.7.1] - 2017-03-08
+### Added
+- 新增接入CAT监控
+
+### Changed
+- 服务端基于Spring改造
+
+## [0.7.0] - 2017-01-12
+### Added
+- 新增消息消费结果的记录
+- 新增负载均衡算法
+
+### Changed
+- 优化客户端心跳发送（多个生产者group合并成一个心跳）
+- 调整RocketMQ参数字段
+- TbjMQ客户端整合到mq-client
+- tarzan-admin拆分为独立工程
+- 权重基准值调整为10
+
+## [0.6.0] - 2017-01-10
+### Added
+- 新增部署说明文档
+
+### Changed
+- 修复消息重发未记录msgId的问题
+- 文档目录调整
+- 表结构调整，增加id字段
 
 ## [0.5.0] - 2016-12-12
 ### Added
@@ -48,4 +75,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - 重构Server端MQ消息发送者
 - 重构MQ客户端
 
-[0.5.0]: http://git.tongbanjie.com/ware/tarzan/tree/master
+[0.7.1]: http://git.tongbanjie.com/ware/tarzan/tree/master
