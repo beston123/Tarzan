@@ -2,7 +2,7 @@
 
 ## 简介
 Tarzan取自电影《人猿泰山》的英文名，用于保证消息生产者的消息被可靠投递
-- admin: 服务端和消息监控中心
+- [admin](https://github.com/beston123/Tarzan-admin): 服务端和消息监控中心
 - client: 客户端，服务端连接管理和事务消息发送
 - cluster: 集群策略和负载均衡
 - common: 公用的代码
