@@ -20,11 +20,11 @@
 
 #### 启动
 
-    sh startup.sh
+    ./startup.sh
 
 #### 停止
 
-    sh shutdown.sh
+    ./shutdown.sh
 
 ### Admin部署
 #### 配置
