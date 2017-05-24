@@ -12,17 +12,16 @@ Tarzan取自电影《人猿泰山》的英文名，用于保证消息生产者�
 - store: 服务端的数据存储
 - mq: 各类mq客户端，集成到应用
 
-## 架构图
+## 设计
 ![架构图](https://github.com/beston123/tevent/blob/master/doc/development/Architecture.png)
 
-## 生产者事务消息
 ![生产者事务消息](https://github.com/beston123/tevent/blob/master/doc/development/TransactionMessage.png)
 
-## 更新日志
-[CHANGELOG] (https://github.com/beston123/Tarzan/blob/master/CHANGELOG.md)
+## 版本
+[更新日志](https://github.com/beston123/Tarzan/blob/master/CHANGELOG.md)
 
-## 部署说明
-[INSTALL] (https://github.com/beston123/Tarzan/blob/master/doc/install/INSTALL.md)
+## 文档
+[部署说明](https://github.com/beston123/Tarzan/blob/master/doc/install/INSTALL.md)
 
 ## 建议
 版本目前仍在开发中，若您有任何建议，可以通过Email：beston@yeah.net 联系。
