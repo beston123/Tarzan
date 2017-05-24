@@ -305,6 +305,12 @@ public class NettyRpcServer extends NettyRpcAbstract implements RpcServer {
         protected void channelRead0(ChannelHandlerContext ctx, RpcCommand msg) throws Exception {
             processMessageReceived(ctx, msg);
         }
+
+        @Override
+        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+            final String remoteAddress = RpcHelper.parseChannelRemoteAddr(ctx.channel());
+            LOGGER.warn("NettyServerHandler read exception " + remoteAddress, cause);
+        }
     }
 
     class NettyConnectManageHandler extends ChannelDuplexHandler {
@@ -351,8 +357,8 @@ public class NettyRpcServer extends NettyRpcAbstract implements RpcServer {
         @Override
         public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
             if (evt instanceof IdleStateEvent) {
-                IdleStateEvent evnet = (IdleStateEvent) evt;
-                if (evnet.state().equals(IdleState.ALL_IDLE)) {
+                IdleStateEvent event = (IdleStateEvent) evt;
+                if (event.state().equals(IdleState.ALL_IDLE)) {
                     final String remoteAddress = RpcHelper.parseChannelRemoteAddr(ctx.channel());
                     LOGGER.warn("NETTY SERVER PIPELINE: IDLE exception [{}]", remoteAddress);
                     RpcHelper.closeChannel(ctx.channel());

@@ -64,8 +64,8 @@ public class MQMessageHandlerFactory {
         switch (mqType){
             case ROCKET_MQ:
                 return new RocketMQHandler(serverController);
-            case RABBIT_MQ:
-                return new RabbitMQHandler(serverController);
+            case KAFKA:
+                return new KafkaMQHandler(serverController);
             default:
                 LOGGER.warn("Unsupported mqType '{}'", mqType);
                 break;
@@ -80,7 +80,7 @@ public class MQMessageHandlerFactory {
             executorService.execute(new Runnable() {
                 @Override
                 public void run() {
-                    MQMessageHandlerFactory.getInstance().getAndCreate(MQType.RABBIT_MQ, null);
+                    MQMessageHandlerFactory.getInstance().getAndCreate(MQType.ROCKET_MQ, null);
                 }
             });
         }

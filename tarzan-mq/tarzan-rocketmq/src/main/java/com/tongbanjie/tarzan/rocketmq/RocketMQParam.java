@@ -10,6 +10,7 @@ import org.apache.commons.lang3.Validate;
  * @author zixiao
  * @date 16/10/27
  */
+@Deprecated
 public class RocketMQParam {
 
     /**
@@ -24,19 +25,13 @@ public class RocketMQParam {
     @NotNull
     private String topic;
 
-    /**
-     * 消息Tags
-     */
-    private String tags;
-
     public RocketMQParam(){
 
     }
 
-    public RocketMQParam(String groupId, String topic, String tags){
+    public RocketMQParam(String groupId, String topic){
         this.groupId = groupId;
         this.topic = topic;
-        this.tags = tags;
     }
 
     public void validate() throws Exception{
@@ -52,10 +47,6 @@ public class RocketMQParam {
         return topic;
     }
 
-    public String getTags() {
-        return tags;
-    }
-
     public RocketMQParam setGroupId(String groupId) {
         this.groupId = groupId;
         return this;
@@ -66,17 +57,11 @@ public class RocketMQParam {
         return this;
     }
 
-    public RocketMQParam setTags(String tags) {
-        this.tags = tags;
-        return this;
-    }
-
     @Override
     public String toString() {
         return "RocketMQParam{" +
                 "groupId='" + groupId + '\'' +
                 ", topic='" + topic + '\'' +
-                ", tags='" + tags + '\'' +
                 '}';
     }
 }

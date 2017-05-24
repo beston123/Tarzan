@@ -10,7 +10,7 @@ package com.tongbanjie.tarzan.common.message;
 public enum MQType {
 
     ROCKET_MQ((byte) 0),
-    RABBIT_MQ((byte) 1);
+    KAFKA((byte) 1);
 
     MQType(byte code) {
         this.code = code;

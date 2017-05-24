@@ -4,8 +4,11 @@ import java.io.Serializable;
 
 /**
  * 分页参数 <p>
- * 〈功能详细描述〉
  *
+ * 用法：
+    <if test="pagingParam != null">
+        limit #{pagingParam.offset},#{pagingParam.limit}
+    </if>
  * @author zixiao
  * @date 16/10/26
  */

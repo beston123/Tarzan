@@ -9,8 +9,8 @@ package com.tongbanjie.tarzan.common;
  */
 public enum ServiceState {
 
-    NOT_START,
-    IN_STARTING,
-    RUNNING,
-    FAILED;
+    NOT_START,  //未启动
+    STARTING,   //启动中
+    RUNNING,    //运行中
+    FAILED      //启动失败
 }

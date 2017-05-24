@@ -7,7 +7,7 @@ package com.tongbanjie.tarzan.common;
  * @author zixiao
  * @date 16/12/1
  */
-public class PagingQuery {
+public class PagingQuery extends OrderBy{
 
     protected PagingParam pagingParam;
 

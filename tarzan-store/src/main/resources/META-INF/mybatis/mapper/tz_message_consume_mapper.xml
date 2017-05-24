@@ -68,6 +68,12 @@
     <where >
       <include refid="where_sql" />
     </where>
+    <if test="orderByClause != null">
+      ${orderByClause}
+    </if>
+    <if test="pagingParam != null">
+      limit #{pagingParam.offset},#{pagingParam.limit}
+    </if>
   </select>
 
   <sql id="where_sql">

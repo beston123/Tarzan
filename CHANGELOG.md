@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.8.0] - 2017-05-03
+### Added
+- RocketMQ消息支持Tag
+- 待发消息支持按产生时间查询
+- 客户端bean加载支持属性注入，避免循环依赖
+- 客户端和服务端地址新增version字段
+
 ## [0.7.1] - 2017-03-08
 ### Added
 - 新增接入CAT监控
@@ -74,5 +81,3 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - 重构Server和Client配置
 - 重构Server端MQ消息发送者
 - 重构MQ客户端
-
-[0.7.1]: http://git.tongbanjie.com/ware/tarzan/tree/master

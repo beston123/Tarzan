@@ -9,6 +9,7 @@ import com.tongbanjie.tarzan.common.ServiceState;
 import com.tongbanjie.tarzan.common.util.NamedSingleThreadFactory;
 import com.tongbanjie.tarzan.common.util.NamedThreadFactory;
 import com.tongbanjie.tarzan.registry.Address;
+import com.tongbanjie.tarzan.registry.ClientAddress;
 import com.tongbanjie.tarzan.registry.RecoverableRegistry;
 import com.tongbanjie.tarzan.cluster.loadbalance.LoadBalance;
 import com.tongbanjie.tarzan.cluster.loadbalance.LoadBalanceFactory;
@@ -127,7 +128,7 @@ public class ClientController implements Service {
         synchronized (this) {
             switch (this.serviceState) {
                 case NOT_START:
-                    serviceState = ServiceState.IN_STARTING;
+                    serviceState = ServiceState.STARTING;
                     try {
                         doStart();
                         serviceState = ServiceState.RUNNING;
@@ -141,7 +142,7 @@ public class ClientController implements Service {
                         }
                     }
                     break;
-                case IN_STARTING:
+                case STARTING:
                 case RUNNING:
                 case FAILED:
                 default:
@@ -153,20 +154,24 @@ public class ClientController implements Service {
     }
 
     private void doStart() throws ClientException{
-
+        //1、启动RPC客户端
         if (this.rpcClient != null) {
             this.rpcClient.start();
         }
 
+        //2、注册处理器
         this.registerProcessor();
 
+        //3.1 连接注册中心
         try {
             clientRegistry.start();
         } catch (Exception e) {
             throw new ClientException("The registry connect failed, address: " + clientConfig.getRegistryAddress(), e);
         }
+        //3.2 注册服务器地址
+        clientRegistry.register(new ClientAddress(clientConfig.getAppName(), clientConfig.getClientId()));
 
-        //定时向所有服务端发送心跳
+        //4、定时向所有服务端发送心跳
         this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
             @Override

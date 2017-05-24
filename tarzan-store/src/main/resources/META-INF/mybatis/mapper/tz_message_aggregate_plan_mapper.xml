@@ -71,7 +71,12 @@
     <where >
       <include refid="where_sql" />
     </where>
-    order by id asc
+    <if test="orderByClause != null">
+      ${orderByClause}
+    </if>
+    <if test="pagingParam != null">
+      limit #{pagingParam.offset},#{pagingParam.limit}
+    </if>
   </select>
 
   <sql id="where_sql">
@@ -81,11 +86,24 @@
     <if test="aggregateType != null" >
       and aggregate_type = #{aggregateType,jdbcType=TINYINT}
     </if>
+    <if test="status != null" >
+      and status = #{status,jdbcType=TINYINT}
+    </if>
     <if test="statusList != null" >
       and status in
       <foreach collection="statusList" item="status" open="(" close=")"  separator=",">
         #{status, jdbcType=TINYINT}
       </foreach>
+    </if>
+    <if test="timeStartFrom != null" >
+      <![CDATA[
+        and time_start >= #{timeStartFrom,jdbcType=TIMESTAMP}
+      ]]>
+    </if>
+    <if test="timeStartTo != null" >
+      <![CDATA[
+        and time_start <= #{timeStartTo,jdbcType=TIMESTAMP}
+      ]]>
     </if>
   </sql>
 

@@ -1,9 +1,10 @@
 package com.tongbanjie.tarzan.registry;
 
+import com.tongbanjie.tarzan.common.TarzanVersion;
 import com.tongbanjie.tarzan.common.Weighable;
 
 /**
- * 服务器地址 <p>
+ * 服务端地址 <p>
  * 〈功能详细描述〉
  *
  * @author zixiao
@@ -35,6 +36,11 @@ public class ServerAddress implements Address{
      */
     private Integer serverId;
 
+    /**
+     * 版本号
+     */
+    private Integer version;
+
     public ServerAddress(String address){
         this(address, Weighable.DEFAULT_WEIGHT);
     }
@@ -42,6 +48,7 @@ public class ServerAddress implements Address{
     public ServerAddress(String address, short weight){
         this.address = address;
         this.weight = weight <= 0 ? Weighable.DEFAULT_WEIGHT : weight;
+        this.version = TarzanVersion.CURRENT.getValue();
     }
 
     public ServerAddress(String ip, int port){
@@ -90,6 +97,14 @@ public class ServerAddress implements Address{
         this.serverId = serverId;
     }
 
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -100,7 +115,8 @@ public class ServerAddress implements Address{
         if (weight != that.weight) return false;
         if (enable != that.enable) return false;
         if (address != null ? !address.equals(that.address) : that.address != null) return false;
-        return !(serverId != null ? !serverId.equals(that.serverId) : that.serverId != null);
+        if (serverId != null ? !serverId.equals(that.serverId) : that.serverId != null) return false;
+        return !(version != null ? !version.equals(that.version) : that.version != null);
 
     }
 
@@ -110,6 +126,7 @@ public class ServerAddress implements Address{
         result = 31 * result + (int) weight;
         result = 31 * result + (enable ? 1 : 0);
         result = 31 * result + (serverId != null ? serverId.hashCode() : 0);
+        result = 31 * result + (version != null ? version.hashCode() : 0);
         return result;
     }
 
@@ -120,6 +137,7 @@ public class ServerAddress implements Address{
                 ", weight=" + weight +
                 ", enable=" + enable +
                 ", serverId=" + serverId +
+                ", version=" + version +
                 '}';
     }
 }

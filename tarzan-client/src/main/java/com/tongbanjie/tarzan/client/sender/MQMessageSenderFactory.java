@@ -43,8 +43,8 @@ public class MQMessageSenderFactory {
         switch (mqType){
             case ROCKET_MQ:
                 return new RocketMQMessageSender(clientController, transactionCheckListener);
-            case RABBIT_MQ:
-                return new RabbitMQMessageSender(clientController, transactionCheckListener);
+            case KAFKA:
+                return new KafkaMQMessageSender(clientController, transactionCheckListener);
             default:
                 LOGGER.warn("Unsupported mqType '{}'", mqType);
                 break;

@@ -6,7 +6,6 @@ import com.tongbanjie.tarzan.client.MessageResult;
 import com.tongbanjie.tarzan.client.transaction.TransactionCheckListener;
 import com.tongbanjie.tarzan.common.Constants;
 import com.tongbanjie.tarzan.rocketmq.RocketMQMessageNotifier;
-import com.tongbanjie.tarzan.rocketmq.RocketMQParam;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,7 +22,7 @@ public class RocketMQClientTest {
 
     @Before
     public void before() throws Exception {
-        clientConfig = new ClientConfig("192.168.1.120:2181");
+        clientConfig = new ClientConfig("zk.tbj.com:2181");
     }
 
     @Test
@@ -50,11 +49,8 @@ public class RocketMQClientTest {
     }
 
     private RocketMQMessageNotifier create() throws Exception {
-        RocketMQParam rocketMQParam = new RocketMQParam();
-        rocketMQParam.setGroupId(Constants.TARZAN_TEST_P_GROUP)
-                .setTopic(Constants.TARZAN_TEST_TOPIC);
         TransactionCheckListener checkListener = new TestTransactionCheckListener();
-        RocketMQMessageNotifier mqNotifyManager = new RocketMQMessageNotifier(rocketMQParam, checkListener, clientConfig);
+        RocketMQMessageNotifier mqNotifyManager = new RocketMQMessageNotifier(Constants.TARZAN_TEST_P_GROUP, Constants.TARZAN_TEST_TOPIC, checkListener, clientConfig);
         mqNotifyManager.init();
         return mqNotifyManager;
     }

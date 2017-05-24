@@ -9,6 +9,7 @@ import com.tongbanjie.tarzan.common.PagingParam;
 import com.tongbanjie.tarzan.common.Result;
 import com.tongbanjie.tarzan.common.message.MQType;
 import com.tongbanjie.tarzan.store.model.AggregateType;
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,10 +135,51 @@ public class MessageAggregatePlanService {
             Date now = messageAggregatePlanMapper.getNow();
             result = Result.buildSucc(now);
         } catch (Exception e) {
-            LOGGER.error("get now fail.",e);
+            LOGGER.error("get now fail.", e);
             result = Result.buildFail(FailResult.STORE, e.getMessage());
         }
         return result;
     }
+
+    public Result<Integer> countAggregatePlan(MessageAggregatePlanQuery messageAggregatePlanQuery){
+        Result<Integer> result;
+        try {
+            validateQuery(messageAggregatePlanQuery);
+            Integer count = messageAggregatePlanMapper.selectCountByCondition(messageAggregatePlanQuery);
+            result = Result.buildSucc(count);
+        } catch (IllegalArgumentException e) {
+            LOGGER.error("countAggregatePlan fail.", e);
+            result = Result.buildFail(FailResult.PARAMETER, e.getMessage());
+        } catch (Exception e) {
+            LOGGER.error("countAggregatePlan fail.", e);
+            result = Result.buildFail(FailResult.STORE, e.getMessage());
+        }
+        return result;
+    }
+
+    public Result<List<MessageAggregatePlan>> listAggregatePlan(MessageAggregatePlanQuery messageAggregatePlanQuery){
+        Result<List<MessageAggregatePlan>> result;
+        try {
+            validateQuery(messageAggregatePlanQuery);
+            List<MessageAggregatePlan> list = messageAggregatePlanMapper.selectByCondition(messageAggregatePlanQuery);
+            result = Result.buildSucc(list);
+        } catch (IllegalArgumentException e) {
+            LOGGER.error("listAggregatePlan fail.", e);
+            result = Result.buildFail(FailResult.PARAMETER, e.getMessage());
+        } catch (Exception e) {
+            LOGGER.error("listAggregatePlan fail.", e);
+            result = Result.buildFail(FailResult.STORE, e.getMessage());
+        }
+        return result;
+    }
+
+    private void validateQuery(MessageAggregatePlanQuery messageAggregatePlanQuery){
+        Validate.notNull(messageAggregatePlanQuery);
+        if(messageAggregatePlanQuery.getTimeStartFrom() == null
+                && messageAggregatePlanQuery.getTimeStartTo() == null){
+            throw new IllegalArgumentException("查询条件至少有[开始时间]，参数："+messageAggregatePlanQuery);
+        }
+    }
+
 }
 

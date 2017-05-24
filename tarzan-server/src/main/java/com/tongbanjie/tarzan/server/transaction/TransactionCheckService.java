@@ -145,7 +145,7 @@ public class TransactionCheckService implements ScheduledService {
             ResultValidate.isTrue(listResult);
             for(MQMessage mqMessage : listResult.getData()){
                 if(TransactionState.PREPARE.getCode() == mqMessage.getTransactionState()){
-                    this.transactionCheckExecutor.gotoCheck(mqMessage.getProducerGroup(), mqMessage);
+                    this.transactionCheckExecutor.gotoCheck(mqMessage.getProducerGroup(), mqType, mqMessage);
                     toCheckMessageService.incrRetryCount(mqMessage.getId());
                 }else{
                     removeFromToCheckList(mqType, mqMessage);

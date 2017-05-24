@@ -1,6 +1,7 @@
 package com.tongbanjie.tarzan.server.transaction;
 
 import com.tongbanjie.tarzan.common.message.MQMessage;
+import com.tongbanjie.tarzan.common.message.MQType;
 
 /**
  * 向消息生产者回查事务状态 接口<p>
@@ -11,5 +12,5 @@ import com.tongbanjie.tarzan.common.message.MQMessage;
  */
 public interface TransactionCheckExecutor {
 
-    void gotoCheck(String producerGroup, MQMessage mqMessage);
+    void gotoCheck(String producerGroup, MQType mqType, MQMessage mqMessage);
 }

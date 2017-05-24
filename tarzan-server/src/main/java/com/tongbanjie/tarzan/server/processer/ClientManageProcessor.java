@@ -16,6 +16,7 @@
  */
 package com.tongbanjie.tarzan.server.processer;
 
+import com.tongbanjie.tarzan.rpc.util.RpcHelper;
 import com.tongbanjie.tarzan.server.ServerController;
 import com.tongbanjie.tarzan.server.client.ClientChannelInfo;
 import com.tongbanjie.tarzan.rpc.protocol.RequestCode;
@@ -77,7 +78,9 @@ public class ClientManageProcessor implements NettyRequestProcessor {
             requestHeader.getClientId(),//
             request.getVersion()//
             );
-
+        if(LOGGER.isDebugEnabled()){
+            LOGGER.debug("Get unRegister request from address [{}].", RpcHelper.parseChannelRemoteAddr(ctx.channel()));
+        }
         final String group = requestHeader.getGroup();
         if (group != null) {
             this.serverController.getClientManager().unregister(group, clientChannelInfo);
@@ -99,7 +102,9 @@ public class ClientManageProcessor implements NettyRequestProcessor {
             heartbeatData.getClientId(),//
             request.getVersion()//
             );
-
+        if(LOGGER.isDebugEnabled()){
+            LOGGER.debug("Get heartbeat request from address [{}].", RpcHelper.parseChannelRemoteAddr(ctx.channel()));
+        }
         for(String group : groups){
             this.serverController.getClientManager().register(group, clientChannelInfo);
         }
@@ -111,7 +116,9 @@ public class ClientManageProcessor implements NettyRequestProcessor {
 
     public RpcCommand healthCheck(ChannelHandlerContext ctx, RpcCommand request) {
         RpcCommand response = RpcCommandBuilder.buildResponse();
-
+        if(LOGGER.isDebugEnabled()){
+            LOGGER.debug("Get healthCheck request from address [{}].", RpcHelper.parseChannelRemoteAddr(ctx.channel()));
+        }
         response.setCmdCode(ResponseCode.SUCCESS);
         response.setRemark(null);
         return response;

@@ -7,7 +7,9 @@ import com.tongbanjie.tarzan.client.ClientException;
 import com.tongbanjie.tarzan.client.sender.MQMessageSender;
 import com.tongbanjie.tarzan.client.sender.MQMessageSenderFactory;
 import com.tongbanjie.tarzan.client.transaction.TransactionCheckListener;
+import com.tongbanjie.tarzan.common.NotNull;
 import com.tongbanjie.tarzan.common.message.MQType;
+import org.apache.commons.lang3.Validate;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -22,16 +24,24 @@ public abstract class AbstractMQMessageNotifier<T> implements MQMessageNotifier<
 
     private final AtomicBoolean isStart = new AtomicBoolean(false);
 
-    private TransactionCheckListener transactionCheckListener;
+    private MQMessageSender mqMessageSender;
 
-    protected MQMessageSender mqMessageSender;
+    @NotNull
+    private MQType mqType;
 
-    private final ClientConfig clientConfig;
+    /**
+     * 事务检查器
+     */
+    @NotNull
+    protected TransactionCheckListener transactionCheckListener;
 
-    private final MQType mqType;
+    /**
+     * Client配置信息
+     */
+    @NotNull
+    protected ClientConfig clientConfig;
 
-    public AbstractMQMessageNotifier(ClientConfig clientConfig, MQType mqType){
-        this.clientConfig = clientConfig;
+    public AbstractMQMessageNotifier(MQType mqType){
         this.mqType = mqType;
     }
 
@@ -46,11 +56,23 @@ public abstract class AbstractMQMessageNotifier<T> implements MQMessageNotifier<
     }
 
     private void validate(){
-        if(mqType == null){
-            throw new ClientException("Init MQ client failed, mqType can not be null.");
+        try {
+            Validate.notNull(mqType, "mqType can not be null");
+            Validate.notNull(transactionCheckListener, "transactionCheckListener can not be null");
+            Validate.notNull(clientConfig, "clientConfig can not be null");
+        }catch (IllegalArgumentException e){
+            throw new ClientException("Init MQ client failed,"+e.getMessage());
         }
     }
-    
+
+    public MQMessageSender getMqMessageSender() {
+        return mqMessageSender;
+    }
+
+    public TransactionCheckListener getTransactionCheckListener() {
+        return transactionCheckListener;
+    }
+
     public void setTransactionCheckListener(TransactionCheckListener transactionCheckListener) {
         this.transactionCheckListener = transactionCheckListener;
         if(mqMessageSender != null && mqMessageSender.transactionCheckListener() == null){
@@ -58,4 +80,11 @@ public abstract class AbstractMQMessageNotifier<T> implements MQMessageNotifier<
         }
     }
 
+    public ClientConfig getClientConfig() {
+        return clientConfig;
+    }
+
+    public void setClientConfig(ClientConfig clientConfig) {
+        this.clientConfig = clientConfig;
+    }
 }

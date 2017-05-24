@@ -78,4 +78,27 @@ public class MessageConsumeService {
     }
 
 
+    public Result<List<MessageConsume>> query(MessageConsumeQuery messageConsumeQuery) {
+        Result<List<MessageConsume>> result;
+        try {
+            Validate.notNull(messageConsumeQuery, "查询参数不为空");
+            List<MessageConsume> list = messageConsumeMapper.selectByCondition(messageConsumeQuery);
+            result = Result.buildSucc(list);
+        } catch (Exception e) {
+            result = Result.buildFail(FailResult.STORE, e.getMessage());
+        }
+        return result;
+    }
+
+    public Result<Integer> count(MessageConsumeQuery messageConsumeQuery) {
+        Result<Integer> result;
+        try {
+            Validate.notNull(messageConsumeQuery, "查询参数不为空");
+            Integer count = messageConsumeMapper.selectCountByCondition(messageConsumeQuery);
+            result = Result.buildSucc(count);
+        } catch (Exception e) {
+            result = Result.buildFail(FailResult.STORE, e.getMessage());
+        }
+        return result;
+    }
 }

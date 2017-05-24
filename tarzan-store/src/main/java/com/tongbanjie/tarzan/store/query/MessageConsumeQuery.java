@@ -46,6 +46,10 @@ public class MessageConsumeQuery extends PagingQuery {
      */
     private Boolean consumeStatus;
 
+    public MessageConsumeQuery() {
+        setOrderByClause(ORDER_BY_ID_ASC);
+    }
+
     public Long getTid() {
         return tid;
     }

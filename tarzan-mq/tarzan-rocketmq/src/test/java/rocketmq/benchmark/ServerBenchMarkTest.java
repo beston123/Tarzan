@@ -6,7 +6,6 @@ import com.tongbanjie.tarzan.client.MessageResult;
 import com.tongbanjie.tarzan.client.mq.MQMessageNotifier;
 import com.tongbanjie.tarzan.common.Constants;
 import com.tongbanjie.tarzan.rocketmq.RocketMQMessageNotifier;
-import com.tongbanjie.tarzan.rocketmq.RocketMQParam;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -49,7 +48,7 @@ public class ServerBenchMarkTest {
 
     private final int threadsNum = topicsNum;
 
-    private final String registryAddress = "192.168.1.120:2181";
+    private final String registryAddress = "zk.tbj.com:2181";
 
     private ExecutorService executorService;
 
@@ -150,10 +149,11 @@ public class ServerBenchMarkTest {
 
 
     private RocketMQMessageNotifier createMqNotifyManager(int index, ClientConfig clientConfig) throws Exception {
-        RocketMQParam rocketMQParam = new RocketMQParam();
-        rocketMQParam.setGroupId(Constants.TARZAN_TEST_P_GROUP + index)
-                .setTopic(Constants.TARZAN_TEST_TOPIC + index);
-        RocketMQMessageNotifier mqNotifyManager = new RocketMQMessageNotifier(rocketMQParam, null, clientConfig);
+        RocketMQMessageNotifier mqNotifyManager = new RocketMQMessageNotifier(
+                Constants.TARZAN_TEST_P_GROUP + index,
+                Constants.TARZAN_TEST_TOPIC + index,
+                new TestTransactionCheckListener(),
+                clientConfig);
         mqNotifyManager.init();
         return mqNotifyManager;
     }

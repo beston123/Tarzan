@@ -73,6 +73,16 @@
       and tid > #{tidFromExclude,jdbcType=BIGINT}
     ]]>
     </if>
+    <if test="sourceTimeFrom != null" >
+      <![CDATA[
+        and source_time >= #{sourceTimeFrom,jdbcType=TIMESTAMP}
+      ]]>
+    </if>
+    <if test="sourceTimeTo != null" >
+      <![CDATA[
+        and source_time <= #{sourceTimeTo,jdbcType=TIMESTAMP}
+      ]]>
+    </if>
   </sql>
 
   <select id="selectCountByCondition" resultType="int" parameterType="ToCheckMessageQuery" >
