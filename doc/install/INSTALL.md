@@ -19,12 +19,10 @@
 - store.properties: 数据库、redis等配置
 
 #### 启动
-
     ./startup.sh
 
 #### 停止
-
-    ./shutdown.sh
+    ./shutdown.sh
 
 ### Admin部署
 #### 配置
