@@ -50,4 +50,14 @@ public abstract class RequestCode {
      */
     public static final int RECORD_CONSUME = 8;
 
+    /**
+     * 检查一次事务状态［tarzan-admin发起］
+     */
+    public static final int ADMIN_CHECK_TRANSACTION_ONCE = 9;
+
+    /**
+     * 发送一次消息［tarzan-admin发起］
+     */
+    public static final int ADMIN_SEND_MESSAGE_ONCE = 10;
+
 }

@@ -125,4 +125,25 @@
     select now()
   </select>
 
+  <delete id="deleteByCondition" parameterType="MessageAggregatePlanQuery" >
+    delete from tz_message_aggregate_plan
+    <where >
+      status = #{status,jdbcType=TINYINT}
+      <![CDATA[
+        and time_start <= #{timeStartTo,jdbcType=TIMESTAMP}
+      ]]>
+      <if test="mqType != null" >
+        and mq_type = #{mqType,jdbcType=TINYINT}
+      </if>
+      <if test="aggregateType != null" >
+        and aggregate_type = #{aggregateType,jdbcType=TINYINT}
+      </if>
+      <if test="timeStartFrom != null" >
+        <![CDATA[
+        and time_start >= #{timeStartFrom,jdbcType=TIMESTAMP}
+        ]]>
+      </if>
+    </where>
+  </delete>
+
 </mapper>

@@ -9,13 +9,15 @@ import com.tongbanjie.tarzan.rpc.protocol.RpcCommand;
 import com.tongbanjie.tarzan.rpc.protocol.RpcCommandBuilder;
 import com.tongbanjie.tarzan.rpc.protocol.header.RecordConsumeHeader;
 import com.tongbanjie.tarzan.rpc.protocol.header.MessageResultHeader;
-import com.tongbanjie.tarzan.server.ServerController;
+import com.tongbanjie.tarzan.store.StoreManager;
 import com.tongbanjie.tarzan.store.model.MessageConsume;
 import com.tongbanjie.tarzan.store.service.MessageConsumeService;
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * 〈记录消息消费结果 处理器〉<p>
@@ -24,15 +26,13 @@ import org.slf4j.LoggerFactory;
  * @author zixiao
  * @date 17/1/13
  */
+@Component
 public class RecordConsumeProcessor implements NettyRequestProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SendMessageProcessor.class);
 
-    private final ServerController serverController;
-
-    public RecordConsumeProcessor(final ServerController serverController) {
-        this.serverController = serverController;
-    }
+    @Autowired
+    private StoreManager storeManager;
 
     @Override
     public RpcCommand processRequest(ChannelHandlerContext ctx, RpcCommand request) throws Exception {
@@ -71,7 +71,7 @@ public class RecordConsumeProcessor implements NettyRequestProcessor {
     }
 
     private void recordConsume(RecordConsumeHeader messageHeader){
-        MessageConsumeService messageConsumeService = this.serverController.getStoreManager().getMessageConsumeService();
+        MessageConsumeService messageConsumeService = this.storeManager.getMessageConsumeService();
         if(messageHeader.getTid() != null){
             Result<Long> exist = messageConsumeService.exist(messageHeader.getTid(), messageHeader.getConsumerGroup());
             Validate.isTrue(exist.isSuccess(), exist.getErrorDetail());

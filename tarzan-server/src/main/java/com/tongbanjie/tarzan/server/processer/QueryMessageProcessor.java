@@ -14,6 +14,8 @@ import com.tongbanjie.tarzan.server.handler.MQMessageHandlerFactory;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * 〈消息查询处理器〉<p>
@@ -22,15 +24,13 @@ import org.slf4j.LoggerFactory;
  * @author zixiao
  * @date 16/11/22
  */
+@Component
 public class QueryMessageProcessor implements NettyRequestProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SendMessageProcessor.class);
 
-    private final ServerController serverController;
-
-    public QueryMessageProcessor(final ServerController serverController) {
-        this.serverController = serverController;
-    }
+    @Autowired
+    private ServerController serverController;
 
     @Override
     public RpcCommand processRequest(ChannelHandlerContext ctx, RpcCommand request) throws Exception {

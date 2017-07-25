@@ -17,7 +17,6 @@
 package com.tongbanjie.tarzan.server.processer;
 
 import com.tongbanjie.tarzan.rpc.util.RpcHelper;
-import com.tongbanjie.tarzan.server.ServerController;
 import com.tongbanjie.tarzan.server.client.ClientChannelInfo;
 import com.tongbanjie.tarzan.rpc.protocol.RequestCode;
 import com.tongbanjie.tarzan.rpc.protocol.ResponseCode;
@@ -27,9 +26,12 @@ import com.tongbanjie.tarzan.rpc.netty.NettyRequestProcessor;
 import com.tongbanjie.tarzan.rpc.protocol.RpcCommand;
 import com.tongbanjie.tarzan.rpc.protocol.RpcCommandBuilder;
 import com.tongbanjie.tarzan.common.body.HeartbeatData;
+import com.tongbanjie.tarzan.server.client.ClientManager;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -40,15 +42,13 @@ import java.util.List;
  * @author zixiao
  * @date 16/9/30
  */
+@Component
 public class ClientManageProcessor implements NettyRequestProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientManageProcessor.class);
 
-    private final ServerController serverController;
-
-    public ClientManageProcessor(final ServerController serverController) {
-        this.serverController = serverController;
-    }
+    @Autowired
+    private ClientManager clientManager;
 
     @Override
     public RpcCommand processRequest(ChannelHandlerContext ctx, RpcCommand request)
@@ -83,7 +83,7 @@ public class ClientManageProcessor implements NettyRequestProcessor {
         }
         final String group = requestHeader.getGroup();
         if (group != null) {
-            this.serverController.getClientManager().unregister(group, clientChannelInfo);
+            this.clientManager.unregister(group, clientChannelInfo);
         }
 
         response.setCmdCode(ResponseCode.SUCCESS);
@@ -106,7 +106,7 @@ public class ClientManageProcessor implements NettyRequestProcessor {
             LOGGER.debug("Get heartbeat request from address [{}].", RpcHelper.parseChannelRemoteAddr(ctx.channel()));
         }
         for(String group : groups){
-            this.serverController.getClientManager().register(group, clientChannelInfo);
+            this.clientManager.register(group, clientChannelInfo);
         }
 
         response.setCmdCode(ResponseCode.SUCCESS);

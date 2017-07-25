@@ -30,10 +30,7 @@ import com.tongbanjie.tarzan.rpc.netty.NettyServerConfig;
 import com.tongbanjie.tarzan.rpc.protocol.RequestCode;
 import com.tongbanjie.tarzan.server.client.ClientChannelManageService;
 import com.tongbanjie.tarzan.server.client.ClientManager;
-import com.tongbanjie.tarzan.server.processer.ClientManageProcessor;
-import com.tongbanjie.tarzan.server.processer.QueryMessageProcessor;
-import com.tongbanjie.tarzan.server.processer.RecordConsumeProcessor;
-import com.tongbanjie.tarzan.server.processer.SendMessageProcessor;
+import com.tongbanjie.tarzan.server.processer.*;
 import com.tongbanjie.tarzan.server.transaction.TransactionCheckService;
 import com.tongbanjie.tarzan.store.StoreManager;
 import com.tongbanjie.tarzan.common.util.DistributedIdGenerator;
@@ -97,6 +94,21 @@ public class ServerController implements Service {
 
     // 服务器地址
     private ServerAddress serverAddress;
+
+    @Autowired
+    private SendMessageProcessor sendMessageProcessor;
+
+    @Autowired
+    private QueryMessageProcessor queryMessageProcessor;
+
+    @Autowired
+    private ClientManageProcessor clientManageProcessor;
+
+    @Autowired
+    private RecordConsumeProcessor recordConsumeProcessor;
+
+    @Autowired
+    private AdminRequestProcessor adminRequestProcessor;
 
     public ServerController() {
 
@@ -196,20 +208,34 @@ public class ServerController implements Service {
                 this.serverConfig.getClientManageThreadPoolNum(),
                 new NamedThreadFactory("ClientManageThread_"));
 
-        SendMessageProcessor sendProcessor = new SendMessageProcessor(this);
-        this.rpcServer.registerProcessor(RequestCode.SEND_MESSAGE, sendProcessor, this.sendMessageExecutor);
-        this.rpcServer.registerProcessor(RequestCode.TRANSACTION_MESSAGE, sendProcessor, this.sendMessageExecutor);
+        /**
+         * SendMessageProcessor
+         */
+        this.rpcServer.registerProcessor(RequestCode.SEND_MESSAGE, sendMessageProcessor, this.sendMessageExecutor);
+        this.rpcServer.registerProcessor(RequestCode.TRANSACTION_MESSAGE, sendMessageProcessor, this.sendMessageExecutor);
 
-        QueryMessageProcessor queryProcessor = new QueryMessageProcessor(this);
-        this.rpcServer.registerProcessor(RequestCode.QUERY_MESSAGE, queryProcessor, this.sendMessageExecutor);
+        /**
+         * QueryMessageProcessor
+         */
+        this.rpcServer.registerProcessor(RequestCode.QUERY_MESSAGE, queryMessageProcessor, this.sendMessageExecutor);
 
-        ClientManageProcessor clientProcessor = new ClientManageProcessor(this);
-        this.rpcServer.registerProcessor(RequestCode.HEART_BEAT, clientProcessor, this.clientManageExecutor);
-        this.rpcServer.registerProcessor(RequestCode.UNREGISTER_CLIENT, clientProcessor, this.clientManageExecutor);
-        this.rpcServer.registerProcessor(RequestCode.HEALTH_CHECK, clientProcessor, this.clientManageExecutor);
+        /**
+         * ClientManageProcessor
+         */
+        this.rpcServer.registerProcessor(RequestCode.HEART_BEAT, clientManageProcessor, this.clientManageExecutor);
+        this.rpcServer.registerProcessor(RequestCode.UNREGISTER_CLIENT, clientManageProcessor, this.clientManageExecutor);
+        this.rpcServer.registerProcessor(RequestCode.HEALTH_CHECK, clientManageProcessor, this.clientManageExecutor);
 
-        RecordConsumeProcessor recordConsumeProcessor = new RecordConsumeProcessor(this);
+        /**
+         * RecordConsumeProcessor
+         */
         this.rpcServer.registerProcessor(RequestCode.RECORD_CONSUME, recordConsumeProcessor, this.sendMessageExecutor);
+
+        /**
+         * AdminRequestProcessor
+         */
+        this.rpcServer.registerProcessor(RequestCode.ADMIN_CHECK_TRANSACTION_ONCE, adminRequestProcessor, this.sendMessageExecutor);
+        this.rpcServer.registerProcessor(RequestCode.ADMIN_SEND_MESSAGE_ONCE, adminRequestProcessor, this.sendMessageExecutor);
     }
 
     public void start() throws Exception {

@@ -17,6 +17,8 @@ import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * 消息发送请求处理者<p>
@@ -25,15 +27,13 @@ import org.slf4j.LoggerFactory;
  * @author zixiao
  * @date 16/9/30
  */
+@Component
 public class SendMessageProcessor implements NettyRequestProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SendMessageProcessor.class);
 
-    private final ServerController serverController;
-
-    public SendMessageProcessor(final ServerController serverController) {
-        this.serverController = serverController;
-    }
+    @Autowired
+    private ServerController serverController;
 
     @Override
     public RpcCommand processRequest(ChannelHandlerContext ctx, RpcCommand request) throws Exception {

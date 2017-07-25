@@ -101,4 +101,28 @@ public class MessageConsumeService {
         }
         return result;
     }
+
+    public Result<Integer> delete(Long id) {
+        Result<Integer> result;
+        try {
+            Validate.notNull(id, "参数Id不为空");
+            Integer count = messageConsumeMapper.deleteByPrimaryKey(id);
+            result = Result.buildSucc(count);
+        } catch (Exception e) {
+            result = Result.buildFail(FailResult.STORE, e.getMessage());
+        }
+        return result;
+    }
+
+    public Result<MessageConsume> get(Long id) {
+        Result<MessageConsume> result;
+        try {
+            Validate.notNull(id, "参数Id不为空");
+            MessageConsume data = messageConsumeMapper.selectByPrimaryKey(id);
+            result = Result.buildSucc(data);
+        } catch (Exception e) {
+            result = Result.buildFail(FailResult.STORE, e.getMessage());
+        }
+        return result;
+    }
 }

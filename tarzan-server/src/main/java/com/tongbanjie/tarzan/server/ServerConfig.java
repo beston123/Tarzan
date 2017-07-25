@@ -45,6 +45,12 @@ public class ServerConfig {
     private int sendThreadPoolQueueCapacity = 100000;
 
     /**
+     * 消息最大检查天数
+     * [当前时间－maxCheckDays]前的消息不再检查/重发
+     */
+    private int messageMaxCheckDays = 7;
+
+    /**
      * Server监听端口
      */
     @Value("${tarzan.server.port}")
@@ -102,6 +108,14 @@ public class ServerConfig {
         this.sendThreadPoolQueueCapacity = sendThreadPoolQueueCapacity;
     }
 
+    public int getMessageMaxCheckDays() {
+        return messageMaxCheckDays;
+    }
+
+    public void setMessageMaxCheckDays(int messageMaxCheckDays) {
+        this.messageMaxCheckDays = messageMaxCheckDays;
+    }
+
     public int getServerPort() {
         return serverPort;
     }
@@ -148,6 +162,8 @@ public class ServerConfig {
                 "sendMessageThreadPoolNum=" + sendMessageThreadPoolNum +
                 ", clientManageThreadPoolNum=" + clientManageThreadPoolNum +
                 ", sendThreadPoolQueueCapacity=" + sendThreadPoolQueueCapacity +
+                ", messageMaxCheckDays=" + messageMaxCheckDays +
+                ", serverPort=" + serverPort +
                 ", serverId=" + serverId +
                 ", serverWeight=" + serverWeight +
                 ", registryAddress='" + registryAddress + '\'' +

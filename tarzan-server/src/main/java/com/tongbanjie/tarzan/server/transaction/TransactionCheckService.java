@@ -11,6 +11,7 @@ import com.tongbanjie.tarzan.common.util.ResultValidate;
 import com.tongbanjie.tarzan.common.util.Timeout;
 import com.tongbanjie.tarzan.common.PagingParam;
 import com.tongbanjie.tarzan.common.Result;
+import com.tongbanjie.tarzan.server.ServerConfig;
 import com.tongbanjie.tarzan.store.StoreManager;
 import com.tongbanjie.tarzan.store.model.ToSendMessage;
 import com.tongbanjie.tarzan.store.query.ToCheckMessageQuery;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -76,6 +78,9 @@ public class TransactionCheckService implements ScheduledService {
 
     @Autowired
     private RedisComponent redisComponent;
+
+    @Autowired
+    private ServerConfig serverConfig;
 
     private ScheduledExecutorService scheduledExecutorService = Executors
             .newSingleThreadScheduledExecutor(new NamedThreadFactory("TransactionCheckService"));
@@ -140,6 +145,10 @@ public class TransactionCheckService implements ScheduledService {
         LOGGER.info("本次需要检查事务状态的消息数:{}条, 页数:{}页.", total, pagingParam.getTotalPage());
         ToCheckMessageQuery query = new ToCheckMessageQuery();
         query.setMqType(mqType.getCode());
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH, -1*serverConfig.getMessageMaxCheckDays());
+        query.setSourceTimeFrom(calendar.getTime());
+
         while (timeout.validate()){
             Result<List<MQMessage>> listResult = storeService.getToCheck(query, pagingParam);
             ResultValidate.isTrue(listResult);

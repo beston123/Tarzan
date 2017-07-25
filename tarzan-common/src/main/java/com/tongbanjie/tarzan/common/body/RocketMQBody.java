@@ -28,10 +28,10 @@ public class RocketMQBody implements MQBody {
     public static RocketMQBody build(RocketMQMessage mqMessage){
         final RocketMQBody mqBody = new RocketMQBody();
         mqBody.setTopic(mqMessage.getTopic());
+        mqBody.setTags(mqMessage.getTags());
         mqBody.setProducerGroup(mqMessage.getProducerGroup());
         mqBody.setMessageBody(mqMessage.getMessageBody());
         mqBody.setMessageKey(mqMessage.getMessageKey());
-        mqBody.setTags(mqMessage.getTags());
         return mqBody;
     }
 

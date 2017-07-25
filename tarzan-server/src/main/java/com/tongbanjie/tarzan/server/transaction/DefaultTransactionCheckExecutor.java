@@ -15,6 +15,7 @@ import com.tongbanjie.tarzan.rpc.protocol.RpcCommand;
 import com.tongbanjie.tarzan.rpc.protocol.RpcCommandBuilder;
 import com.tongbanjie.tarzan.rpc.protocol.header.CheckTransactionStateHeader;
 import com.tongbanjie.tarzan.server.client.ClientChannelInfo;
+import com.tongbanjie.tarzan.server.client.ClientManager;
 import io.netty.channel.Channel;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -36,6 +37,9 @@ public class DefaultTransactionCheckExecutor implements TransactionCheckExecutor
 
     @Autowired
     private ServerController serverController;
+
+    @Autowired
+    private ClientManager clientManager;
 
     @Override
     public void gotoCheck(String producerGroup, MQType mqType, MQMessage mqMessage) {
@@ -76,8 +80,7 @@ public class DefaultTransactionCheckExecutor implements TransactionCheckExecutor
      */
     private void checkTransaction(final String producerGroup, final RpcCommand request, final long tid){
         //1、随机选取一个Producer
-        final ClientChannelInfo clientChannelInfo =
-                this.serverController.getClientManager().pickClientRandomly(producerGroup);
+        final ClientChannelInfo clientChannelInfo = this.clientManager.pickClientRandomly(producerGroup);
         if (null == clientChannelInfo) {
             LOGGER.warn("Check a producer transaction state, but not find any channel of this group[{}]",
                     producerGroup);

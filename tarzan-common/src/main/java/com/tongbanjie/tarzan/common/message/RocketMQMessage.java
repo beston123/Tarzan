@@ -28,6 +28,7 @@ public class RocketMQMessage extends MQMessage{
         mqMessage.setMessageKey(mqBody.getMessageKey());
         mqMessage.setProducerGroup(mqBody.getProducerGroup());
         mqMessage.setTopic(mqBody.getTopic());
+        mqMessage.setTags(mqBody.getTags());
         if(transactionState != null){
             mqMessage.setTransactionState(transactionState.getCode());
         }

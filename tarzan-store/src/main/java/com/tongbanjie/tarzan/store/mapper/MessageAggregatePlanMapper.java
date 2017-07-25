@@ -23,4 +23,6 @@ public interface MessageAggregatePlanMapper {
     MessageAggregatePlan getLatest(MessageAggregatePlanQuery query);
 
     Date getNow();
+
+    int deleteByCondition(MessageAggregatePlanQuery query);
 }

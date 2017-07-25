@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -73,6 +74,9 @@ public class MessageResendService implements ScheduledService {
 
     @Autowired
     private ToSendMessageService toSendMessageService;
+
+    @Autowired
+    private ServerConfig serverConfig;
 
     private ScheduledExecutorService scheduledExecutorService = Executors
             .newSingleThreadScheduledExecutor(new NamedThreadFactory("MessageResendService"));
@@ -141,6 +145,10 @@ public class MessageResendService implements ScheduledService {
         LOGGER.info("本次需要重发的消息数:{}条, 页数:{}页.", total, pagingParam.getTotalPage());
         ToSendMessageQuery query = new ToSendMessageQuery();
         query.setMqType(mqType.getCode());
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH, -1*serverConfig.getMessageMaxCheckDays());
+        query.setSourceTimeFrom(calendar.getTime());
+
         while (timeout.validate()){
             Result<List<MQMessage>> listResult = storeService.getToSend(query, pagingParam);
             ResultValidate.isTrue(listResult);

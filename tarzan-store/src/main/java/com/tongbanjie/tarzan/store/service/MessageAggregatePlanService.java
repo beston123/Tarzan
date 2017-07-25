@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -38,6 +39,12 @@ public class MessageAggregatePlanService {
     @Resource
     private MessageAggregatePlanMapper messageAggregatePlanMapper;
 
+    /**
+     * 查询待处理的汇集计划列表
+     * @param mqType
+     * @param aggregateType
+     * @return
+     */
     public Result<List<MessageAggregatePlan>> getToDo(MQType mqType, AggregateType aggregateType){
         MessageAggregatePlanQuery query = new MessageAggregatePlanQuery();
         query.setMqType(mqType.getCode());
@@ -61,6 +68,14 @@ public class MessageAggregatePlanService {
         return result;
     }
 
+    /**
+     * 创建汇集计划
+     * 创建周期 每 BATCH_PERIOD_SEC 秒
+     * @param start
+     * @param mqType
+     * @param aggregateType
+     * @return
+     */
     public Result<MessageAggregatePlan> create(Date start, MQType mqType, AggregateType aggregateType){
         Result<MessageAggregatePlan> result;
         try {
@@ -85,6 +100,12 @@ public class MessageAggregatePlanService {
         return result;
     }
 
+    /**
+     * 获取最新一期的汇集计划
+     * @param mqType
+     * @param aggregateType
+     * @return
+     */
     public Result<MessageAggregatePlan> getLatest(MQType mqType, AggregateType aggregateType){
         Result<MessageAggregatePlan> result;
         try {
@@ -174,11 +195,35 @@ public class MessageAggregatePlanService {
     }
 
     private void validateQuery(MessageAggregatePlanQuery messageAggregatePlanQuery){
-        Validate.notNull(messageAggregatePlanQuery);
+        Validate.notNull(messageAggregatePlanQuery, "查询参数不能为空");
         if(messageAggregatePlanQuery.getTimeStartFrom() == null
                 && messageAggregatePlanQuery.getTimeStartTo() == null){
             throw new IllegalArgumentException("查询条件至少有[开始时间]，参数："+messageAggregatePlanQuery);
         }
+    }
+
+    /**
+     * 清理汇集计划
+     * 1、必须有截至时间，且截至时间在当期时间7天前
+     * 2、只能删除汇聚状态是［成功］的数据
+     * @param messageAggregatePlanQuery
+     * @return
+     */
+    public Result<Integer> cleanAggregatePlan(MessageAggregatePlanQuery messageAggregatePlanQuery){
+        try {
+            Validate.notNull(messageAggregatePlanQuery, "参数不能为空");
+            Validate.notNull(messageAggregatePlanQuery.getTimeStartTo(), "截至时间不能为空");
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.DAY_OF_MONTH, -7);
+            Validate.isTrue(messageAggregatePlanQuery.getTimeStartTo().before(calendar.getTime()), "不能删除7天内的数据");
+        } catch (IllegalArgumentException e) {
+            return Result.buildFail(FailResult.PARAMETER, e.getMessage());
+        } catch (NullPointerException e) {
+            return Result.buildFail(FailResult.PARAMETER, e.getMessage());
+        }
+        messageAggregatePlanQuery.setStatus(AggregateStatus.SUCCESS);
+        int count = messageAggregatePlanMapper.deleteByCondition(messageAggregatePlanQuery);
+        return Result.buildSucc(count);
     }
 
 }
