@@ -9,7 +9,7 @@ package com.tongbanjie.tarzan.common;
  */
 public abstract class TarzanVersion {
 
-    public static final Version CURRENT = Version.V0_8_0;
+    public static final Version CURRENT = Version.V0_9_0;
 
     public enum Version{
 
@@ -20,7 +20,8 @@ public abstract class TarzanVersion {
         V0_5_0(5, "0.5.0"),
         V0_6_0(6, "0.6.0"),
         V0_7_0(7, "0.7.0"),
-        V0_8_0(8, "0.8.0");
+        V0_8_0(8, "0.8.0"),
+        V0_9_0(9, "0.9.0");
 
         private int value;
 

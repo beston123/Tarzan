@@ -24,4 +24,6 @@ Tarzan取自电影《人猿泰山》的英文名，用于保证消息生产者�
 [部署说明](https://github.com/beston123/Tarzan/blob/master/doc/install/INSTALL.md)
 
 ## 建议
-版本目前仍在开发中，若您有任何建议，可以通过Email：beston@yeah.net 联系。
+版本目前仍在开发中，若您有任何建议，可以通过QQ群或邮件反馈。
+QQ群：668250402
+mail：beston@yeah.net

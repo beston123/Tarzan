@@ -59,6 +59,7 @@ CREATE TABLE tarzan.`tz_message_consume` (
   `message_key` varchar(80) NOT NULL COMMENT '消息key',
   `consumer_group` varchar(60) NOT NULL COMMENT '消费者group',
   `topic` varchar(60) NOT NULL COMMENT 'Topic',
+  `tags` varchar(60) DEFAULT NULL COMMENT 'Tags',
   `consumer` varchar(45) NOT NULL COMMENT '消费者［ ip/appName］',
   `mq_type` tinyint(4) NOT NULL COMMENT 'MQ类型',
   `consume_status` tinyint(1) NOT NULL COMMENT '消费状态',

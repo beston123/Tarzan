@@ -20,7 +20,6 @@
         <moduleSet>
             <includes>
                 <include>com.tongbanjie.tarzan:tarzan-server</include>
-                <include>com.tongbanjie.tarzan:tarzan-client</include>
                 <include>com.tongbanjie.tarzan:tarzan-common</include>
                 <include>com.tongbanjie.tarzan:tarzan-registry</include>
                 <include>com.tongbanjie.tarzan:tarzan-rpc</include>

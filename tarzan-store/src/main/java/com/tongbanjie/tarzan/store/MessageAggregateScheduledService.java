@@ -2,6 +2,7 @@ package com.tongbanjie.tarzan.store;
 
 import com.tongbanjie.tarzan.store.model.MessageAggregatePlan;
 import com.tongbanjie.tarzan.store.query.MQMessageQuery;
+import com.tongbanjie.tarzan.store.redis.RedisComponent;
 import com.tongbanjie.tarzan.store.service.MessageAggregatePlanService;
 import com.tongbanjie.tarzan.common.PagingParam;
 import com.tongbanjie.tarzan.common.Result;
@@ -9,7 +10,6 @@ import com.tongbanjie.tarzan.common.ScheduledService;
 import com.tongbanjie.tarzan.common.exception.TimeoutException;
 import com.tongbanjie.tarzan.common.message.MQMessage;
 import com.tongbanjie.tarzan.common.message.MQType;
-import com.tongbanjie.tarzan.common.redis.RedisComponent;
 import com.tongbanjie.tarzan.common.util.NamedSingleThreadFactory;
 import com.tongbanjie.tarzan.common.util.ResultValidate;
 import com.tongbanjie.tarzan.common.util.Timeout;

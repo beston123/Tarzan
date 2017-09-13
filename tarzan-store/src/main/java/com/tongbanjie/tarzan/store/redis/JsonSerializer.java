@@ -1,4 +1,4 @@
-package com.tongbanjie.tarzan.common.redis;
+package com.tongbanjie.tarzan.store.redis;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;

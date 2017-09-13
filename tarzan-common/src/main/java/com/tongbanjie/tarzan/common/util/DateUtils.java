@@ -43,7 +43,7 @@ public class DateUtils {
 
     private static final String REGEX_yyyyMMddHHmmss = "^\\d{14}$";
 
-    private static final String REGEX_EEE_MMM_dd_HH_mm_ss_Z_yyyy = "^[A-Z]{1}[a-z]{2}\\s[A-Z]{1}[a-z]{2}\\s\\d{2}\\s\\d{2}:\\d{2}:\\d{2}\\s[A-Z]{3}\\s\\d{4}$";
+    private static final String REGEX_EEE_MMM_dd_HH_mm_ss_Z_yyyy = "^[A-Z]{1}[a-z]{2}\\s[A-Z]{1}[a-z]{2}\\s\\d{2}\\s\\d{2}:\\d{2}:\\d{2}\\s[A-Z]{1,5}\\s\\d{4}$";
 
     private static final String REGEX_yyyyMMdd = "^\\d{8}$";
 
@@ -193,9 +193,12 @@ public class DateUtils {
         dateParseTest("2014/3/12 12:5:34");
         dateParseTest("2014 03 12 12 05 34");
 
+        dateParseTest("Wed Mar 12 13:05:34 HKT 2014");
         dateParseTest("Wed Mar 12 13:05:34 CST 2014");
+        dateParseTest("Wed Mar 12 13:05:34 HKST 2014");
 
         dateParseTest("20140312");
+        dateParseTest("2014.3.12");
         dateParseTest("2014-03-12");
         dateParseTest("2014年3月12号");
     }

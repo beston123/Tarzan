@@ -1,20 +1,21 @@
 package com.tongbanjie.tarzan.server.handler;
 
 import com.alibaba.rocketmq.client.exception.MQClientException;
-import com.alibaba.rocketmq.client.producer.*;
+import com.alibaba.rocketmq.client.producer.DefaultMQProducer;
+import com.alibaba.rocketmq.client.producer.MQProducer;
+import com.alibaba.rocketmq.client.producer.SendResult;
 import com.alibaba.rocketmq.common.message.Message;
 import com.tongbanjie.tarzan.common.Constants;
-import com.tongbanjie.tarzan.common.message.*;
-import com.tongbanjie.tarzan.common.message.SendStatus;
-import com.tongbanjie.tarzan.server.ServerController;
+import com.tongbanjie.tarzan.common.Result;
+import com.tongbanjie.tarzan.common.body.RocketMQBody;
 import com.tongbanjie.tarzan.common.exception.SystemException;
+import com.tongbanjie.tarzan.common.message.*;
 import com.tongbanjie.tarzan.rpc.protocol.ResponseCode;
 import com.tongbanjie.tarzan.rpc.protocol.RpcCommand;
 import com.tongbanjie.tarzan.rpc.protocol.RpcCommandBuilder;
-import com.tongbanjie.tarzan.common.body.RocketMQBody;
 import com.tongbanjie.tarzan.rpc.protocol.header.MessageResultHeader;
 import com.tongbanjie.tarzan.rpc.protocol.header.QueryMessageHeader;
-import com.tongbanjie.tarzan.common.Result;
+import com.tongbanjie.tarzan.server.ServerController;
 import com.tongbanjie.tarzan.store.service.RocketMQStoreService;
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.lang3.StringUtils;
@@ -60,15 +61,21 @@ public class RocketMQHandler implements MQMessageHandler {
         RpcCommand response;
         final RocketMQBody mqBody = request.getBody(RocketMQBody.class);
 
-        RocketMQMessage mqMessage = RocketMQMessage.build(mqBody, TransactionState.PREPARE);
-
-        Result<String> sendResult = sendMessage(mqMessage);
-        if(sendResult.isSuccess()){
+        RocketMQMessage mqMessage = RocketMQMessage.build(mqBody, TransactionState.COMMIT);
+        /*************** 1、持久化消息 ***************/
+        Result<Long> putResult = mQStoreService.put(mqMessage);
+        if(putResult.isSuccess()){
+            Long transactionId = putResult.getData();
             MessageResultHeader responseHeader = new MessageResultHeader();
-            responseHeader.setMsgId(sendResult.getData());
+            responseHeader.setTransactionId(transactionId);
             response = RpcCommandBuilder.buildSuccess(responseHeader);
+            /*************** 2、异步发送消息 ***************/
+            mqMessage.setId(transactionId);
+            sendMessageAsync(mqMessage, transactionId);
         }else{
-            response = RpcCommandBuilder.buildFail("发送消息失败");
+            LOGGER.error("发送消息失败, topic:{}, messageKey:{}, error:{}",
+                    mqMessage.getTopic(), mqMessage.getMessageKey(), putResult.getErrorDetail());
+            response = RpcCommandBuilder.buildFail("发送消息失败," + putResult.getErrorDetail());
         }
         return response;
     }
@@ -76,36 +83,34 @@ public class RocketMQHandler implements MQMessageHandler {
     @Override
     public Result<String/* msgId */> sendMessage(MQMessage mqMessage){
         Result<String> result;
-        if(mqMessage instanceof RocketMQMessage){
-            RocketMQMessage rocketMQMessage = (RocketMQMessage) mqMessage;
-            try{
-                SendResult sendResult = doSend(rocketMQMessage);
-                Validate.notNull(sendResult);
-                if(com.alibaba.rocketmq.client.producer.SendStatus.SEND_OK == sendResult.getSendStatus()){
-                    Validate.notEmpty(sendResult.getMsgId());
-                    result = Result.buildSucc(sendResult.getMsgId());
-                }else{
-                    LOGGER.warn("消息发送可能失败 messageKey:{}, msgId:{}, sendStatus:{}",
-                            mqMessage.getMessageKey(), sendResult.getMsgId(), sendResult.getSendStatus());
-                    result = Result.buildFail("SendError", "消息发送可能失败, 发送状态："+sendResult.getSendStatus());
-                }
-            }catch (Exception e){
-                LOGGER.error("消息发送失败, messageKey:" +mqMessage.getMessageKey()
-                        +", topic:"+rocketMQMessage.getTopic(), e);
-                result = Result.buildFail("SendError", "消息发送失败", e.getMessage());
+        if(!(mqMessage instanceof RocketMQMessage)){
+            return Result.buildFail("SendError", "消息格式错误");
+        }
+        RocketMQMessage rocketMQMessage = (RocketMQMessage) mqMessage;
+        try{
+            SendResult sendResult = sendToMQ(rocketMQMessage);
+            Validate.notNull(sendResult);
+            if(com.alibaba.rocketmq.client.producer.SendStatus.SEND_OK == sendResult.getSendStatus()){
+                result = Result.buildSucc(sendResult.getMsgId());
+            }else{
+                LOGGER.warn("消息发送可能失败 messageKey:{}, msgId:{}, sendStatus:{}",
+                        mqMessage.getMessageKey(), sendResult.getMsgId(), sendResult.getSendStatus());
+                result = Result.buildFail("SendError", "消息发送可能失败, 发送状态："+sendResult.getSendStatus());
             }
-        }else{
-            result = Result.buildFail("SendError", "消息格式错误");
+        }catch (Exception e){
+            LOGGER.error("消息发送失败, messageKey:" +mqMessage.getMessageKey()
+                    +", topic:"+rocketMQMessage.getTopic(), e);
+            result = Result.buildFail("SendError", "消息发送失败", e.getMessage());
         }
         return result;
     }
 
     /**
-     * 发送消息方法
+     * 发送消息到MQ
      * @param mqMessage
      * @return
      */
-    private SendResult doSend(RocketMQMessage mqMessage){
+    private SendResult sendToMQ(RocketMQMessage mqMessage){
         /*************** 1、查找 MQ发送者 ***************/
         MQProducer producer;
         try {
@@ -187,7 +192,7 @@ public class RocketMQHandler implements MQMessageHandler {
             LOGGER.error("提交事务消息失败, transactionId: " + transactionId+", error: "+ commitResult.getErrorDetail());
             response = RpcCommandBuilder.buildFail("提交事务消息失败," + commitResult.getErrorDetail());
         }
-        //异步发送消息
+        /*************** 3、异步发送消息 ***************/
         sendMessageAsync(mqMessage, transactionId);
         return response;
     }

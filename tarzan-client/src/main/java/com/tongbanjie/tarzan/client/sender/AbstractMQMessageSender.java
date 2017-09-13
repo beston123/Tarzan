@@ -64,7 +64,7 @@ public abstract class AbstractMQMessageSender<T extends MQBody> implements MQMes
             RpcCommand response = this.clientController.getClusterClient().invokeSync(sendMessageTimeOut, request);
             if (response.getCmdCode() == ResponseCode.SUCCESS){
                 MessageResultHeader responseHeader = (MessageResultHeader)response.decodeCustomHeader(MessageResultHeader.class);
-                result = MessageResult.buildSucc(responseHeader.getMsgId());
+                result = MessageResult.buildSucc(responseHeader.getTransactionId());
             }else{
                 result = MessageResult.buildFail("系统异常, code:"+response.getCmdCode()
                         +", error:"+ response.getRemark());

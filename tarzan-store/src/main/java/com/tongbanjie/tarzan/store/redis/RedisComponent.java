@@ -1,4 +1,4 @@
-package com.tongbanjie.tarzan.common.redis;
+package com.tongbanjie.tarzan.store.redis;
 
 import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;

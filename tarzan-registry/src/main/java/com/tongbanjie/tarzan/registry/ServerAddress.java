@@ -3,6 +3,8 @@ package com.tongbanjie.tarzan.registry;
 import com.tongbanjie.tarzan.common.TarzanVersion;
 import com.tongbanjie.tarzan.common.Weighable;
 
+import java.util.Date;
+
 /**
  * 服务端地址 <p>
  * 〈功能详细描述〉
@@ -41,6 +43,11 @@ public class ServerAddress implements Address{
      */
     private Integer version;
 
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
     public ServerAddress(String address){
         this(address, Weighable.DEFAULT_WEIGHT);
     }
@@ -49,6 +56,7 @@ public class ServerAddress implements Address{
         this.address = address;
         this.weight = weight <= 0 ? Weighable.DEFAULT_WEIGHT : weight;
         this.version = TarzanVersion.CURRENT.getValue();
+        this.createTime = new Date();
     }
 
     public ServerAddress(String ip, int port){
@@ -105,6 +113,14 @@ public class ServerAddress implements Address{
         this.version = version;
     }
 
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -116,7 +132,8 @@ public class ServerAddress implements Address{
         if (enable != that.enable) return false;
         if (address != null ? !address.equals(that.address) : that.address != null) return false;
         if (serverId != null ? !serverId.equals(that.serverId) : that.serverId != null) return false;
-        return !(version != null ? !version.equals(that.version) : that.version != null);
+        if (version != null ? !version.equals(that.version) : that.version != null) return false;
+        return !(createTime != null ? !createTime.equals(that.createTime) : that.createTime != null);
 
     }
 
@@ -127,6 +144,7 @@ public class ServerAddress implements Address{
         result = 31 * result + (enable ? 1 : 0);
         result = 31 * result + (serverId != null ? serverId.hashCode() : 0);
         result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         return result;
     }
 
@@ -138,6 +156,7 @@ public class ServerAddress implements Address{
                 ", enable=" + enable +
                 ", serverId=" + serverId +
                 ", version=" + version +
+                ", createTime=" + createTime +
                 '}';
     }
 }

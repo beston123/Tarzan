@@ -5,7 +5,7 @@
     <parent>
         <artifactId>tarzan</artifactId>
         <groupId>com.tongbanjie.tarzan</groupId>
-        <version>0.8.0</version>
+        <version>0.9.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,7 +15,7 @@
         <!-- SLF4J -->
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
 
         <!-- Apache Commons Lang -->
@@ -53,18 +53,12 @@
         <dependency>
             <groupId>com.baidu.unbiz</groupId>
             <artifactId>fluent-validator</artifactId>
-        </dependency>
-
-        <!-- junit -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
     </dependencies>

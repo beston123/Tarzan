@@ -1,4 +1,4 @@
-package rocketmq.client;
+package rockermq.client;
 
 import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.common.message.Message;

@@ -22,7 +22,7 @@
         </constructor-arg>
     </bean>
 
-    <bean id="redisComponent" class="com.tongbanjie.tarzan.common.redis.RedisComponent"
+    <bean id="redisComponent" class="com.tongbanjie.tarzan.store.redis.RedisComponent"
           init-method="init" destroy-method="destory">
         <property name="pool" ref="shardedJedisPool"></property>
     </bean>

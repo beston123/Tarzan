@@ -7,7 +7,7 @@
     <groupId>com.tongbanjie.tarzan</groupId>
     <artifactId>tarzan</artifactId>
     <packaging>pom</packaging>
-    <version>0.8.0</version>
+    <version>0.9.0</version>
     
     <name>tarzan</name>
     <description>可靠事件系统</description>
@@ -58,6 +58,11 @@
     <dependencyManagement>
         <dependencies>
             <!-- SLF4J -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${version.slf4j}</version>
+            </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
@@ -260,19 +265,6 @@
         </plugins>
     </build>
 
-    <!--distributionManagement>
-        <repository>
-            <id>nexus-releases</id>
-            <name>Nexus Release Repository</name>
-            <url>http://192.168.1.6:8081/nexus/content/repositories/releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>nexus-snapshots</id>
-            <name>Nexus Snapshot Repository</name>
-            <url>http://192.168.1.6:8081/nexus/content/repositories/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement-->
-
     <modules>
         <module>tarzan-server</module>
         <module>tarzan-client</module>
@@ -282,6 +274,7 @@
         <module>tarzan-store</module>
         <module>tarzan-cluster</module>
         <module>tarzan-mq</module>
+        <module>tarzan-example</module>
     </modules>
 
 </project>

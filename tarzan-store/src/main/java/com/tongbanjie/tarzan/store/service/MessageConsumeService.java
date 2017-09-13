@@ -61,7 +61,7 @@ public class MessageConsumeService {
 
     /**
      * 更新
-     * @param messageConsume 支持3个参数更新:consumer, consumeStatus,reconsumeTimes
+     * @param messageConsume 支持4个参数更新:messageId, consumer, consumeStatus,reconsumeTimes
      * @return
      */
     public Result<Void> update(MessageConsume messageConsume){

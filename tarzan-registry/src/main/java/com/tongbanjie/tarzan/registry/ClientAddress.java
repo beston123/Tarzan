@@ -3,6 +3,8 @@ package com.tongbanjie.tarzan.registry;
 import com.tongbanjie.tarzan.common.TarzanVersion;
 import com.tongbanjie.tarzan.common.Weighable;
 
+import java.util.Date;
+
 /**
  * 〈客户端地址〉<p>
  * 〈功能详细描述〉
@@ -41,11 +43,17 @@ public class ClientAddress implements Address {
      */
     private Integer version;
 
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
     public ClientAddress(String appName, String address, short weight){
         this.appName = appName;
         this.address = address;
         this.weight = weight <= 0 ? Weighable.DEFAULT_WEIGHT : weight;
         this.version = TarzanVersion.CURRENT.getValue();
+        this.createTime = new Date();
     }
 
     public ClientAddress(String appName, String address){
@@ -98,6 +106,14 @@ public class ClientAddress implements Address {
         this.version = version;
     }
 
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -109,7 +125,8 @@ public class ClientAddress implements Address {
         if (enable != that.enable) return false;
         if (address != null ? !address.equals(that.address) : that.address != null) return false;
         if (appName != null ? !appName.equals(that.appName) : that.appName != null) return false;
-        return !(version != null ? !version.equals(that.version) : that.version != null);
+        if (version != null ? !version.equals(that.version) : that.version != null) return false;
+        return !(createTime != null ? !createTime.equals(that.createTime) : that.createTime != null);
 
     }
 
@@ -120,6 +137,7 @@ public class ClientAddress implements Address {
         result = 31 * result + (enable ? 1 : 0);
         result = 31 * result + (appName != null ? appName.hashCode() : 0);
         result = 31 * result + (version != null ? version.hashCode() : 0);
+        result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         return result;
     }
 
@@ -131,6 +149,7 @@ public class ClientAddress implements Address {
                 ", enable=" + enable +
                 ", appName='" + appName + '\'' +
                 ", version=" + version +
+                ", createTime=" + createTime +
                 '}';
     }
 }

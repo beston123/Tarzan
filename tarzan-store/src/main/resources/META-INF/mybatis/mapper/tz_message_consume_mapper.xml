@@ -8,6 +8,7 @@
     <result column="message_key" property="messageKey" jdbcType="VARCHAR" />
     <result column="consumer_group" property="consumerGroup" jdbcType="VARCHAR" />
     <result column="topic" property="topic" jdbcType="VARCHAR" />
+    <result column="tags" property="tags" jdbcType="VARCHAR" />
     <result column="consumer" property="consumer" jdbcType="VARCHAR" />
     <result column="mq_type" property="mqType" jdbcType="TINYINT" />
     <result column="consume_status" property="consumeStatus" jdbcType="BIT" />
@@ -17,7 +18,7 @@
   </resultMap>
 
   <sql id="Base_Column_List" >
-    tid, id, message_id, message_key, consumer_group, topic, consumer, mq_type, consume_status,
+    tid, id, message_id, message_key, consumer_group, topic, tags, consumer, mq_type, consume_status,
     reconsume_times, create_time, modify_time
   </sql>
 
@@ -30,11 +31,11 @@
 
   <insert id="insert" parameterType="MessageConsume" useGeneratedKeys="true" keyProperty="id" >
     insert into tz_message_consume (tid, message_id, message_key, consumer_group,
-      topic, consumer, mq_type, 
+      topic, tags, consumer, mq_type,
       consume_status, reconsume_times,
       create_time, modify_time)
     values (#{tid,jdbcType=BIGINT}, #{messageId,jdbcType=VARCHAR}, #{messageKey,jdbcType=VARCHAR}, #{consumerGroup,jdbcType=VARCHAR},
-      #{topic,jdbcType=VARCHAR}, #{consumer,jdbcType=VARCHAR}, #{mqType,jdbcType=TINYINT}, 
+      #{topic,jdbcType=VARCHAR}, #{tags,jdbcType=VARCHAR}, #{consumer,jdbcType=VARCHAR}, #{mqType,jdbcType=TINYINT},
       #{consumeStatus,jdbcType=BIT}, #{reconsumeTimes,jdbcType=SMALLINT},
       now(), now())
   </insert>
@@ -47,6 +48,9 @@
   <update id="updateByPrimaryKeySelective" parameterType="MessageConsume" >
     update tz_message_consume
     <set >
+      <if test="messageId != null" >
+        message_id = #{messageId,jdbcType=VARCHAR},
+      </if>
       <if test="consumer != null" >
         consumer = #{consumer,jdbcType=VARCHAR},
       </if>
@@ -92,11 +96,24 @@
     <if test="topic != null" >
       and topic = #{topic,jdbcType=VARCHAR}
     </if>
+    <if test="tags != null" >
+      and tags = #{tags,jdbcType=VARCHAR}
+    </if>
     <if test="mqType != null" >
       and mq_type = #{mqType,jdbcType=TINYINT}
     </if>
     <if test="consumeStatus != null" >
       and consume_status = #{consumeStatus,jdbcType=BIT}
+    </if>
+    <if test="createTimeFrom != null" >
+      <![CDATA[
+        and create_time >= #{createTimeFrom,jdbcType=TIMESTAMP}
+      ]]>
+    </if>
+    <if test="createTimeTo != null" >
+      <![CDATA[
+        and create_time <= #{createTimeTo,jdbcType=TIMESTAMP}
+      ]]>
     </if>
   </sql>
 

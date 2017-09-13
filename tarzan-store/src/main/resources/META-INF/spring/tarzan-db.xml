@@ -21,7 +21,7 @@
             <value>stat</value>
         </property>
         <property name="maxActive">
-            <value>20</value>
+            <value>100</value>
         </property>
         <property name="initialSize">
             <value>1</value>

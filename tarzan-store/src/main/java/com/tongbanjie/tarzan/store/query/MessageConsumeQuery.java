@@ -2,6 +2,8 @@ package com.tongbanjie.tarzan.store.query;
 
 import com.tongbanjie.tarzan.common.PagingQuery;
 
+import java.util.Date;
+
 /**
  * 〈消息消费结果 查询参数〉<p>
  * 〈功能详细描述〉
@@ -37,6 +39,11 @@ public class MessageConsumeQuery extends PagingQuery {
     private String topic;
 
     /**
+     * Tags
+     */
+    private String tags;
+
+    /**
      * MQ类型
      */
     private Integer mqType;
@@ -45,6 +52,16 @@ public class MessageConsumeQuery extends PagingQuery {
      * 消费状态
      */
     private Boolean consumeStatus;
+
+    /**
+     * 创建时间From
+     */
+    private Date createTimeFrom;
+
+    /**
+     * 创建时间To
+     */
+    private Date createTimeTo;
 
     public MessageConsumeQuery() {
         setOrderByClause(ORDER_BY_ID_ASC);
@@ -90,6 +107,14 @@ public class MessageConsumeQuery extends PagingQuery {
         this.topic = topic;
     }
 
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
+
     public Integer getMqType() {
         return mqType;
     }
@@ -106,6 +131,22 @@ public class MessageConsumeQuery extends PagingQuery {
         this.consumeStatus = consumeStatus;
     }
 
+    public Date getCreateTimeFrom() {
+        return createTimeFrom;
+    }
+
+    public void setCreateTimeFrom(Date createTimeFrom) {
+        this.createTimeFrom = createTimeFrom;
+    }
+
+    public Date getCreateTimeTo() {
+        return createTimeTo;
+    }
+
+    public void setCreateTimeTo(Date createTimeTo) {
+        this.createTimeTo = createTimeTo;
+    }
+
     @Override
     public String toString() {
         return "MessageConsumeQuery{" +
@@ -114,8 +155,11 @@ public class MessageConsumeQuery extends PagingQuery {
                 ", messageKey='" + messageKey + '\'' +
                 ", consumerGroup='" + consumerGroup + '\'' +
                 ", topic='" + topic + '\'' +
+                ", tags='" + tags + '\'' +
                 ", mqType=" + mqType +
                 ", consumeStatus=" + consumeStatus +
+                ", createTimeFrom=" + createTimeFrom +
+                ", createTimeTo=" + createTimeTo +
                 '}';
     }
 }

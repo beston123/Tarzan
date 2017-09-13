@@ -19,6 +19,8 @@ public class MQConsume {
 
     private String topic;
 
+    private String tags;
+
     private String consumer;
 
     private Short reconsumeTimes;
@@ -63,6 +65,14 @@ public class MQConsume {
         this.topic = topic;
     }
 
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
+
     public String getConsumer() {
         return consumer;
     }
@@ -87,6 +97,7 @@ public class MQConsume {
                 ", messageKey='" + messageKey + '\'' +
                 ", consumerGroup='" + consumerGroup + '\'' +
                 ", topic='" + topic + '\'' +
+                ", tags='" + tags + '\'' +
                 ", consumer='" + consumer + '\'' +
                 ", reconsumeTimes=" + reconsumeTimes +
                 '}';

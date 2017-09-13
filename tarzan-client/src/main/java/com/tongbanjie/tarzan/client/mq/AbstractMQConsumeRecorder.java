@@ -63,6 +63,7 @@ public abstract class AbstractMQConsumeRecorder<T extends MQConsume> implements 
         requestHeader.setMessageKey(consume.getMessageKey());
         requestHeader.setConsumerGroup(consume.getConsumerGroup());
         requestHeader.setTopic(consume.getTopic());
+        requestHeader.setTags(consume.getTags());
         requestHeader.setReconsumeTimes(consume.getReconsumeTimes());
         requestHeader.setConsumer(consume.getConsumer());
 

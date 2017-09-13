@@ -1,4 +1,4 @@
-package rocketmq.benchmark;
+package rockermq.benchmark;
 
 import com.alibaba.rocketmq.common.message.Message;
 import com.tongbanjie.tarzan.client.ClientConfig;
@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rocketmq.TestTransactionCheckListener;
+import rockermq.TestTransactionCheckListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ public class ServerBenchMarkTest {
     /**
      * 测试消息总数
      */
-    private final int totalPage = 1;
+    private final int totalPage = 10;
 
     private final int totalMessage = totalPage * 10000;
 

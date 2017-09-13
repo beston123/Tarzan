@@ -1,12 +1,9 @@
 package com.tongbanjie.tarzan.store;
 
-import com.tongbanjie.tarzan.store.service.MessageConsumeService;
-import com.tongbanjie.tarzan.store.service.StoreService;
-import com.tongbanjie.tarzan.store.service.ToCheckMessageService;
-import com.tongbanjie.tarzan.store.service.ToSendMessageService;
 import com.tongbanjie.tarzan.common.Service;
 import com.tongbanjie.tarzan.common.message.MQType;
-import com.tongbanjie.tarzan.common.redis.RedisComponent;
+import com.tongbanjie.tarzan.store.service.MessageConsumeService;
+import com.tongbanjie.tarzan.store.service.StoreService;
 
 import java.util.Map;
 import java.util.Set;

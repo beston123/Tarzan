@@ -1,6 +1,5 @@
 package com.tongbanjie.tarzan.server;
 
-import com.tongbanjie.tarzan.common.redis.RedisComponent;
 import com.tongbanjie.tarzan.server.handler.MQMessageHandler;
 import com.tongbanjie.tarzan.common.PagingParam;
 import com.tongbanjie.tarzan.common.Result;
@@ -14,6 +13,7 @@ import com.tongbanjie.tarzan.common.util.Timeout;
 import com.tongbanjie.tarzan.server.handler.MQMessageHandlerFactory;
 import com.tongbanjie.tarzan.store.StoreManager;
 import com.tongbanjie.tarzan.store.query.ToSendMessageQuery;
+import com.tongbanjie.tarzan.store.redis.RedisComponent;
 import com.tongbanjie.tarzan.store.service.StoreService;
 import com.tongbanjie.tarzan.store.service.ToSendMessageService;
 import org.apache.commons.lang3.RandomUtils;

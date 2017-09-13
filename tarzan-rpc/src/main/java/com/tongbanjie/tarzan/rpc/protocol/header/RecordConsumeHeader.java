@@ -29,6 +29,8 @@ public class RecordConsumeHeader implements CustomHeader {
     @NotNull
     private String topic;
 
+    private String tags;
+
     @NotNull
     private String consumer;
 
@@ -84,6 +86,14 @@ public class RecordConsumeHeader implements CustomHeader {
 
     public void setTopic(String topic) {
         this.topic = topic;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 
     public String getConsumer() {

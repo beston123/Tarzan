@@ -9,25 +9,30 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>tarzan-server</artifactId>
+    <artifactId>tarzan-example</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>tarzan-rpc</artifactId>
+            <artifactId>tarzan-server</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>tarzan-client</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>tarzan-rocketmq</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
 
+        <!-- junit -->
         <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>tarzan-store</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>tarzan-registry</artifactId>
-            <version>${project.version}</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -36,10 +41,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.alibaba.rocketmq</groupId>
-            <artifactId>rocketmq-client</artifactId>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
         </dependency>
 
     </dependencies>
-
 </project>

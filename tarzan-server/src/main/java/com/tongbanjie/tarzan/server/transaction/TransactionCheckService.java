@@ -1,6 +1,5 @@
 package com.tongbanjie.tarzan.server.transaction;
 
-import com.tongbanjie.tarzan.common.redis.RedisComponent;
 import com.tongbanjie.tarzan.common.ScheduledService;
 import com.tongbanjie.tarzan.common.message.MQMessage;
 import com.tongbanjie.tarzan.common.message.MQType;
@@ -15,6 +14,7 @@ import com.tongbanjie.tarzan.server.ServerConfig;
 import com.tongbanjie.tarzan.store.StoreManager;
 import com.tongbanjie.tarzan.store.model.ToSendMessage;
 import com.tongbanjie.tarzan.store.query.ToCheckMessageQuery;
+import com.tongbanjie.tarzan.store.redis.RedisComponent;
 import com.tongbanjie.tarzan.store.service.StoreService;
 import com.tongbanjie.tarzan.store.service.ToCheckMessageService;
 import com.tongbanjie.tarzan.store.service.ToSendMessageService;

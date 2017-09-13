@@ -96,6 +96,7 @@ public class RecordConsumeProcessor implements NettyRequestProcessor {
         messageConsume.setMessageId(messageHeader.getMessageId());
         messageConsume.setMessageKey(messageHeader.getMessageKey());
         messageConsume.setTopic(messageHeader.getTopic());
+        messageConsume.setTags(messageHeader.getTags());
         messageConsume.setConsumerGroup(messageHeader.getConsumerGroup());
         messageConsume.setMqType(messageHeader.getMqType().getCode());
         messageConsume.setConsumer(messageHeader.getConsumer());

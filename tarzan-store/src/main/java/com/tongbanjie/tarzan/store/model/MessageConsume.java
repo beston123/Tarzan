@@ -52,6 +52,12 @@ public class MessageConsume implements Serializable{
     private String topic;
 
     /**
+     * Tags
+     * 子主题
+     */
+    private String tags;
+
+    /**
      * 消费者［ ip/appName］
      */
     @NotNull
@@ -135,6 +141,14 @@ public class MessageConsume implements Serializable{
         this.topic = topic == null ? null : topic.trim();
     }
 
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
+
     public String getConsumer() {
         return consumer;
     }
@@ -192,6 +206,7 @@ public class MessageConsume implements Serializable{
                 ", messageKey='" + messageKey + '\'' +
                 ", consumerGroup='" + consumerGroup + '\'' +
                 ", topic='" + topic + '\'' +
+                ", tags='" + tags + '\'' +
                 ", consumer='" + consumer + '\'' +
                 ", mqType=" + mqType +
                 ", consumeStatus=" + consumeStatus +
