@@ -12,10 +12,30 @@ Tarzan取自电影《人猿泰山》的英文名，用于保证消息生产者�
 - store: 服务端的数据存储
 - mq: 各类mq客户端，集成到应用
 
+## 原理
+分布式事务的三种实现方式，包括可靠事件模式、业务补偿模式、TCC模式。
+
+可靠事件系统Tarzan是基于可靠事件模式实现的分布式事务解决方案。
+
+分布式开放消息系统(RocketMQ)的原理与实践
+http://www.jianshu.com/p/453c6e7ff81c
+
+微服务架构下的数据一致性：可靠事件模式
+http://blog.csdn.net/liuxinghao/article/details/51924877
+
 ## 设计
+
+基于外部事件表，实现可靠的消息投递
+![外部事件表](https://github.com/beston123/tevent/blob/master/doc/development/ExternalEventTable.png)
+
+生产者事务消息实现原理
+![生产者事务消息](https://github.com/beston123/tevent/blob/master/doc/development/TransactionMessage.png)
+
+可靠消息系统实现架构图
 ![架构图](https://github.com/beston123/tevent/blob/master/doc/development/Architecture.png)
 
-![生产者事务消息](https://github.com/beston123/tevent/blob/master/doc/development/TransactionMessage.png)
+可靠消息系统Tarzan数据流图
+![数据流图](https://github.com/beston123/tevent/blob/master/doc/development/DataFlow.png)
 
 ## 版本
 [更新日志](https://github.com/beston123/Tarzan/blob/master/CHANGELOG.md)
