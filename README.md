@@ -15,13 +15,11 @@ Tarzan取自电影《人猿泰山》的英文名，用于保证消息生产者�
 ## 原理
 分布式事务的三种实现方式，包括可靠事件模式、业务补偿模式、TCC模式。
 
-可靠事件系统Tarzan是基于可靠事件模式实现的分布式事务解决方案。
+可靠事件系统Tarzan是基于可靠事件模式的分布式事务解决方案。
 
-分布式开放消息系统(RocketMQ)的原理与实践
-http://www.jianshu.com/p/453c6e7ff81c
-
-微服务架构下的数据一致性：可靠事件模式
-http://blog.csdn.net/liuxinghao/article/details/51924877
+参考：
+[分布式开放消息系统(RocketMQ)的原理与实践](http://www.jianshu.com/p/453c6e7ff81c)
+[微服务架构下的数据一致性：可靠事件模式](http://blog.csdn.net/liuxinghao/article/details/51924877)
 
 ## 设计
 
@@ -38,12 +36,14 @@ http://blog.csdn.net/liuxinghao/article/details/51924877
 ![数据流图](https://github.com/beston123/tevent/blob/master/doc/development/DataFlow.png)
 
 ## 版本
-[更新日志](https://github.com/beston123/Tarzan/blob/master/CHANGELOG.md)
+[更新日志...](https://github.com/beston123/Tarzan/blob/master/CHANGELOG.md)
 
 ## 文档
-[部署说明](https://github.com/beston123/Tarzan/blob/master/doc/install/INSTALL.md)
+[部署说明](https://github.com/beston123/Tarzan/blob/master/doc/install/INSTALLATION.md)
 
 ## 建议
 版本目前仍在开发中，若您有任何建议，可以通过QQ群或邮件反馈。
+
 QQ群：668250402
-mail：beston@yeah.net
+
+Email：beston@yeah.net
