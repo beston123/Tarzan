@@ -11,7 +11,9 @@
 
     ./deploy.sh
     
-缺少依赖 baymax-spring: https://github.com/tongbanjie/baymax
+如果提示缺少的依赖‘baymax-spring’，请下载[baymax-spring_3.0.0.zip](https://github.com/beston123/Tarzan/tree/master/doc/install)，并解压到本地maven仓库。
+
+BayMax: https://github.com/tongbanjie/baymax
 
 ## Installation
 
