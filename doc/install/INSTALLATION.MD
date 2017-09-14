@@ -7,12 +7,18 @@
 - zookeeper 3.4+
 - RocketMQ 3.2.0+
 
+## Building
+
+    ./deploy.sh
+    
+缺少依赖 baymax-spring: https://github.com/tongbanjie/baymax
+
 ## Installation
 
 ### 数据库部署
 - 按顺序执行所有.sql文件
 
-### Tarzan服务端部署
+### 服务端部署
 #### 配置
 - config.properties: 端口、服务端Id、权重、zookeeper、MQ地址等配置
 - log4j.properties: 日志配置
