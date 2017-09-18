@@ -37,9 +37,9 @@ Tarzan取自电影《人猿泰山》的英文名，用于保证消息生产者�
 ![数据流图](https://github.com/beston123/tevent/blob/master/doc/development/DataFlow.png)
 
 ## 文档
-[更新日志...](https://github.com/beston123/Tarzan/blob/master/CHANGELOG.MD)
-[开发指南...](https://github.com/beston123/Tarzan/blob/master/GUIDE.MD)
-[部署说明...](https://github.com/beston123/Tarzan/blob/master/doc/install/INSTALLATION.MD)
+- [更新日志](https://github.com/beston123/Tarzan/blob/master/CHANGELOG.MD)
+- [开发指南](https://github.com/beston123/Tarzan/blob/master/GUIDE.MD)
+- [部署说明](https://github.com/beston123/Tarzan/blob/master/doc/install/INSTALLATION.MD)
 
 ## 建议
 若您有任何建议，可以通过QQ群或邮件反馈。
