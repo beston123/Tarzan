@@ -3,7 +3,7 @@
 ### 1 依赖配置
 ```
     <dependency>
-        <groupId>${project.parent.groupId}</groupId>
+        <groupId>com.tongbanjie.tarzan</groupId>
         <artifactId>tarzan-client</artifactId>
         <version>0.9.0</version>
     </dependency>
