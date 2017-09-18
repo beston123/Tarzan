@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="com.tarzan.example"/>
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:tarzan-example.properties</value>
+                <value>classpath:log4j.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="clientConfig"  class="com.tongbanjie.tarzan.client.ClientConfig" >
+        <constructor-arg name="registryAddress" value="${tarzan.registry.address}" />
+        <constructor-arg name="appName" value="example" />
+    </bean>
+
+    <bean id="testMessageNotifier" class="com.tongbanjie.tarzan.rocketmq.RocketMQMessageNotifier" init-method="init" >
+        <property name="groupId" value="TARZAN_TEST_P_EXAMPLE" />
+        <property name="topic" value="-TARZAN_TEST_TOPIC-" />
+        <property name="transactionCheckListener" ref="testTransactionChecker" />
+        <property name="clientConfig" ref="clientConfig" />
+    </bean>
+
+    <bean id="testTransactionChecker" class="com.tarzan.example.TarzanTestTransactionChecker" />
+
+</beans>

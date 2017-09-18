@@ -17,7 +17,7 @@ BayMax: https://github.com/tongbanjie/baymax
 
 ### Installation
 #### 数据库部署  
-- 创建数据库schema：workflow
+- 创建数据库schema：tarzan
 - 执行sql文件：doc/install/1_create_tables.sql
 
 #### 服务端部署  
