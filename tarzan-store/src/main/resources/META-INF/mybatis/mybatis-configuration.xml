@@ -20,9 +20,5 @@
 
 		<typeAlias alias="RocketMQMessage" type="com.tongbanjie.tarzan.common.message.RocketMQMessage" />
 	</typeAliases>
-	
-	<plugins>
-		<plugin interceptor="com.dianping.cat.mybaties.CatMybatisPlugins" />
-	</plugins>
 
 </configuration>
