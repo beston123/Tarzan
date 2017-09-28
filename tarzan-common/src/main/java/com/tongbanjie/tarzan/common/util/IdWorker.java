@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Calendar;
-import java.util.Random;
 
 /**
  * Twitter的分布式自增ID算法
@@ -75,9 +74,6 @@ public class IdWorker {
 
     private long lastTimestamp = -1L;
 
-    //随机数
-    private final Random sequenceRandom = new Random();
-
     //sequence随机值范围 0-SEQ_ROUND
     private static final int SEQ_ROUND = 256;
 
@@ -115,7 +111,7 @@ public class IdWorker {
             }
         } else {
             //计数重置为随机数
-            sequence = sequenceRandom.nextInt(SEQ_ROUND);
+            sequence = ThreadLocalRandom.current().nextInt(SEQ_ROUND);
         }
 
         lastTimestamp = timestamp;
@@ -143,18 +139,9 @@ public class IdWorker {
 
     public static void main(String[] args) {
         final IdWorker idWorker = new IdWorker(0);
-        for(int t=0;t<20;t++) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    for(int i=0; i<200;i++){
-                        long id = idWorker.nextId();
-                        System.out.println(id +"  "+ id%128);
-                    }
-                }
-            }).start();
+        for(int i=0; i<10; i++){
+            System.out.println(i+": "+idWorker.nextId());
         }
-
     }
 }
 
