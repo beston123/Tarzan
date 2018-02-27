@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class IdGenerateTest {
 
-    private ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(20);
+    private ThreadPoolExecutor executor = (ThreadPoolExecutor)Executors.newFixedThreadPool(20);
 
     @Before
     public void before(){
@@ -56,7 +56,7 @@ public class IdGenerateTest {
         while (executor.getActiveCount() > 0){
             Thread.sleep(1L);
         }
-        System.out.println("Costs: " + timeout.cost() + "ms");
+        System.out.println("Costs: "+timeout.cost()+"ms");
         for(Map.Entry<Integer, AtomicInteger> entry : tables.entrySet()){
             System.out.println("Table:"+entry.getKey() +", count:"+ entry.getValue());
         }

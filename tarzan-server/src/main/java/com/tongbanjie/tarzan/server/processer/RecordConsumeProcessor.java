@@ -48,46 +48,67 @@ public class RecordConsumeProcessor implements NettyRequestProcessor {
     }
 
     private RpcCommand recordConsume(ChannelHandlerContext ctx, RpcCommand request) throws RpcCommandException {
-        RecordConsumeHeader messageHeader = null;
-        try {
-            //1、解析消息头
-            messageHeader = (RecordConsumeHeader)request.decodeCustomHeader(RecordConsumeHeader.class);
+        //1、解析消息头
+        RecordConsumeHeader messageHeader = (RecordConsumeHeader)request.decodeCustomHeader(RecordConsumeHeader.class);
 
-            //2、消息消费结果保存
-            if(!messageHeader.getConsumeStatus() || messageHeader.getReconsumeTimes() > 0){
-                recordConsume(messageHeader);
-            }else {
-                //第一次消费且消费成功的消息，暂不记录
-            }
-            MessageResultHeader resultHeader = new MessageResultHeader();
-            resultHeader.setMsgId(messageHeader.getMessageId());
-            return RpcCommandBuilder.buildSuccess(resultHeader);
-        } catch (RpcCommandException e) {
-            throw e;
-        } catch (Exception e){
-            return RpcCommandBuilder.buildFail("记录消息消费结果失败, message:"+messageHeader +", error:" + e.getMessage());
+        //2、消息消费结果保存
+        Result<Void> result = null;
+        //a、tarzan事务消息
+        if(messageHeader.getTid() != null){
+            result = recordTarzanConsume(messageHeader);
+        //b、普通消息
+        }else{
+            result = recordMQConsume(messageHeader);
+        }
+        if(result != null && !result.isSuccess()){
+            LOGGER.error("Record message consume result failed, message:{}, error:{}", messageHeader, result.getErrorDetail());
+            return RpcCommandBuilder.buildFail("Record message consume result failed:"+result.getErrorMsg());
         }
 
+        MessageResultHeader resultHeader = new MessageResultHeader();
+        resultHeader.setMsgId(messageHeader.getMessageId());
+        return RpcCommandBuilder.buildSuccess(resultHeader);
     }
 
-    private void recordConsume(RecordConsumeHeader messageHeader){
+    /**
+     * tarzan事务消息 消费结果记录
+     * @param messageHeader
+     * @return
+     */
+    private Result<Void> recordTarzanConsume(RecordConsumeHeader messageHeader){
         MessageConsumeService messageConsumeService = this.storeManager.getMessageConsumeService();
-        if(messageHeader.getTid() != null){
-            Result<Long> exist = messageConsumeService.exist(messageHeader.getTid(), messageHeader.getConsumerGroup());
-            Validate.isTrue(exist.isSuccess(), exist.getErrorDetail());
-            if(exist.getData() != null){
-                MessageConsume forUpdate = new MessageConsume();
-                forUpdate.setId(exist.getData());
-                forUpdate.setMessageId(messageHeader.getMessageId());   //最新messageId
-                forUpdate.setConsumer(messageHeader.getConsumer());     //最新的consumer
-                forUpdate.setConsumeStatus(messageHeader.getConsumeStatus());
-                forUpdate.setReconsumeTimes(messageHeader.getReconsumeTimes());
-                Result<Void> result = messageConsumeService.update(forUpdate);
-                Validate.isTrue(result.isSuccess(), result.getErrorDetail());
-            }
+        Result<Long> exist = messageConsumeService.exist(messageHeader.getTid(), messageHeader.getConsumerGroup());
+        Validate.isTrue(exist.isSuccess(), exist.getErrorDetail());
+        //a、如果已存在消费记录，则更新消费结果
+        if(exist.getData() != null){
+            MessageConsume forUpdate = new MessageConsume();
+            forUpdate.setId(exist.getData());
+            forUpdate.setMessageId(messageHeader.getMessageId());   //最新messageId
+            forUpdate.setConsumer(messageHeader.getConsumer());     //最新的consumer
+            forUpdate.setConsumeStatus(messageHeader.getConsumeStatus());
+            forUpdate.setReconsumeTimes(messageHeader.getReconsumeTimes());
+            return messageConsumeService.update(forUpdate);
+        //b、不存在消费记录，且消费失败则插入
+        }else if(!messageHeader.getConsumeStatus()){
+            return messageConsumeService.insert(buildMessageConsume(messageHeader));
+        }else{
+            return Result.buildSucc(null);
         }
-        Result<Void> result = messageConsumeService.insert(buildMessageConsume(messageHeader));
-        Validate.isTrue(result.isSuccess(), result.getErrorDetail());
+    }
+
+    /**
+     * 普通消息 消费结果记录
+     * @param messageHeader
+     * @return
+     */
+    private Result<Void> recordMQConsume(RecordConsumeHeader messageHeader){
+        //消费失败或非首次消费
+        if(!messageHeader.getConsumeStatus() || messageHeader.getReconsumeTimes() > 0){
+            MessageConsumeService messageConsumeService = this.storeManager.getMessageConsumeService();
+            return messageConsumeService.insert(buildMessageConsume(messageHeader));
+        }else{
+            return Result.buildSucc(null);
+        }
     }
 
     private MessageConsume buildMessageConsume(RecordConsumeHeader messageHeader){

@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.9.1] - 2018-02-01
+### Added
+- 新增服务端的自动选举master功能
+- 新增【数据中心Id】的配置项，用于区分zookeeper
+- 客户端新增销毁方法
+
+### Changed
+- 消息消费结果记录逻辑修改
+- 取消【服务端workId】的配置项，通过zookeeper自动生成
+
 ## [0.9.0] - 2017-08-07
 ### Added
 - 消息消费结果记录tag

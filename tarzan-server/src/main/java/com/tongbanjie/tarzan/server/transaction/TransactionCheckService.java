@@ -11,6 +11,7 @@ import com.tongbanjie.tarzan.common.util.Timeout;
 import com.tongbanjie.tarzan.common.PagingParam;
 import com.tongbanjie.tarzan.common.Result;
 import com.tongbanjie.tarzan.server.ServerConfig;
+import com.tongbanjie.tarzan.server.ServerController;
 import com.tongbanjie.tarzan.store.StoreManager;
 import com.tongbanjie.tarzan.store.model.ToSendMessage;
 import com.tongbanjie.tarzan.store.query.ToCheckMessageQuery;
@@ -18,7 +19,6 @@ import com.tongbanjie.tarzan.store.redis.RedisComponent;
 import com.tongbanjie.tarzan.store.service.StoreService;
 import com.tongbanjie.tarzan.store.service.ToCheckMessageService;
 import com.tongbanjie.tarzan.store.service.ToSendMessageService;
-import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +65,9 @@ public class TransactionCheckService implements ScheduledService {
     private static final String JOB_KEY = TransactionCheckService.class.getCanonicalName();
 
     @Autowired
+    private ServerController serverController;
+
+    @Autowired
     private TransactionCheckExecutor transactionCheckExecutor;
 
     @Autowired
@@ -100,7 +103,7 @@ public class TransactionCheckService implements ScheduledService {
                     LOGGER.error("TransactionCheckService 执行失败", e);
                 }
             }
-        }, RandomUtils.nextInt(8 * 60, 10 * 60), 10 * 60, TimeUnit.SECONDS);
+        }, 1 * 60, 10 * 60, TimeUnit.SECONDS);
     }
 
     @Override
@@ -114,6 +117,10 @@ public class TransactionCheckService implements ScheduledService {
 
     @Override
     public void schedule(){
+        if(!serverController.getServerRegistry().isMaster()){
+            return;
+        }
+
         init();
 
         if(!redisComponent.acquireLock(JOB_KEY, JOB_EXPIRE_MILLIS)){

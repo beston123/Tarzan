@@ -10,32 +10,45 @@ package com.tongbanjie.tarzan.common.util;
 public class DistributedIdGenerator {
 
     /**
-     * 同一个Jvm只能设置一次
+     * 数据中心Id和WorkId， 同一个Jvm只能设置一次
      */
+    private static Integer UNIQUE_DATA_CENTER_ID = null;
+
     private static Integer UNIQUE_WORK_ID = null;
 
     private DistributedIdGenerator(){}
 
-    public static Long generateId(){
-        if(UNIQUE_WORK_ID == null){
-            throw new RuntimeException("UNIQUE_WORK_ID must specify a value.");
+    public static void initialize(Integer dataCenterId, Integer workId){
+        if(UNIQUE_DATA_CENTER_ID == null){
+            UNIQUE_DATA_CENTER_ID = dataCenterId;
         }
-        Long id = IdGeneratorFactory.getInstance().getAndCreate(UNIQUE_WORK_ID).nextId();
-        return id;
-    }
-
-    public static void setUniqueWorkId(Integer workId){
         if(UNIQUE_WORK_ID == null){
             UNIQUE_WORK_ID = workId;
         }
     }
 
-    public static long getMaxWorkId(){
-        return IdWorker.maxWorkerId;
+    public static Long generateId(){
+        if(UNIQUE_DATA_CENTER_ID == null || UNIQUE_WORK_ID == null){
+            throw new RuntimeException("DataCenterId and workId must specify a value.");
+        }
+        Long id = IdGeneratorFactory.getInstance().getAndCreate(UNIQUE_DATA_CENTER_ID, UNIQUE_WORK_ID).nextId();
+        return id;
     }
 
-    public static boolean validate(long workId){
-        if(workId < 0 || workId > getMaxWorkId()){
+    public static int getMinWorkId(){
+        return 0;
+    }
+
+    public static int getMaxWorkId(){
+        return ((Long)IdWorker.getMaxWorkerId()).intValue();
+    }
+
+    public static int getMaxDataCenterId(){
+        return ((Long)IdWorker.getMaxDataCenterId()).intValue();
+    }
+
+    public static boolean validateDataCenterId(long dataCenterId){
+        if(dataCenterId < 0 || dataCenterId > IdWorker.getMaxDataCenterId()){
             return true;
         }
         return false;

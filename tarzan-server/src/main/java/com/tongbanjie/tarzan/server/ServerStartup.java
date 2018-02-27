@@ -128,29 +128,6 @@ public class ServerStartup {
                 PropertyConfigurator.configure(logFilePath);
             }
         }
-
-//        /*************** 加载业务配置 ***************/
-//        String configFilePath = ConfigManager.configFilePath;
-//        Properties properties = new Properties();
-//        InputStream is = null;
-//        try {
-//            if (configFilePath.startsWith(Constants.CLASSPATH_PREFIX)) {
-//                configFilePath = StringUtils.substringAfter(configFilePath, Constants.CLASSPATH_PREFIX);
-//                is = ServerStartup.class.getClassLoader().getResourceAsStream(configFilePath);
-//            } else {
-//                is = new FileInputStream(configFilePath);
-//            }
-//            properties.load(is);
-//        }finally {
-//            if(is != null){
-//                is.close();
-//            }
-//        }
-//
-//        Set<String> propNames = properties.stringPropertyNames();
-//        for(String propName : propNames){
-//            System.setProperty(propName, properties.getProperty(propName));
-//        }
     }
 
 }

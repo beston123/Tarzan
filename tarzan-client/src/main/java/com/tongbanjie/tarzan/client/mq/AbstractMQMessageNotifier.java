@@ -26,6 +26,8 @@ public abstract class AbstractMQMessageNotifier<T> implements MQMessageNotifier<
 
     private MQMessageSender mqMessageSender;
 
+    private ClientController clientController;
+
     @NotNull
     private MQType mqType;
 
@@ -45,10 +47,10 @@ public abstract class AbstractMQMessageNotifier<T> implements MQMessageNotifier<
         this.mqType = mqType;
     }
 
-    public void start(String producerGroup) throws ClientException {
+    protected void start(String producerGroup) throws ClientException {
         if(isStart.compareAndSet(false, true)){
             this.validate();
-            ClientController clientController = ClientControllerFactory.getInstance().getAndCreate(clientConfig);
+            clientController = ClientControllerFactory.getInstance().getAndCreate(clientConfig);
             clientController.start();
             mqMessageSender = MQMessageSenderFactory.create(mqType, clientController, transactionCheckListener);
             clientController.registerMQMessageSender(producerGroup, mqMessageSender);
@@ -63,6 +65,11 @@ public abstract class AbstractMQMessageNotifier<T> implements MQMessageNotifier<
         }catch (IllegalArgumentException e){
             throw new ClientException("Init MQ client failed,"+e.getMessage());
         }
+    }
+
+    @Override
+    public void destroy(){
+        clientController.shutdown();
     }
 
     public MQMessageSender getMqMessageSender() {

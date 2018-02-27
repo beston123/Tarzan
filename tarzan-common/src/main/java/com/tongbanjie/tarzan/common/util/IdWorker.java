@@ -53,7 +53,7 @@ public class IdWorker {
     private static final long dataCenterIdBits = 3L;
 
     //机器ID最大值
-    public static final long maxWorkerId = -1L ^ (-1L << workerIdBits);
+    private static final long maxWorkerId = -1L ^ (-1L << workerIdBits);
     //数据中心ID最大值
     private static final long maxDataCenterId = -1L ^ (-1L << dataCenterIdBits);
 
@@ -135,6 +135,14 @@ public class IdWorker {
      */
     protected long timeGen() {
         return System.currentTimeMillis();
+    }
+
+    public static long getMaxDataCenterId() {
+        return maxDataCenterId;
+    }
+
+    public static long getMaxWorkerId() {
+        return maxWorkerId;
     }
 
     public static void main(String[] args) {

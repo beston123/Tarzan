@@ -21,6 +21,6 @@ public interface MQMessageNotifier<T> {
 
     MessageResult rollbackMessage(Long transactionId);
 
-
+    void destroy();
 
 }

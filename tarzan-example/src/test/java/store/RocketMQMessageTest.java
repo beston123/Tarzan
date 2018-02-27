@@ -36,7 +36,7 @@ public class RocketMQMessageTest extends BaseTest{
 
     @Before
     public void before(){
-        DistributedIdGenerator.setUniqueWorkId(1);
+        DistributedIdGenerator.initialize(0, 1);
     }
 
     @Test

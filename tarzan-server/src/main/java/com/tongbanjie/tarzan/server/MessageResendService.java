@@ -16,7 +16,6 @@ import com.tongbanjie.tarzan.store.query.ToSendMessageQuery;
 import com.tongbanjie.tarzan.store.redis.RedisComponent;
 import com.tongbanjie.tarzan.store.service.StoreService;
 import com.tongbanjie.tarzan.store.service.ToSendMessageService;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,7 +94,7 @@ public class MessageResendService implements ScheduledService {
                     LOGGER.error("MessageResendJob 执行失败", e);
                 }
             }
-        }, RandomUtils.nextInt(15 * 60, 18 * 60), 10 * 60, TimeUnit.SECONDS);
+        }, 3 * 60, 10 * 60, TimeUnit.SECONDS);
     }
 
     @Override
@@ -109,6 +108,10 @@ public class MessageResendService implements ScheduledService {
 
     @Override
     public void schedule(){
+        if(!serverController.getServerRegistry().isMaster()){
+            return;
+        }
+
         init();
 
         if(!redisComponent.acquireLock(JOB_KEY, JOB_EXPIRE_MILLIS)){

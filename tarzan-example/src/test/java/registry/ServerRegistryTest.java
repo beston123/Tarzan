@@ -23,7 +23,7 @@ public class ServerRegistryTest {
 
     @Before
     public void init(){
-        zkClient = new ZkClient("192.168.1.120:2181",
+        zkClient = new ZkClient("zk.tbj.com:2181",
                 ZkConstants.SESSION_TIMEOUT, ZkConstants.CONNECTION_TIMEOUT);
     }
 

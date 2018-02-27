@@ -38,6 +38,8 @@ public abstract class AbstractMQConsumeRecorder<T extends MQConsume> implements 
 
     private ClusterClient clusterClient;
 
+    private ClientController clientController;
+
     public AbstractMQConsumeRecorder(ClientConfig clientConfig, MQType mqType){
         this.clientConfig = clientConfig;
         this.mqType = mqType;
@@ -48,13 +50,13 @@ public abstract class AbstractMQConsumeRecorder<T extends MQConsume> implements 
             if(this.mqType == null){
                 throw new ClientException("Init MQ client failed. MQType can not be null");
             }
-            ClientController clientController = ClientControllerFactory.getInstance().getAndCreate(clientConfig);
+            clientController = ClientControllerFactory.getInstance().getAndCreate(clientConfig);
             clientController.start();
             clusterClient = clientController.getClusterClient();
         }
     }
 
-    public MessageResult consumed(T consume, boolean consumeStatus){
+    protected MessageResult consumed(T consume, boolean consumeStatus){
         final RecordConsumeHeader requestHeader = new RecordConsumeHeader();
         requestHeader.setTid(consume.getTid());
         requestHeader.setMqType(this.mqType);
@@ -113,5 +115,9 @@ public abstract class AbstractMQConsumeRecorder<T extends MQConsume> implements 
             result = MessageResult.buildFail("系统异常");
         }
         return result;
+    }
+
+    public void shutdown(){
+        clientController.shutdown();
     }
 }

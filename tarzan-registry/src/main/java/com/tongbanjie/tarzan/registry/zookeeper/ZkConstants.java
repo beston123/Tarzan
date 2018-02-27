@@ -40,6 +40,7 @@ public abstract class ZkConstants {
 
     public static final String SERVER_IDS_ROOT = REGISTRY_ROOT + "/serverIds";
 
+    public static final String MASTER_SERVER = REGISTRY_ROOT + "/master/server";
 
     public final static String PATH_SEPARATOR = "/";
 

@@ -1,5 +1,7 @@
 package com.tongbanjie.tarzan.common.util;
 
+import com.tongbanjie.tarzan.common.Constants;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -16,7 +18,7 @@ public class IdGeneratorFactory {
 
     private final ReentrantLock createLock = new ReentrantLock();
 
-    private final ConcurrentHashMap<Integer/* workerId */, IdWorker> idWorkerTable = new ConcurrentHashMap<Integer, IdWorker>(1);
+    private final ConcurrentHashMap<String/* dataCenterId+workerId */, IdWorker> idWorkerTable = new ConcurrentHashMap<String, IdWorker>(1);
 
     private IdGeneratorFactory(){}
 
@@ -24,22 +26,22 @@ public class IdGeneratorFactory {
         return ID_GENERATOR_FACTORY;
     }
 
-    public IdWorker getAndCreate(int workerId){
-
-        IdWorker instance = this.idWorkerTable.get(workerId);
+    public IdWorker getAndCreate(int dataCenterId, int workerId){
+        String key = dataCenterId + Constants.UNDERLINE + workerId;
+        IdWorker instance = this.idWorkerTable.get(key);
         if (null != instance) {
             return instance;
         }
         try {
             createLock.lock();
 
-            instance = this.idWorkerTable.get(workerId);
+            instance = this.idWorkerTable.get(key);
             if (null != instance) {
                 return instance;
             }
 
-            instance = new IdWorker(workerId);
-            this.idWorkerTable.put(workerId, instance);
+            instance = new IdWorker(workerId, dataCenterId);
+            this.idWorkerTable.put(key, instance);
 
             return instance;
         }finally {

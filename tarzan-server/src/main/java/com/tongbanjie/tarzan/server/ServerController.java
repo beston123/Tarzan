@@ -21,8 +21,8 @@ import com.tongbanjie.tarzan.common.Service;
 import com.tongbanjie.tarzan.common.util.NamedThreadFactory;
 import com.tongbanjie.tarzan.common.util.NetworkUtils;
 import com.tongbanjie.tarzan.registry.Address;
-import com.tongbanjie.tarzan.registry.RecoverableRegistry;
 import com.tongbanjie.tarzan.registry.ServerAddress;
+import com.tongbanjie.tarzan.registry.ServerRegistry;
 import com.tongbanjie.tarzan.registry.zookeeper.ServerZooKeeperRegistry;
 import com.tongbanjie.tarzan.rpc.RpcServer;
 import com.tongbanjie.tarzan.rpc.netty.NettyRpcServer;
@@ -57,7 +57,7 @@ public class ServerController implements Service {
     private NettyServerConfig nettyServerConfig;
 
     // 服务注册中心
-    private RecoverableRegistry serverRegistry;
+    private ServerRegistry serverRegistry;
 
     // 远程通信层对象
     private RpcServer rpcServer;
@@ -121,8 +121,8 @@ public class ServerController implements Service {
         if(serverConfig.getServerPort() < 1024 || serverConfig.getServerPort() > 65535){
             throw new ServerException(Constants.TARZAN_SERVER_PORT + " must be between 1024 and 65535.");
         }
-        if (DistributedIdGenerator.validate(serverConfig.getServerId())) {
-            throw new ServerException(Constants.TARZAN_SERVER_ID + " must be between 0 and "+ DistributedIdGenerator.getMaxWorkId());
+        if (DistributedIdGenerator.validateDataCenterId(serverConfig.getDataCenterId())) {
+            throw new ServerException(Constants.TARZAN_DATACENTER_ID + " must be between 0 and "+ DistributedIdGenerator.getMaxDataCenterId());
         }
 
         /**
@@ -151,16 +151,17 @@ public class ServerController implements Service {
                 .add(this.clientChannelManageService); //检测所有客户端连接
 
         /**
-         * 5、设置分布式Id生成器的WorkId
+         * 5、分布式Id生成器初始化
+         * 设置数据中心Id和WorkId
          */
-        DistributedIdGenerator.setUniqueWorkId(serverConfig.getServerId());
+        DistributedIdGenerator.initialize(serverConfig.getDataCenterId(), serverAddress.getServerId());
     }
 
     /**
      * 连接注册中心，并注册ServerId和地址
      * @return
      */
-    private boolean registerServer() {
+    private void registerServer() {
         //1、连接注册中心
         try {
             serverRegistry.start();
@@ -173,23 +174,18 @@ public class ServerController implements Service {
         if (localIp == null) {
             throw new ServerException("Get localHost ip failed.");
         }
-        serverAddress = new ServerAddress(localIp, serverConfig.getServerPort(),serverConfig.getServerWeight());
-        serverAddress.setServerId(serverConfig.getServerId());
 
+        //3、注册serverId和服务器地址
         if (serverRegistry.isConnected()) {
-            //3.1、注册serverId
-            boolean registerFlag = ((ServerZooKeeperRegistry) this.serverRegistry)
-                    .registerId(serverAddress.getServerId(), serverAddress);
-            if (!registerFlag) {
-                throw new ServerException("The server id '" + serverAddress.getServerId() +
-                        "' already in use, it must be unique in cluster.");
+            try {
+                serverAddress = new ServerAddress(localIp, serverConfig.getServerPort(), serverConfig.getServerWeight());
+                serverRegistry.registerServer(serverAddress, DistributedIdGenerator.getMinWorkId(), DistributedIdGenerator.getMaxWorkId());
+            } catch (Exception e) {
+                throw new ServerException("Register server failed: ", e);
             }
-            //3.2、注册服务器地址
-            serverRegistry.register(serverAddress);
-            return true;
+        }else{
+            throw new ServerException("Register server failed, registry address: " + serverConfig.getRegistryAddress());
         }
-        throw new ServerException("Register server failed, registry address: " + serverConfig.getRegistryAddress()
-                + ", server id: " + serverAddress.getServerId());
     }
 
     /**
@@ -287,7 +283,7 @@ public class ServerController implements Service {
         return clientManager;
     }
 
-    public RecoverableRegistry getServerRegistry() {
+    public ServerRegistry getServerRegistry() {
         return serverRegistry;
     }
 

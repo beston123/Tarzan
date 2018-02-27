@@ -15,6 +15,11 @@ public class MessageResult implements Serializable {
 
     private boolean success = false;
 
+    /**
+     * msgId永远为空，请使用transactionId
+     * 由于消息是异步发送，不再返回消息Id
+     */
+    @Deprecated
     private String msgId;
 
     private Long transactionId;

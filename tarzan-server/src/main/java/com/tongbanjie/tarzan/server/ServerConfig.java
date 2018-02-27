@@ -57,19 +57,19 @@ public class ServerConfig {
     private int serverPort;
 
     /**
-     * ServerId，每个server必须唯一
-     * 取值范围 0-31
-     */
-    @Value("${tarzan.server.id}")
-    private int serverId;
-
-    /**
      * Server权重
      * 取值范围 1-10000
      * @see Weighable
      */
     @Value("${tarzan.server.weight}")
     private short serverWeight;
+
+    /**
+     * 数据中心Id，每套注册中心(zookeeper)必须唯一
+     * 取值范围 0-7
+     */
+    @Value("${tarzan.dataCenter.id}")
+    private int dataCenterId;
 
     /**
      * 注册中心地址
@@ -124,20 +124,20 @@ public class ServerConfig {
         this.serverPort = serverPort;
     }
 
-    public int getServerId() {
-        return serverId;
-    }
-
-    public void setServerId(int serverId) {
-        this.serverId = serverId;
-    }
-
     public short getServerWeight() {
         return serverWeight;
     }
 
     public void setServerWeight(short serverWeight) {
         this.serverWeight = serverWeight;
+    }
+
+    public int getDataCenterId() {
+        return dataCenterId;
+    }
+
+    public void setDataCenterId(int dataCenterId) {
+        this.dataCenterId = dataCenterId;
     }
 
     public String getRegistryAddress() {
@@ -164,8 +164,8 @@ public class ServerConfig {
                 ", sendThreadPoolQueueCapacity=" + sendThreadPoolQueueCapacity +
                 ", messageMaxCheckDays=" + messageMaxCheckDays +
                 ", serverPort=" + serverPort +
-                ", serverId=" + serverId +
                 ", serverWeight=" + serverWeight +
+                ", dataCenterId=" + dataCenterId +
                 ", registryAddress='" + registryAddress + '\'' +
                 ", rocketMQNamesrv='" + rocketMQNamesrv + '\'' +
                 '}';

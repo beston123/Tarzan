@@ -29,9 +29,9 @@ public abstract class Constants {
 
     public static final String TARZAN_SERVER_PORT = "tarzan.server.port";
 
-    public static final String TARZAN_SERVER_ID = "tarzan.server.id";
-
     public static final String TARZAN_SERVER_WEIGHT = "tarzan.server.weight";
+
+    public static final String TARZAN_DATACENTER_ID = "tarzan.dataCenter.id";
 
     public static final String TARZAN_STORE_CONTEXT = "META-INF/spring/tarzan-store-context.xml";
 
@@ -47,6 +47,10 @@ public abstract class Constants {
     public static final String SEPARATOR_COMMA = ",";
 
     public static final String SEPARATOR_SEMICOLON = "";
+
+    public static final String UNDERLINE = "_";
+
+    public static final String LINE_THROUGH = "-";
 
     /******************************* MQ *********************************/
     //tid对应的key

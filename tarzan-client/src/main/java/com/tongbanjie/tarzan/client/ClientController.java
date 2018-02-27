@@ -123,34 +123,35 @@ public class ClientController implements Service {
         this.messageSenderTable.put(group, mqMessageSender);
     }
 
+    @Override
     public void start() throws ClientException {
-
-        synchronized (this) {
-            switch (this.serviceState) {
-                case NOT_START:
-                    serviceState = ServiceState.STARTING;
-                    try {
-                        doStart();
-                        serviceState = ServiceState.RUNNING;
-                        LOGGER.info("Client start successfully. ");
-                    } catch (Exception e) {
-                        serviceState = ServiceState.FAILED;
-                        if(e instanceof ClientException){
-                            throw (ClientException)e;
-                        }else{
-                            throw new ClientException("Client start exception,", e);
+        if(serviceState != ServiceState.RUNNING){
+            synchronized (this) {
+                switch (this.serviceState) {
+                    case NOT_START:
+                        serviceState = ServiceState.STARTING;
+                        try {
+                            doStart();
+                            serviceState = ServiceState.RUNNING;
+                            LOGGER.info("Client'{}' start successfully. ", clientConfig.getClientId());
+                        } catch (Exception e) {
+                            serviceState = ServiceState.FAILED;
+                            if(e instanceof ClientException){
+                                throw (ClientException)e;
+                            }else{
+                                throw new ClientException("Client start exception,", e);
+                            }
                         }
-                    }
-                    break;
-                case STARTING:
-                case RUNNING:
-                case FAILED:
-                default:
-                    LOGGER.warn("Client start concurrently. Current service state: " + this.serviceState);
-                    break;
+                        break;
+                    case STARTING:
+                    case RUNNING:
+                    case FAILED:
+                    default:
+                        LOGGER.warn("Client start concurrently. Current service state: " + this.serviceState);
+                        break;
+                }
             }
         }
-
     }
 
     private void doStart() throws ClientException{
@@ -187,25 +188,33 @@ public class ClientController implements Service {
     }
 
 
+    @Override
     public void shutdown() {
-        if (this.rpcClient != null) {
-            this.rpcClient.shutdown();
-        }
+        if(this.serviceState != ServiceState.NOT_START){
+            synchronized (this) {
+                if (this.rpcClient != null) {
+                    this.rpcClient.shutdown();
+                }
 
-        if (this.sendMessageExecutor != null) {
-            this.sendMessageExecutor.shutdown();
-        }
+                if (this.sendMessageExecutor != null) {
+                    this.sendMessageExecutor.shutdown();
+                }
 
-        if (this.checkTransactionExecutor != null) {
-            this.checkTransactionExecutor.shutdown();
-        }
+                if (this.checkTransactionExecutor != null) {
+                    this.checkTransactionExecutor.shutdown();
+                }
 
-        if (this.clientRegistry != null){
-            this.clientRegistry.shutdown();
-        }
+                if (this.clientRegistry != null){
+                    this.clientRegistry.shutdown();
+                }
 
-        if (this.scheduledExecutorService != null){
-            this.scheduledExecutorService.shutdown();
+                if (this.scheduledExecutorService != null){
+                    this.scheduledExecutorService.shutdown();
+                }
+
+                this.serviceState = ServiceState.NOT_START;
+                LOGGER.info("Client'{}' shutdown successfully. ", clientConfig.getClientId());
+            }
         }
     }
 

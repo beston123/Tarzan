@@ -27,7 +27,7 @@ BayMax: https://github.com/tongbanjie/baymax
 上传程序包‘tarzan-${version}.tar.gz’到服务器，并解压
 
 ##### 配置  
-- config.properties: 监听端口，服务端Id，服务端权重，zookeeper地址，RocketMQ地址
+- config.properties: 监听端口，数据中心Id，服务端权重，zookeeper地址，RocketMQ地址
 - log4j.properties: 日志配置
 - store.properties: 数据库，Redis配置
 
