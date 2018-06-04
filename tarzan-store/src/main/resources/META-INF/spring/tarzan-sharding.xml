@@ -1,33 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:baymax="http://baymax.tongbanjie.com/schema/baymax-3.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:sharding="http://shardingjdbc.io/schema/shardingjdbc/sharding"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-	                       http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
-	                       http://baymax.tongbanjie.com/schema/baymax-3.0
-	                       http://baymax.tongbanjie.com/schema/baymax-3.0.xsd">
-    <!-- 开启baymax -->
-    <baymax:context />
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context.xsd
+                        http://shardingjdbc.io/schema/shardingjdbc/sharding
+                        http://shardingjdbc.io/schema/shardingjdbc/sharding/sharding.xsd
+                        ">
 
-    <!--  分表配置 -->
-    <baymax:table tableName="tz_message_rocketmq" namePatten="tz_message_rocketmq_{000}">
-        <baymax:columns>
-            <!-- 根据哪个字段分表 -->
-            <baymax:column name="id"/>
-        </baymax:columns>
+    <sharding:standard-strategy id="tableStrategy" sharding-column="id" precise-algorithm-class="com.tongbanjie.tarzan.store.sharding.PreciseTableSharding256_64" />
 
-        <!-- 取最后一位%分表数 作为表后缀 -->
-        <baymax:function class="com.tongbanjie.tarzan.store.sharding.VirtualModFunction256_64"/>
-
-        <!-- 指定 每个数据库上分别有哪些表后缀 -->
-        <baymax:nodeMapping class="com.tongbanjie.baymax.router.strategy.SimpleTableNodeMapping">
-            <!-- p0 代表是一个数据源，与 multipleDataSource 定义的 identity 对应 -->
-            <!-- 这个配置代表的是 p0 数据库存储的表 -->
-            <baymax:node>p0:000,004,008,012,016,020,024,028,032,036,040,044,048,052,056,060,064,068,072,076,080,084,088,092,096,100,104,108,112,116,120,124,128,132,136,140,144,148,152,156,160,164,168,172,176,180,184,188,192,196,200,204,208,212,216,220,224,228,232,236,240,244,248,252</baymax:node>
-
-            <!-- 这个配置代表的是 p1 数据库存储的表 -->
-            <!--baymax:node>p1:000</baymax:node-->
-        </baymax:nodeMapping>
-    </baymax:table>
-
+    <sharding:data-source id="shardingDataSource">
+        <sharding:sharding-rule data-source-names="dataSource" default-data-source-name="dataSource">
+            <sharding:table-rules>
+                <sharding:table-rule logic-table="tz_message_rocketmq" actual-data-nodes="dataSource.tz_message_rocketmq_${['000','004','008','012','016','020','024','028','032','036','040','044','048','052','056','060','064','068','072','076','080','084','088','092','096','100','104','108','112','116','120','124','128','132','136','140','144','148','152','156','160','164','168','172','176','180','184','188','192','196','200','204','208','212','216','220','224','228','232','236','240','244','248','252']}"
+                                     table-strategy-ref="tableStrategy" />
+            </sharding:table-rules>
+        </sharding:sharding-rule>
+        <sharding:props>
+            <prop key="sql.show">true</prop>
+        </sharding:props>
+    </sharding:data-source>
 </beans>

@@ -12,6 +12,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @date 16/12/1
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:META-INF/spring/tarzan-store-context.xml")
+@ContextConfiguration(locations = "classpath:tarzan-test.xml")
 public class BaseTest {
 }

@@ -7,7 +7,7 @@ import com.tongbanjie.tarzan.common.message.RocketMQMessage;
 import com.tongbanjie.tarzan.common.message.TransactionState;
 import com.tongbanjie.tarzan.common.util.DateUtils;
 import com.tongbanjie.tarzan.common.util.DistributedIdGenerator;
-import com.tongbanjie.tarzan.store.dao.RocketMQMessageDAO;
+import com.tongbanjie.tarzan.store.mapper.RocketMQMessageMapper;
 import com.tongbanjie.tarzan.store.query.MQMessageQuery;
 import com.tongbanjie.tarzan.store.service.RocketMQStoreService;
 import org.junit.Before;
@@ -29,7 +29,7 @@ import java.util.List;
 public class RocketMQMessageTest extends BaseTest{
 
     @Resource
-    private RocketMQMessageDAO rocketMQMessageDAO;
+    private RocketMQMessageMapper rocketMQMessageDAO;
 
     @Resource
     private RocketMQStoreService rocketMQStoreService;
@@ -66,11 +66,11 @@ public class RocketMQMessageTest extends BaseTest{
     @Test
     public void selectByPrimaryKeys(){
         List<Long> ids = new ArrayList<Long>(5);
-        ids.add(6542728632467544L);
-        ids.add(6542728625127467L);
-        ids.add(6542728595767305L);
-        ids.add(6542728578990108L);
-        ids.add(6542728532852767L);
+        ids.add(5310854761283584L);
+        ids.add(5310853702221831L);
+        ids.add(5310852354801710L);
+        ids.add(5310853472583766L);
+        ids.add(5310853389746317L);
         List<RocketMQMessage> list = rocketMQMessageDAO.selectByPrimaryKeys(ids);
         Assert.isTrue(list.size() == ids.size());
     }
@@ -79,7 +79,7 @@ public class RocketMQMessageTest extends BaseTest{
     public void selectByCondition() throws ParseException {
         MQMessageQuery messageQuery = new MQMessageQuery();
         messageQuery.setCreateTimeFromInclude(DateUtils.tryParse("2017-01-09 11:40:50"));
-        messageQuery.setCreateTimeToExclude(DateUtils.tryParse("2017-01-29 11:40:51"));
+        messageQuery.setCreateTimeToExclude(DateUtils.tryParse("2017-02-29 11:40:51"));
         messageQuery.setPagingParam(new PagingParam(5));
         List<RocketMQMessage> list = rocketMQMessageDAO.selectByCondition(messageQuery);
         for(RocketMQMessage mqMessage : list){

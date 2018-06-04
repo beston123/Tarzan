@@ -58,41 +58,19 @@
         </property>
     </bean>
 
-    <!-- 分表分库数据源 -->
-    <bean id="shardingDataSource" class="com.tongbanjie.baymax.datasource.BaymaxDataSource" init-method="init">
-        <property name="dataSourceGroupSet">
-            <set>
-                <bean class="com.tongbanjie.baymax.datasource.DataSourceGroup">
-                    <property name="identity" value="p0"/>
-                    <property name="targetDataSource" ref="dataSource"/>
-                </bean>
-                <!--bean class="com.tongbanjie.baymax.datasource.DataSourceGroup">
-                    <property name="identity" value="p1"/>
-                    <property name="targetDataSource" ref="dataSource_p1"/>
-                </bean-->
-            </set>
-        </property>
-    </bean>
 
     <!-- 事务管理器 -->
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="dataSource" />
+        <property name="dataSource" ref="shardingDataSource" />
     </bean>
 
     <tx:annotation-driven transaction-manager="transactionManager"/>
-
-    <!-- 分表分库SqlSessionFactory，mybatis文件配置，扫描所有mapper文件，同时指定数据源 -->
-    <bean id="shardingSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-        <property name="configLocation" value="classpath:META-INF/mybatis/mybatis-configuration.xml" />
-        <property name="mapperLocations" value="classpath*:META-INF/mybatis/mapper/sharding/*.xml" />
-        <property name="dataSource" ref="shardingDataSource" />
-    </bean>
 
     <!-- SqlSessionFactory，mybatis文件配置，扫描所有mapper文件，同时指定数据源 -->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="configLocation" value="classpath:META-INF/mybatis/mybatis-configuration.xml" />
         <property name="mapperLocations" value="classpath*:META-INF/mybatis/mapper/*.xml" />
-        <property name="dataSource" ref="dataSource" />
+        <property name="dataSource" ref="shardingDataSource" />
     </bean>
 
     <!-- 自动扫描Dao -->

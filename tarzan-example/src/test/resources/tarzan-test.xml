@@ -14,7 +14,7 @@
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
         <property name="locations">
             <list>
-                <value>file:${TARZAN_HOME}/conf/store.properties</value>
+                <value>classpath*:test.properties</value>
             </list>
         </property>
     </bean>

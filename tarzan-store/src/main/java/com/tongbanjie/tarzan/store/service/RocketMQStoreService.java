@@ -1,6 +1,6 @@
 package com.tongbanjie.tarzan.store.service;
 
-import com.tongbanjie.tarzan.store.dao.RocketMQMessageDAO;
+import com.tongbanjie.tarzan.store.mapper.RocketMQMessageMapper;
 import com.tongbanjie.tarzan.store.query.ToSendMessageQuery;
 import com.tongbanjie.tarzan.common.FailResult;
 import com.tongbanjie.tarzan.common.message.MQType;
@@ -36,7 +36,7 @@ public class RocketMQStoreService implements StoreService<RocketMQMessage> {
     private static final List<RocketMQMessage> EMPTY_LIST = Collections.unmodifiableList(new ArrayList<RocketMQMessage>(0));
 
     @Resource
-    private RocketMQMessageDAO rocketMQMessageDAO;
+    private RocketMQMessageMapper rocketMQMessageDAO;
 
     @Resource
     private ToCheckMessageService toCheckMessageService;

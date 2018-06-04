@@ -1,4 +1,4 @@
-package com.tongbanjie.tarzan.store.dao;
+package com.tongbanjie.tarzan.store.mapper;
 
 import com.tongbanjie.tarzan.common.message.RocketMQMessage;
 import com.tongbanjie.tarzan.store.query.MQMessageQuery;
@@ -13,7 +13,7 @@ import java.util.List;
  * @author zixiao
  * @date 16/10/26
  */
-public interface RocketMQMessageDAO {
+public interface RocketMQMessageMapper {
 
     /**
      * 按主键查询

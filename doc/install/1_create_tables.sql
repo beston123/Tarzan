@@ -96,1136 +96,128 @@ CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_000` (
   INDEX `CREATE_TIME` (`create_time` ASC))
   ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_004` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_004` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_008` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_008` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_012` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_012` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_016` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_016` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_020` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_020` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_024` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_024` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_028` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_028` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_032` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_032` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_036` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_036` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_040` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_040` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_044` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_044` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_048` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_048` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_052` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_052` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_056` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_056` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_060` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_060` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_064` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_064` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_068` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_068` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_072` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_072` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_076` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_076` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_080` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_080` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_084` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_084` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_088` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_088` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_092` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_092` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_096` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_096` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_100` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_100` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_104` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_104` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_108` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_108` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_112` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_112` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_116` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_116` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_120` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_120` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_124` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_124` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_128` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_128` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_132` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_132` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_136` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_136` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_140` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_140` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_144` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_144` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_148` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_148` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_152` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_152` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_156` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_156` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_160` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_160` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_164` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_164` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_168` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_168` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_172` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_172` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_176` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_176` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_180` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_180` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_184` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_184` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_188` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_188` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_192` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_192` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_196` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_196` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_200` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_200` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_204` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_204` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_208` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_208` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_212` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_212` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_216` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_216` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_220` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_220` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_224` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_224` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_228` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_228` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_232` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_232` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_236` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_236` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_240` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_240` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_244` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_244` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_248` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_248` LIKE `tarzan`.`tz_message_rocketmq_000`;
 
-CREATE TABLE IF NOT EXISTS `tarzan`.`tz_message_rocketmq_252` (
-  `id` BIGINT(20) NOT NULL COMMENT '主键Id',
-  `message_key` VARCHAR(60) NOT NULL COMMENT '消息key',
-  `topic` VARCHAR(60) NOT NULL COMMENT '消息topic',
-  `producer_group` VARCHAR(60) NOT NULL COMMENT '生产者group',
-  `transaction_state` TINYINT(2) NOT NULL COMMENT '事务状态',
-  `send_status` TINYINT(4) NOT NULL DEFAULT '0' COMMENT '发送状态',
-  `has_aggregated` TINYINT(1) NOT NULL COMMENT '是否被汇总',
-  `message_id` VARCHAR(45) NULL DEFAULT NULL COMMENT 'mq消息Id',
-  `message_body` VARBINARY(8000) NULL DEFAULT NULL COMMENT '消息内容',
-  `create_time` DATETIME NOT NULL COMMENT '创建时间',
-  `modify_time` DATETIME NOT NULL COMMENT '修改时间',
-  `tags` VARCHAR(60) NULL DEFAULT NULL COMMENT '消息tags',
-  PRIMARY KEY (`id`),
-  INDEX `MSG_KEY` (`message_key` ASC),
-  INDEX `CREATE_TIME` (`create_time` ASC))
-  ENGINE = InnoDB DEFAULT CHARACTER SET = utf8 COMMENT = '消息数据表[RocketMQ]';
+CREATE TABLE `tarzan`.`tz_message_rocketmq_252` LIKE `tarzan`.`tz_message_rocketmq_000`;

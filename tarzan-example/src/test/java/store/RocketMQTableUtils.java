@@ -1,8 +1,7 @@
 package store;
 
-import com.tongbanjie.tarzan.store.sharding.BaymaxSharding;
-import com.tongbanjie.tarzan.store.sharding.VirtualModFunction256_16;
-import com.tongbanjie.tarzan.store.sharding.VirtualModFunction256_64;
+import com.tongbanjie.tarzan.store.sharding.TableShardingTool;
+import com.tongbanjie.tarzan.store.sharding.VirtualTableSharding;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,11 +14,11 @@ import org.junit.Test;
  */
 public class RocketMQTableUtils {
 
-    private BaymaxSharding sharding;
+    private TableShardingTool sharding;
 
     @Before
     public void init(){
-        sharding = new BaymaxSharding(256, 64, "tz_message_rocketmq", new VirtualModFunction256_64());
+        sharding = new TableShardingTool(new VirtualTableSharding(256, 64), "tz_message_rocketmq");
     }
 
     @Test
