@@ -6,6 +6,7 @@ import com.tongbanjie.tarzan.registry.RegistryType;
 import com.tongbanjie.tarzan.registry.ServerAddress;
 import com.tongbanjie.tarzan.registry.ServerRegistry;
 import org.I0Itec.zkclient.IZkChildListener;
+import org.I0Itec.zkclient.exception.ZkNodeExistsException;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.*;
@@ -116,20 +117,26 @@ public class ServerZooKeeperRegistry extends AbstractZooKeeperRegistry implement
      * @return
      */
     private int tryGetServerId(Address address, int minId, int maxId){
+        if(!zkClient.exists(ZkConstants.SERVER_IDS_ROOT)){
+            zkClient.createPersistent(ZkConstants.SERVER_IDS_ROOT, true);
+        }
         for(int id=minId; id<=maxId; id++){
             String path = ZkConstants.SERVER_IDS_ROOT + ZkConstants.PATH_SEPARATOR + id;
             //a、id没有被使用，则直接占用
             if(!zkClient.exists(path)){
-                if(!zkClient.exists(ZkConstants.SERVER_IDS_ROOT)){
-                    zkClient.createPersistent(ZkConstants.SERVER_IDS_ROOT);
-                }
                 ((ServerAddress) address).setServerId(id);
-                zkClient.createPersistent(path, address);
-                return id;
+                try {
+                    zkClient.createPersistent(path, address);
+                    return id;
+                } catch (ZkNodeExistsException e) {
+                    //id has been occupied by another node
+                    continue;
+                }
             }
-            Address existedAddress = zkClient.readData(path, true);
+
             //b、存在且是自身IP，则返回成功
-            if(existedAddress != null && address.getAddress().equals(existedAddress.getAddress())){
+            Address existedAddress = zkClient.readData(path, true);
+            if (existedAddress != null && address.getAddress().equals(existedAddress.getAddress())){
                 return id;
             }
         }

@@ -1,14 +1,23 @@
 package registry;
 
 import com.tongbanjie.tarzan.registry.Address;
+import com.tongbanjie.tarzan.registry.ServerAddress;
+import com.tongbanjie.tarzan.registry.ServerRegistry;
+import com.tongbanjie.tarzan.registry.zookeeper.ServerZooKeeperRegistry;
 import com.tongbanjie.tarzan.registry.zookeeper.ZkConstants;
 import org.I0Itec.zkclient.ZkClient;
+import org.apache.log4j.PropertyConfigurator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * ServerRegistryTest <p>
@@ -23,6 +32,7 @@ public class ServerRegistryTest {
 
     @Before
     public void init(){
+        PropertyConfigurator.configure("log4j.properties");
         zkClient = new ZkClient("zk.tbj.com:2181",
                 ZkConstants.SESSION_TIMEOUT, ZkConstants.CONNECTION_TIMEOUT);
     }
@@ -77,5 +87,27 @@ public class ServerRegistryTest {
         }
     }
 
+    @Test
+    public void register() throws Exception {
+        List<ServerRegistry> registries = new ArrayList<ServerRegistry>();
+        for(int i=0; i<10; i++){
+            ServerRegistry registry = new ServerZooKeeperRegistry("zk.tbj.com:2181");
+            registry.start();
+            registries.add(registry);
+        }
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        final AtomicInteger port = new AtomicInteger(2000);
+        for (final ServerRegistry registry : registries){
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    registry.registerServer(new ServerAddress("127.0.0.1", port.addAndGet(1)), 0, 32);
+                    System.out.println("isMaster:"+registry.isMaster());
+                }
+            });
+        }
+        executorService.shutdown();
+        executorService.awaitTermination(60, TimeUnit.SECONDS);
+    }
 
 }
