@@ -98,8 +98,23 @@ public class IdWorker {
         long timestamp = timeGen();
 
         if (timestamp < lastTimestamp) {
-            LOG.error(String.format("clock is moving backwards.  Rejecting requests until %d.", lastTimestamp));
-            throw new RuntimeException(String.format("Clock moved backwards.  Refusing to generate id for %d milliseconds", lastTimestamp - timestamp));
+            long offset = lastTimestamp - timestamp;
+            //时间偏差<=20ms，则等待2倍时间
+            if(offset <= 20){
+                try {
+                    wait(offset<<1);
+                    timestamp = timeGen();
+                    if (timestamp < lastTimestamp) {
+                        //还是小于，抛异常并上报
+                        throw new RuntimeException("Clock moved backwards >20ms consecutively.");
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }else{
+                LOG.error(String.format("clock is moving backwards. Rejecting requests until %d.", lastTimestamp));
+                throw new RuntimeException(String.format("Clock moved backwards. Refusing to generate id for %d ms.", lastTimestamp - timestamp));
+            }
         }
 
         if (lastTimestamp == timestamp) {
