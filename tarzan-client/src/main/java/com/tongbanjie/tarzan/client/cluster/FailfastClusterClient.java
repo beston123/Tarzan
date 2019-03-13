@@ -43,7 +43,7 @@ public class FailfastClusterClient extends ClusterClient{
             throws InterruptedException, RpcConnectException, RpcTooMuchRequestException, RpcTimeoutException, RpcSendRequestException {
         try {
             Address address = select(targetList);
-            doInvokeSync(timeoutMillis, address, arg);
+            doInvokeAsync(timeoutMillis, address, arg, callback);
         } catch (RpcConnectException e) {
             throw e;
         }
