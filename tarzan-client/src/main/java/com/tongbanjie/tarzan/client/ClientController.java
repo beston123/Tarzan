@@ -4,6 +4,8 @@ import com.tongbanjie.tarzan.client.cluster.ClusterClient;
 import com.tongbanjie.tarzan.client.cluster.FailoverClusterClient;
 import com.tongbanjie.tarzan.client.processer.ServerRequestProcessor;
 import com.tongbanjie.tarzan.client.sender.MQMessageSender;
+import com.tongbanjie.tarzan.cluster.loadbalance.LoadBalance;
+import com.tongbanjie.tarzan.cluster.loadbalance.LoadBalanceFactory;
 import com.tongbanjie.tarzan.common.Service;
 import com.tongbanjie.tarzan.common.ServiceState;
 import com.tongbanjie.tarzan.common.util.NamedSingleThreadFactory;
@@ -11,9 +13,6 @@ import com.tongbanjie.tarzan.common.util.NamedThreadFactory;
 import com.tongbanjie.tarzan.registry.Address;
 import com.tongbanjie.tarzan.registry.ClientAddress;
 import com.tongbanjie.tarzan.registry.RecoverableRegistry;
-import com.tongbanjie.tarzan.cluster.loadbalance.LoadBalance;
-import com.tongbanjie.tarzan.cluster.loadbalance.LoadBalanceFactory;
-import com.tongbanjie.tarzan.cluster.loadbalance.LoadBalanceStrategy;
 import com.tongbanjie.tarzan.registry.zookeeper.ClientZooKeeperRegistry;
 import com.tongbanjie.tarzan.rpc.RpcClient;
 import com.tongbanjie.tarzan.rpc.netty.NettyClientConfig;
@@ -91,7 +90,7 @@ public class ClientController implements Service {
         this.clusterClient = new FailoverClusterClient(new ThreadLocal<LoadBalance<Address>>(){
             @Override
             protected LoadBalance<Address> initialValue() {
-                return LoadBalanceFactory.getLoadBalance(LoadBalanceStrategy.WeightedRandom);
+                return LoadBalanceFactory.get();
             }
         }, this.rpcClient, this.clientRegistry);
 

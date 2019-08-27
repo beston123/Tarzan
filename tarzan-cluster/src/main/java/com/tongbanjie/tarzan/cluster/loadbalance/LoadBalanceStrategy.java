@@ -9,8 +9,8 @@ package com.tongbanjie.tarzan.cluster.loadbalance;
  */
 public enum  LoadBalanceStrategy {
 
-    Random,
-    RoundRobin,
-    WeightedRandom,
-    WeightedRoundRobin
+    random,
+    roundRobin,
+    weightedRandom,
+    weightedRoundRobin
 }

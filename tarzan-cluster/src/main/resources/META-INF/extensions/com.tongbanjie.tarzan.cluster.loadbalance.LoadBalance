@@ -1,0 +1,4 @@
+random=com.tongbanjie.tarzan.cluster.loadbalance.RandomLoadBalance
+roundRobin=com.tongbanjie.tarzan.cluster.loadbalance.RoundRobinLoadBalance
+weightedRandom=com.tongbanjie.tarzan.cluster.loadbalance.WeightedRandomLoadBalance
+weightedRoundRobin=com.tongbanjie.tarzan.cluster.loadbalance.WeightedRoundRobinLoadBalance

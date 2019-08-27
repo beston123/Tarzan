@@ -1,10 +1,10 @@
 package com.tongbanjie.tarzan.cluster.loadbalance;
 
 import com.tongbanjie.tarzan.common.Weighable;
+import com.tongbanjie.tarzan.common.util.ThreadLocalRandom;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 基于［随机算法］的负载均衡<p>
@@ -14,8 +14,6 @@ import java.util.Random;
  * @date 16/10/18
  */
 public class RandomLoadBalance<T extends Weighable> extends AbstractLoadBalance<T>{
-
-    private final Random random = new Random();
 
     @Override
     public T select(List<T> list) {
@@ -34,7 +32,7 @@ public class RandomLoadBalance<T extends Weighable> extends AbstractLoadBalance<
             lastSelected = list.get(0).equals(lastSelected) ? list.get(1) : list.get(0);
         }else{
             //随机
-            lastSelected = list.get(random.nextInt(size));
+            lastSelected = list.get(ThreadLocalRandom.current().nextInt(size));
         }
         return lastSelected;
     }

@@ -1,6 +1,7 @@
 package com.tongbanjie.tarzan.cluster.loadbalance;
 
 import com.tongbanjie.tarzan.common.Weighable;
+import com.tongbanjie.tarzan.common.extension.ExtensionLoader;
 
 import java.util.ArrayList;
 
@@ -13,30 +14,18 @@ import java.util.ArrayList;
  */
 public class LoadBalanceFactory {
 
-    public static LoadBalance getLoadBalance(LoadBalanceStrategy strategy){
-        LoadBalance loadBalance = null;
-        switch (strategy){
-            case Random:
-                loadBalance = new RandomLoadBalance();
-                break;
-            case RoundRobin:
-                loadBalance = new RoundRobinLoadBalance();
-                break;
-            case WeightedRandom:
-                loadBalance = new WeightedRandomLoadBalance();
-                break;
-            case WeightedRoundRobin:
-                loadBalance = new WeightedRoundRobinLoadBalance();
-                break;
-            default:
-                loadBalance = new RandomLoadBalance();
-                break;
-        }
-        return loadBalance;
+    private static ExtensionLoader<LoadBalance> extensionLoader = ExtensionLoader.load(LoadBalance.class);
+
+    public static LoadBalance get(){
+        return extensionLoader.get();
+    }
+
+    private static LoadBalance get(String name){
+        return extensionLoader.find(name);
     }
 
     public static void main(String[] args) {
-        LoadBalance<Weighable> addressLoadBalance = LoadBalanceFactory.getLoadBalance(LoadBalanceStrategy.Random);
+        LoadBalance<Weighable> addressLoadBalance = get();
         addressLoadBalance.select(new ArrayList<Weighable>());
     }
 

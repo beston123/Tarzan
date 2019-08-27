@@ -1,6 +1,7 @@
 package com.tongbanjie.tarzan.cluster.loadbalance;
 
 import com.tongbanjie.tarzan.common.Weighable;
+import com.tongbanjie.tarzan.common.extension.SPI;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ import java.util.List;
  * @author zixiao
  * @date 16/10/18
  */
+@SPI("weightedRandom")
 public interface LoadBalance<T extends Weighable> {
 
     T select(List<T> list);
