@@ -21,7 +21,7 @@
 
         <version.spring>3.2.8.RELEASE</version.spring>
 
-        <version.netty>4.1.5.Final</version.netty>
+        <version.netty>4.1.42.Final</version.netty>
 
         <version.zookeeper>3.4.8</version.zookeeper>
         <version.zkclient>0.8</version.zkclient>
