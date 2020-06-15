@@ -27,7 +27,7 @@
         <version.zkclient>0.8</version.zkclient>
 
         <version.commons-lang>3.3.2</version.commons-lang>
-        <version.commons-collections>4.0</version.commons-collections>
+        <version.commons-collections>4.1</version.commons-collections>
 
         <version.fluent-validator>1.0.5</version.fluent-validator>
 
