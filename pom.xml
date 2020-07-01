@@ -43,7 +43,7 @@
 
         <version.mybatis>3.2.5</version.mybatis>
         <version.mybatis-spring>1.2.2</version.mybatis-spring>
-        <version.mysql-connector-java>5.1.18</version.mysql-connector-java>
+        <version.mysql-connector-java>8.0.16</version.mysql-connector-java>
         <version.druid>1.0.14</version.druid>
         <version.jedis>2.8.2</version.jedis>
         <version.sharding-jdbc-core>2.0.3</version.sharding-jdbc-core>
