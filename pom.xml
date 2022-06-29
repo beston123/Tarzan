@@ -23,7 +23,7 @@
 
         <version.netty>4.1.5.Final</version.netty>
 
-        <version.zookeeper>3.4.8</version.zookeeper>
+        <version.zookeeper>3.4.14</version.zookeeper>
         <version.zkclient>0.8</version.zkclient>
 
         <version.commons-lang>3.3.2</version.commons-lang>
